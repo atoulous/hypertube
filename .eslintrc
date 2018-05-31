@@ -1,0 +1,27 @@
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "rules": {
+    "react/jsx-filename-extension": 0,
+    "function-paren-newline": 0,
+    "object-curly-newline": 0
+  },
+  "globals": {
+    "document": true,
+    "describe": true,
+    "it": true,
+    "before": true,
+    "beforeEach": true,
+    "after": true,
+    "afterEach": true,
+    "fetch": true,
+    "localStorage": true,
+    "testEndpoint": true,
+    "window": true,
+    "Worker": true,
+    "onmessage": true,
+    "onerror": true,
+    "close": true,
+    "postMessage": true
+  }
+}

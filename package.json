@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start-client": "cd client && yarn start",
-    "start-server": "nodemon --exec babel-node server",
+    "start-server": "nodemon --exec babel-node --ignore client server",
     "start-dev": "concurrently --kill-others-on-fail 'yarn start-server' 'yarn start-client'"
   },
   "dependencies": {
