@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import logo from '../../logo.svg';
-import './Home.css';
+import './Home.scss';
 
 class Home extends Component {
   state = {
