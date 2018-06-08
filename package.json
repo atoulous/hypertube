@@ -2,9 +2,9 @@
   "name": "hypertube",
   "version": "1.0.0",
   "scripts": {
-    "start-client": "cd client && yarn start",
+    "start-client": "cd client && npm run start",
     "start-server": "nodemon --exec babel-node --ignore client server",
-    "start-dev": "concurrently --kill-others-on-fail 'yarn start-server' 'yarn start-client'"
+    "start-dev": "concurrently --kill-others-on-fail 'npm run start-server' 'npm run start-client'"
   },
   "dependencies": {
     "express": "^4.16.2"
