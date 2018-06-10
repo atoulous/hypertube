@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import logo from '../../logo.svg';
 import './Home.scss';
 
 class Home extends Component {
@@ -15,6 +14,7 @@ class Home extends Component {
       .catch(err => console.log(err));
   }
 
+
   callApi = async () => {
     const response = await fetch('/api/hello');
     const body = await response.json();
@@ -27,12 +27,7 @@ class Home extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">{this.state.response}</p>
-        <br />
+        <h1>{this.state.response}</h1>
         <Link to="/library">Go to library</Link>
       </div>
     );

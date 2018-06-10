@@ -1,11 +1,23 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+
+import Grid from '@material-ui/core/Grid';
+
+import CardMovie from '../CardMovie';
 
 const Library = () => (
   <div>
-    here there will be our library
-    <br />
-    <Link to="/">Go back home</Link>
+    <h1>Library</h1>
+    <Grid container spacing={24}>
+      <Grid item xs={6} sm={3}>
+        <CardMovie />
+      </Grid>
+      <Grid item xs={6} sm={3}>
+        <CardMovie />
+      </Grid>
+      <Grid item xs={6} sm={3}>
+        <CardMovie />
+      </Grid>
+    </Grid>
   </div>
 );
 
