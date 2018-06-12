@@ -12,7 +12,12 @@
   "dependencies": {
     "express": "^4.16.3",
     "fluent-ffmpeg": "^2.1.2",
+    "htmlparser2": "^3.9.2",
     "mongoose": "^5.1.5",
+    "moviedb": "^0.2.10",
+    "parse5": "^5.0.0",
+    "request": "^2.87.0",
+    "thepiratebay": "^1.4.7",
     "torrent-stream": "^1.0.4"
   }
 }
