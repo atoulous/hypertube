@@ -4,6 +4,7 @@ const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs')
 const torrentStream = require('torrent-stream')
 const Media = require('../models/Media')
+const config = require('../config')
 
 const downloadTorrent = async (media) => {
 	return new Promise(async (resolve, reject) => {
@@ -53,7 +54,7 @@ async function startTranscode(inputStream, media) {
 			.addOption('-hls_time', 2)
 			.addOption('-hls_playlist_type', 'vod')
 			.addOption('-start_number', '0')
-			.addOption('-hls_base_url', 'http://127.0.0.1:1221/' + media._id + '/')
+			.addOption('-hls_base_url', 'http://127.0.0.1:' + config.port + '/' + media._id + '/')
 			.addOption('-hls_list_size', 0)
 			.addOption('-f', 'hls')
 			.on('start', (command) => {
