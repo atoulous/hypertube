@@ -1,0 +1,41 @@
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<h1>List of media</h1>
+<div class='mList'></div>
+
+
+<h1>Video</h1>
+<video id="video" width="400" height="400" controls></video>
+
+
+<script>
+	let vid = null
+
+	$.get('http://127.0.0.1:1221/media', (res) => {
+		res.forEach((el) => {
+			$('.mList').html('<a href="#" class="startMedia" data-vid="' + el._id + '">Media</a><br />' + $('.mList').html())
+		})
+	})
+
+	$(document).on('click', '.startMedia', (event) => {
+		vid = $(event.target).data('vid')
+
+		console.log('Sending request...')
+		$.get('http://127.0.0.1:1221/startmedia/' + vid, () => {
+			console.log('Request is back, media is ready, starting playback')
+
+
+			var video = document.getElementById('video');
+			if(Hls.isSupported()) {
+				var hls = new Hls({startPosition : 0});
+				hls.loadSource('http://127.0.0.1:1221/' + vid + '/stream.m3u8');
+				hls.attachMedia(video);
+				hls.on(Hls.Events.MANIFEST_PARSED,function() {
+					video.play();
+				})
+			}
+
+		})
+	})
+</script>
