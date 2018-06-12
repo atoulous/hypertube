@@ -1,7 +1,6 @@
 import express from 'express';
 
 import config from './config';
-import router from './routes';
 import mediaRoutes from './routes/media'
 
 const app = express();
