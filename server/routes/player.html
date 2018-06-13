@@ -7,25 +7,29 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-<h1>List of media</h1>
-<div class='mList'></div>
-
-
-<h1>Video</h1>
 <video id="video" width="400" height="400" controls></video>
+<div class="loading">
+	<h1>Your video is loading. Please wait, this may take up to 30s...</h1>
+</div>
 
+<div class='mList'></div>
 
 <script>
 	let vid = null
 
 	$.get('http://127.0.0.1:5000/media', (res) => {
 		res.forEach((el) => {
-			$('.mList').html('<a href="#" class="startMedia" data-vid="' + el._id + '">Media</a><br />' + $('.mList').html())
+			if (el.metadatas)
+				$('.mList').html('<a href="#" class="startMedia"><img data-vid="' + el._id + '" width=185 align="left" src="http://image.tmdb.org/t/p/w185//' + el.metadatas.posterPath + '" style="display:inline;"/></a><br />' + $('.mList').html())
 		})
 	})
 
+	$('video').hide()
+	$('.loading').hide()
 	$(document).on('click', '.startMedia', (event) => {
 		vid = $(event.target).data('vid')
+		$('video').hide()
+		$('.loading').show()
 
 		console.log('Sending request...')
 		$.get('http://127.0.0.1:5000/startmedia/' + vid, () => {
@@ -39,6 +43,8 @@
 				hls.attachMedia(video);
 				hls.on(Hls.Events.MANIFEST_PARSED,function() {
 					video.play();
+					$('video').show()
+					$('.loading').hide()
 				})
 			}
 
