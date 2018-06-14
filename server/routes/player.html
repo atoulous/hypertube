@@ -15,12 +15,13 @@
 <div class='mList'></div>
 
 <script>
+let video = null
 	let vid = null
+	let hls = null
 
 	$.get('http://127.0.0.1:5000/media', (res) => {
 		res.forEach((el) => {
-			if (el.metadatas)
-				$('.mList').html('<a href="#" class="startMedia"><img data-vid="' + el._id + '" width=185 align="left" src="http://image.tmdb.org/t/p/w185//' + el.metadatas.posterPath + '" style="display:inline;"/></a><br />' + $('.mList').html())
+			$('.mList').html('<a href="#" class="startMedia" data-vid="' + el._id + '">' + el._id + ' ' + el.displayName + '</a><br />' + $('.mList').html())
 		})
 	})
 
@@ -36,13 +37,15 @@
 			console.log('Request is back, media is ready, starting playback')
 
 
-			var video = document.getElementById('video');
+			video = document.getElementById('video');
 			if(Hls.isSupported()) {
-				var hls = new Hls({startPosition : 0});
-				hls.loadSource('http://127.0.0.1:5000/' + vid + '/stream.m3u8');
+				hls = new Hls({startPosition : 0});
+				hls.loadSource('http://127.0.0.1:5000/' + vid + '/master.m3u8');
 				hls.attachMedia(video);
 				hls.on(Hls.Events.MANIFEST_PARSED,function() {
-					video.play();
+					if (hls.subtitleTracks.length !== 0) {
+						hls.subtitleDisplay = true
+					}
 					$('video').show()
 					$('.loading').hide()
 				})
