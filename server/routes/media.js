@@ -34,7 +34,6 @@ const serveWhenAvailable = async (res, filePath) => {
 	if (fs.existsSync(filePath)) {
 		return res.status(200).end(fs.readFileSync(filePath))
 	} else {
-		console.log(filePath, 'does not exist.')
 		setTimeout(() => {
 			return serveWhenAvailable(res, filePath)
 		}, 1000)
@@ -42,7 +41,18 @@ const serveWhenAvailable = async (res, filePath) => {
 }
 router.get('/:mid/*.m3u8', (req, res) => {
 	res.set('Content-type', 'application/x-mpegURL')
-	const filePath = __dirname + '/../controllers/streams/' + req.params.mid + '/ps.m3u8'
+	const filePath = __dirname + '/../controllers/streams' + req.originalUrl
+	serveWhenAvailable(res, filePath)
+})
+router.get('/:mid/stream_vtt.m3u8', (req, res) => {
+	res.set('Content-type', 'application/x-mpegURL')
+	const filePath = __dirname + '/../controllers/streams' + req.originalUrl
+	serveWhenAvailable(res, filePath)
+})
+
+router.get('/:mid/*.vtt', (req, res) => {
+	const filePath = __dirname + '/../controllers/streams' + req.originalUrl
+	res.set('Content-type', 'application/octet-stream')
 	serveWhenAvailable(res, filePath)
 })
 router.get('/:mid/*.ts', (req, res) => {
@@ -50,6 +60,9 @@ router.get('/:mid/*.ts', (req, res) => {
 	res.set('Content-type', 'application/octet-stream')
 	serveWhenAvailable(res, filePath)
 })
+
+
+
 
 router.get('/play/:id', (req, res) => {
 	res.sendFile(__dirname + '/player.html')
