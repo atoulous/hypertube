@@ -4,10 +4,17 @@ const ThePirateBay = require('./ThePirateBay'),
 	config = require('../config')
 
 const crawl = () => {
-	console.log('Started the crawling process')
-	ThePirateBay.crawl().catch((err) => {
-		console.log(err)
-	})
+	try {
+		console.log('Started the crawling process')
+		ThePirateBay.crawl(201, 'movie')
+			.then(ThePirateBay.crawl(205, 'show'))
+			.catch((err) => {
+				console.log(err)
+			})
+	} catch(e) {
+		console.log(e)
+	}
+
 }
 
 const startCrawling = () => {

@@ -108,12 +108,12 @@ const getMediaMetadata = (mediaName) => {
 	})
 }
 
-const crawl = async () => {
+const crawl = async (category, categoryName) => {
 	return new Promise(async (resolve, reject) => {
-		console.log('[Crawler - ThePirateBay]', 'Start')
+		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
 			const mirror = await selectMirror()
-			const html = await downloadHtml(mirror, '/top/200')
+			const html = await downloadHtml(mirror, '/top/' + category)
 			const torrents = await parseHtml(html)
 
 			let i = 0
@@ -133,6 +133,7 @@ const crawl = async () => {
 					magnet: torrent.magnet,
 					status: 'listed',
 					source: 'ThePirateBay',
+					mediaType: categoryName,
 					seeders: torrent.seeders,
 					leechers: torrent.leechers,
 					metadatas: metadatas
