@@ -12,39 +12,26 @@ const delay = async (ms) => {
 }
 
 // Determines the length of the media, in decimal seconds
-async function getMediaLength(magnet) {
+async function getMediaLength(targetFilename) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			console.log('GetMediaLength()')
-			const engine = torrentStream(magnet)
-			engine.on('ready', async () => {
-				engine.files.sort((a, b) => a.length < b.length)
-				const fileName = engine.files[0].name
-				const filePath = __dirname + '/streams/' + fileName
-
-				console.log('GetMediaLength', 'torrent engine ready, selected file is', fileName)
-				const readStream = engine.files[0].createReadStream()
-				const writeStream = fs.createWriteStream(filePath)
-				readStream.pipe(writeStream)
-
-				const checkProbe = async () => {
-					console.log('GetMediaLength', 'Checking probe status')
-					ffprobe(filePath, async (err, probeData) => {
-						if (err) {
-							console.log('GetMediaLength', 'Probe failed. Retrying in 2000ms')
-							setTimeout(checkProbe, 2000)
-							return
-						}
-						console.log('GetMediaLength', 'Probe succeeded. Media length is', probeData.format.duration)
-						fs.unlinkSync(filePath)
-						engine.destroy(() => {
-							console.log('GetMediaLength', 'Engine destroyed. Resolving')
-							return resolve(probeData.format.duration)
-						})
+			const checkProbe = async () => {
+				console.log('GetMediaLength', 'Checking probe status')
+				ffprobe(targetFilename, async (err, probeData) => {
+					if (err) {
+						console.log('GetMediaLength', 'Probe failed. Retrying in 2000ms')
+						setTimeout(checkProbe, 2000)
+						return
+					}
+					console.log('GetMediaLength', 'Probe succeeded. Media length is', probeData.format.duration)
+					fs.unlinkSync(filePath)
+					engine.destroy(() => {
+						console.log('GetMediaLength', 'Engine destroyed. Resolving')
+						return resolve(probeData.format.duration)
 					})
-				}
-				setTimeout(checkProbe, 2000)
-			})
+				})
+			}
+			setTimeout(checkProbe, 2000)
 		} catch (e) {
 			return reject(e)
 		}
@@ -57,13 +44,18 @@ async function startTorrent(magnet) {
 		try {
 			console.log('startTorrent()')
 			const engine = torrentStream(magnet)
+			console.log(magnet)
 			engine.on('ready', async () => {
 				engine.files.sort((a, b) => a.length < b.length)
+				const targetFilename = __dirname + '/streams/' + media._id + '/' + engine.files[0].name
 
 				console.log('startTorrent', 'torrent engine ready, selected file is', engine.files[0].name)
 				const readStream = engine.files[0].createReadStream()
-				console.log('startTorrent', 'Stream openned, resolving')
-				return resolve(readStream)
+				const writeStream = fs.createWriteStream(targetFilename)
+				readStream.pipe(writeStream)
+
+				console.log('startTorrent', 'Stream openned, resolving, file is', targetFilename)
+				return resolve(targetFilename)
 			})
 		} catch (e) {
 			return reject(e)
@@ -106,12 +98,12 @@ async function generateMasterPlaylist(duration, media) {
 }
 
 // Transcodes the stream into an HLS playlist
-async function startTranscode(inputStream, media) {
+async function startTranscode(filename, media, piece) {
 	return new Promise((resolve, reject) => {
 		try {
-			console.log('Transcoding started')
+			console.log('Transcoding started for job #', media._id, '@', piece)
 
-			ffmpeg(inputStream)
+			ffmpeg(filename)
 			// Use the original video codec
 			.videoCodec('copy')
 			// Use 64k AAC for the audio
@@ -123,7 +115,7 @@ async function startTranscode(inputStream, media) {
 			// Set to VOD, allow scrubbing and keeps older fragments in the manifest
 			.addOption('-hls_playlist_type', 'vod')
 			// Start at fragment 0
-			.addOption('-start_number', '0')
+			.addOption('-start_number', piece)
 			// Url to prepend to each fragment
 			.addOption('-hls_base_url', `http://127.0.0.1:${config.default.port}/${media._id}/`)
 			// Set the list size to 0 = infinite
@@ -141,14 +133,16 @@ async function startTranscode(inputStream, media) {
 			.on('start', (command) => {
 				console.log('Ffmpeg started with command', command)
 				return resolve()
-			}).on('end', function() {
-				console.log('Ffmpeg is done converting target', media._id)
-				// Replace our 'estimates' playlist with the actual one
-				fs.unlinkSync(__dirname + '/streams/' + media._id + '/ps.m3u8')
-				fs.renameSync(__dirname + '/streams/' + media._id + '/stream.m3u8', __dirname + '/streams/' + media._id + '/ps.m3u8')
-				media.status = 'downloaded'
-				media.save()
-			}).on('error', function(err) {
+			})
+			// .on('end', function() {
+			// 	console.log('Ffmpeg is done converting target', media._id)
+			// 	// Replace our 'estimates' playlist with the actual one
+			// 	fs.unlinkSync(__dirname + '/streams/' + media._id + '/ps.m3u8')
+			// 	fs.renameSync(__dirname + '/streams/' + media._id + '/stream.m3u8', __dirname + '/streams/' + media._id + '/ps.m3u8')
+			// 	media.status = 'downloaded'
+			// 	media.save()
+			// })
+			.on('error', function(err) {
 				console.log('Ffmpeg error for target', media._id, 'error is:', err);
 				return reject(err.message)
 			}).save(__dirname + '/streams/' + media._id + '/stream.m3u8');
@@ -164,15 +158,15 @@ const downloadTorrent = async (media) => {
 		try {
 			fs.mkdirSync(__dirname + '/streams/' + media._id)
 
-			const mediaLength = await getMediaLength(media.magnet)
-			const inputStream = await startTorrent(media.magnet)
+			const targetFilename = await startTorrent(media.magnet)
+			const mediaLength = await getMediaLength(targetFilename)
 
 			console.log('Waiting 10s for the torrent to start downloading.')
 			await delay(10000)
 			console.log('5s are up.')
 
 			await generateMasterPlaylist(mediaLength, media)
-			await startTranscode(inputStream, media)
+			await startTranscode(targetFilename, media, 0)
 			media.status = 'downloading'
 			await media.save()
 
@@ -183,6 +177,7 @@ const downloadTorrent = async (media) => {
 			return resolve()
 		} catch(e) {
 			console.log('Catched', e)
+			throw e
 			return reject(e)
 		}
 	})
