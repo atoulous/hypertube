@@ -8,8 +8,10 @@ const MediaSchema = mongoose.Schema({
 	status: {
 		type: String,
 		enum: [ 'listed', 'downloading', 'ok' ]
-	},
-	source: String,
+	}, mediaType: {
+		type: String,
+		enum: [ 'movie', 'show' ]
+	}, source: String,
 	seeders: Number,
 	leechers: Number,
 	metadatas: {

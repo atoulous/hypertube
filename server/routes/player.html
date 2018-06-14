@@ -19,8 +19,7 @@
 
 	$.get('http://127.0.0.1:5000/media', (res) => {
 		res.forEach((el) => {
-			if (el.metadatas)
-				$('.mList').html('<a href="#" class="startMedia"><img data-vid="' + el._id + '" width=185 align="left" src="http://image.tmdb.org/t/p/w185//' + el.metadatas.posterPath + '" style="display:inline;"/></a><br />' + $('.mList').html())
+			$('.mList').html('<a href="#" class="startMedia" data-vid="' + el._id + '">' + el.displayName + '</a><br />' + $('.mList').html())
 		})
 	})
 

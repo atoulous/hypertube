@@ -6,21 +6,16 @@ const request = require('request'),
 	Utils = require('./utils'),
 	config = {default: {
 	  movieDbApiKey: 'd322868ef91d1fef2ba68c167a37c56a'
-  	}},
+	}},
 	MovieDB = require('moviedb')(config.default.movieDbApiKey)
 
 
 const mirrorList = Utils.shuffle([
-	'https://pirateproxy.sh',
-	'https://thepiratebay-org.prox.space',
-	'https://cruzing.xyz',
-	'https://tpbproxy.nl',
-	'https://thepiratebay.rocks',
-	'https://proxydl.cf',
+	'http://1337x.to'
 ])
 
 const selectMirror = async() => {
-	return new Promise((resolve, reject) => {
+	return new Promise(async (resolve, reject) => {
 		mirrorList.forEach((mirror) => {
 			request(mirror, { method: 'HEAD' }, async (err, res) => {
 				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299)) {
@@ -31,18 +26,24 @@ const selectMirror = async() => {
 	})
 }
 
-const downloadHtml = async (host, url) => {
+const fetchHtml = async (uri) => {
 	return new Promise(async (resolve, reject) => {
-		request(host + url, async (err, res, body) => {
+		request(uri, async (err, res, body) => {
 			if (err) return reject(err)
 			if (res.statusCode < 200 || res.statusCode > 299) {
-				// The mirror crapped its pants. Pick a new one and restart operation
-				const newMirror = await selectMirror()
-				const html = await downloadHtml(newMirror, url)
-				return resolve(html)
+				return reject(body)
 			}
 			return resolve(body)
 		})
+	})
+}
+
+const downloadHtml = async (host, url) => {
+	return new Promise(async (resolve, reject) => {
+		const html = await fetchHtml(host + url).catch(() => {
+			return resolve(downloadHtml(host, url))
+		})
+		return resolve(html)
 	})
 }
 
@@ -54,13 +55,12 @@ const parseHtml = async (html) => {
 
 		var parser = new htmlparser.Parser({
 			onopentag: (name, attribs) => {
-				if (name === 'a' && attribs.class && attribs.class === 'detLink') {
+				if (name === 'a' && attribs.href && attribs.href.startsWith('/torrent/')) {
 					grab = 'name'
-				} else if (name === 'a' && attribs.href && attribs.href.startsWith('magnet:?')) {
-					currentTorrent.magnet = attribs.href
-				} else if (name === 'td' && attribs.align && attribs.align === 'right' && !currentTorrent.seeders) {
+					currentTorrent.tmpUrl = attribs.href
+				} else if (name === 'td' && attribs.class && attribs.class.indexOf('seeds') !== -1) {
 					grab = 'seeders'
-				} else if (name === 'td' && attribs.align && attribs.align === 'right'  && !currentTorrent.leechers) {
+				} else if (name === 'td' && attribs.class && attribs.class.indexOf('leeches') !== -1) {
 					grab = 'leechers'
 				}
 			}, ontext: (text) => {
@@ -108,48 +108,71 @@ const getMediaMetadata = (mediaName) => {
 	})
 }
 
+const parseMagnetFromPage = async(html) => {
+	return new Promise((resolve, reject) => {
+		var parser = new htmlparser.Parser({
+			onopentag: (name, attribs) => {
+				if (name === 'a' && attribs.href && attribs.href.startsWith('magnet:?')) {
+					return resolve(attribs.href)
+				}
+			}, onerror: (err) => {
+				return reject(err)
+			}}, {
+				decodeEntities: true
+		})
+		parser.write(html)
+		parser.end()
+	})
+}
+
+const getMagnet = async (torrent, mirror) => {
+	return new Promise(async (resolve, reject) => {
+		const html = await fetchHtml(mirror + torrent)
+		const magnet = await parseMagnetFromPage(html)
+
+		return resolve(magnet)
+	})
+}
+
 const crawl = async (category, categoryName) => {
 	return new Promise(async (resolve, reject) => {
-		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
+		console.log('[Crawler - 1337x]', 'Started for category', category, '-', categoryName)
 		try {
 			const mirror = await selectMirror()
-			const html = await downloadHtml(mirror, '/top/' + category)
+			const html = await downloadHtml(mirror, category)
+
 			const torrents = await parseHtml(html)
-
 			let i = 0
-			torrents.map(async (torrent) => {
-				const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
-				if (olderTorrent) {
-					olderTorrent.seeders = torrent.seeders
-					olderTorrent.leechers = torrent.leechers
-					await olderTorrent.save()
-					return
-				}
 
-				torrent.name = Utils.beautifyTorrentName(torrent.name)
-
-				let searchTerm = torrent.name
-				if (categoryName === 'show') {
-					searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
-				}
-				const metadatas = await getMediaMetadata(searchTerm)
-				const media = new Media({
-					displayName: torrent.name,
-					magnet: torrent.magnet,
-					status: 'listed',
-					source: 'ThePirateBay',
-					mediaType: categoryName,
-					seeders: torrent.seeders,
-					leechers: torrent.leechers,
-					metadatas: metadatas
+			for (const torrent of torrents) {
+				torrent.magnet = await getMagnet(torrent.tmpUrl, mirror).catch(() => {
+					torrents.splice(i, 1)
+					console.log('Removed item', i)
 				})
-				await media.save()
-			})
-			console.log('[Crawler - ThePirateBay]', 'Finished for category', category, '-', categoryName)
+				torrent.name = Utils.beautifyTorrentName(torrent.name)
+				torrent.metadatas = await getMediaMetadata(torrent.name)
+
+				const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
+				if (!olderTorrent) {
+					const media = new Media({
+						displayName: torrent.name,
+						magnet: torrent.magnet,
+						status: 'listed',
+						source: '1337x',
+						mediaType: categoryName,
+						seeders: torrent.seeders,
+						leechers: torrent.leechers,
+						metadatas: torrent.metadatas
+					})
+					await media.save()
+				}
+				i += 1
+			}
+			console.log('[Crawler - 1337x]', 'Finished for category', category, '-', categoryName)
 			return resolve()
 		} catch(err) {
-			console.log('[Crawler - ThePirateBay]', err)
-			return reject(err)
+			console.log(err)
+			throw err
 		}
 	})
 }
