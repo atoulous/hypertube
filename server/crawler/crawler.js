@@ -3,18 +3,15 @@
 const ThePirateBay = require('./ThePirateBay'),
 	config = require('../config')
 
-const crawl = () => {
+const crawl = async () => {
 	try {
-		console.log('Started the crawling process')
-		ThePirateBay.crawl(201, 'movie')
-			.then(ThePirateBay.crawl(205, 'show'))
-			.catch((err) => {
-				console.log(err)
-			})
+		Promise.resolve([
+			ThePirateBay.crawl(201, 'movie'),
+			ThePirateBay.crawl(205, 'show')
+		])
 	} catch(e) {
 		console.log(e)
 	}
-
 }
 
 const startCrawling = () => {
