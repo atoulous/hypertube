@@ -48,7 +48,19 @@ router.get('/:mid/*.m3u8', (req, res) => {
 router.get('/:mid/*.ts', (req, res) => {
 	const filePath = __dirname + '/../controllers/streams' + req.originalUrl
 	res.set('Content-type', 'application/octet-stream')
-	serveWhenAvailable(res, filePath)
+
+	if (fs.existsSync(filePath)) {
+		return res.status(200).end(fs.readFileSync(filePath))
+	}
+
+	const match = (/^.*stream([0-9)]+).ts$/).exec(req.originalUrl)
+	console.log(req.originalUrl)
+	if (match) {
+		console.log('Requested: ', req.params.mid, '@', match[1], 'dont have that, starting a transcoding job')
+		// Media.findOne({ _id: ObjectId(req.params.mid) }, (err, media) => {
+		// 	MediaController.startTranscode()
+		// })
+	}
 })
 
 router.get('/play/:id', (req, res) => {
