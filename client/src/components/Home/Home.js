@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 
 import './Home.scss';
+
+const styles = {
+  title: {
+    textAlign: 'center',
+  },
+};
 
 class Home extends Component {
   state = {
@@ -9,13 +18,12 @@ class Home extends Component {
   };
 
   componentDidMount() {
-    this.callApi()
+    this.callApiExample()
       .then(res => this.setState({ response: res.express }))
       .catch(err => console.log(err));
   }
 
-
-  callApi = async () => {
+  callApiExample = async () => {
     const response = await fetch('/api/hello');
     const body = await response.json();
 
@@ -25,13 +33,25 @@ class Home extends Component {
   };
 
   render() {
+    const { classes } = this.props;
+
     return (
       <div className="App">
-        <h1>{this.state.response}</h1>
-        <Link to="/library">Go to library</Link>
+        <Typography className={classes.title} gutterBottom variant="headline" component="h1">
+          Home
+        </Typography>
+
+        <Typography className={classes.title}>
+          {this.state.response}
+        </Typography>
       </div>
     );
   }
 }
 
-export default Home;
+
+Home.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(Home);

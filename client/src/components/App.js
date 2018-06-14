@@ -11,7 +11,7 @@ const App = () => (
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/library" component={Library} />
-        <Route component={Home} />
+        <Route exact path="/library/:tabsValue" component={Library} />
       </Switch>
     </Layout>
   </BrowserRouter>

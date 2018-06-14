@@ -16,5 +16,5 @@ export default {
   hashSalt: process.env.HASH_SALT || 10,
   jwtKey: process.env.JWT_KEY || 'secret',
   crawlTimeout: 1000 * 60 * 15, // 15 minutes
-  movieDbApiKey: 'd322868ef91d1fef2ba68c167a37c56a'
+  movieDbApiKey: 'd322868ef91d1fef2ba68c167a37c56a',
 };

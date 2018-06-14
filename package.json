@@ -6,6 +6,18 @@
     "start-server": "nodemon --exec babel-node --ignore client server",
     "start-dev": "concurrently --kill-others-on-fail 'npm run start-server' 'npm run start-client'"
   },
+  "dependencies": {
+    "express": "^4.16.3",
+    "ffprobe": "^1.1.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "htmlparser2": "^3.9.2",
+    "mongoose": "^5.1.5",
+    "morgan": "^1.9.0",
+    "moviedb": "^0.2.10",
+    "node-ffprobe": "^1.2.2",
+    "request": "^2.87.0",
+    "torrent-stream": "^1.0.4"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.3",
