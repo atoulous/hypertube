@@ -1,13 +1,17 @@
 'use strict'
 
 const beautifyTorrentName = (name) => {
-	name = name.replace('.', ' ')
+	name = name.replace(/\./g, ' ')
 	name = name.split("1080p")[0]
 	name = name.split("720p")[0]
 	name = name.split("Bluray")[0]
+	name = name.split("[HDRip]")[0]
+	name = name.split("[HDTV]")[0]
+	name = name.split("[WEB]")[0]
 	name = name.split("HDRip")[0]
 	name = name.split("HDTV")[0]
 	name = name.split("WEB")[0]
+	name = name.replace(/([sS][0-9]{1,2}[eE][0-9]{1,2})(.*)/g, '$1')
 
 	let year = 2010
 	while ( year <= 2019 ) {
@@ -15,8 +19,9 @@ const beautifyTorrentName = (name) => {
 		name = name.split(year)[0]
 		year++
 	}
-	name = name.replace('.', ' ')
 
+	if (name.endsWith(' '))
+		name = name.substring(0, name.length - 1)
 	return name
 }
 
