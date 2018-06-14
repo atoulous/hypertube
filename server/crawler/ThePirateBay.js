@@ -145,9 +145,11 @@ const crawl = async (category, categoryName) => {
 				})
 				await media.save()
 			})
+			console.log('[Crawler - ThePirateBay]', 'Finished for category', category, '-', categoryName)
 			return resolve()
 		} catch(err) {
-			return reject('[Crawler - ThePirateBay] ' + err)
+			console.log('[Crawler - ThePirateBay]', err)
+			return reject(err)
 		}
 	})
 }
