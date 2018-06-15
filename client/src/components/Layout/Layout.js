@@ -11,7 +11,9 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
+import MenuIcon from '@material-ui/icons/Menu';
 import Menu from '@material-ui/core/Menu';
+import Hidden from '@material-ui/core/Hidden';
 
 import MenuData from '../Menu';
 
@@ -27,12 +29,16 @@ const styles = theme => ({
     zIndex: theme.zIndex.drawer + 1,
     backgroundColor: 'black',
   },
-  drawerPaper: {
-    position: 'relative',
-    width: 240,
+  navIconHide: {
+    [theme.breakpoints.up('md')]: {
+      display: 'none',
+    },
   },
-  flex: {
-    flex: 1,
+  drawerPaper: {
+    [theme.breakpoints.up('md')]: {
+      width: 200,
+      position: 'relative',
+    },
   },
   content: {
     flexGrow: 1,
@@ -54,20 +60,23 @@ class Layout extends Component {
   state = {
     auth: true,
     anchorEl: null,
+    mobileOpen: false,
   };
 
   handleMenu = (event) => {
-    console.log('handleMenu');
     this.setState({ anchorEl: event.currentTarget });
   };
 
   handleClose = () => {
-    console.log('handleClose');
     this.setState({ anchorEl: null });
   };
 
+  handleDrawerToggle = () => {
+    this.setState({ mobileOpen: !this.state.mobileOpen });
+  };
+
   render() {
-    const { classes, children } = this.props;
+    const { classes, theme, children } = this.props;
     const { auth, anchorEl } = this.state;
     const open = Boolean(anchorEl);
 
@@ -75,12 +84,20 @@ class Layout extends Component {
       <div className={classes.root}>
         <AppBar position="absolute" className={classes.appBar}>
           <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={this.handleDrawerToggle}
+              className={classes.navIconHide}
+            >
+              <MenuIcon />
+            </IconButton>
             <Link to="/" title="Home" className={classes.homeButton}>
               <Typography
                 variant="title"
                 color="inherit"
-                className={classes.flex}
-              >Hypertube
+              >
+                Hypertube
               </Typography>
             </Link>
 
@@ -113,15 +130,39 @@ class Layout extends Component {
               </Menu>
             </div>
             )}
-
           </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" classes={{ paper: classes.drawerPaper }}>
-          <div className={classes.toolbar} />
-          <List>
-            <MenuData />
-          </List>
-        </Drawer>
+
+        <Hidden mdUp>
+          <Drawer
+            variant="temporary"
+            classes={{ paper: classes.drawerPaper }}
+            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+            open={this.state.mobileOpen}
+            onClose={this.handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+          >
+            <div className={classes.toolbar} />
+            <List>
+              <MenuData />
+            </List>
+          </Drawer>
+        </Hidden>
+
+        <Hidden smDown implementation="css">
+          <Drawer
+            variant="permanent"
+            classes={{ paper: classes.drawerPaper }}
+          >
+            <div className={classes.toolbar} />
+            <List>
+              <MenuData />
+            </List>
+          </Drawer>
+        </Hidden>
+
         <main className={classes.content}>
           <div className={classes.toolbar} />
           {children}
@@ -134,6 +175,7 @@ class Layout extends Component {
 Layout.propTypes = {
   classes: PropTypes.object.isRequired,
   children: PropTypes.node.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Layout);
+export default withStyles(styles, { withTheme: true })(Layout);

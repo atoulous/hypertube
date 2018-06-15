@@ -8,10 +8,14 @@ import Typography from '@material-ui/core/Typography';
 
 import TabsLibrary from './TabsLibrary';
 import CardMovie from '../CardMovie';
+import AutoComplete from '../AutoComplete';
 
 const styles = {
   title: {
     textAlign: 'center',
+  },
+  root: {
+    flexGrow: 1,
   },
 };
 
@@ -73,10 +77,11 @@ class Library extends Component {
     const { medias, tabsValue } = this.state;
 
     return (
-      <div>
+      <div className={classes.root}>
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Library
         </Typography>
+        <AutoComplete />
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
 
         <InfiniteScroll
@@ -86,7 +91,7 @@ class Library extends Component {
           loader={<div className="loader" key={0}>Loading ...</div>}
           useWindow
         >
-          <Grid container spacing={24} style={{ overflow: 'auto' }}>
+          <Grid container spacing={24} style={{ margin: 'auto' }}>
             {
               medias.map((media) => {
                 // console.log('media==', media);
@@ -101,7 +106,7 @@ class Library extends Component {
                   <CardMovie
                     key={media._id}
                     title={title}
-					mediaId={media._id}
+                    mediaId={media._id}
                     magnet={media.magnet}
                     imagePath={imagePath}
                     overview={overview}
