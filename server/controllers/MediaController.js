@@ -90,7 +90,7 @@ async function generateMasterPlaylist(duration, media) {
 			let streamCount = 0
 			while (duration >= 10.0) {
 				writeStream.write('#EXTINF:9.550000,\n')
-				writeStream.write(`http://127.0.0.1:${config.default.port}/${media._id}/stream${streamCount}.ts\n`)
+				writeStream.write(`http://127.0.0.1:${config.default.port}/api/media/${media._id}/stream${streamCount}.ts\n`)
 				streamCount += 1
 				duration -= 9.55
 			}
@@ -125,7 +125,7 @@ async function startTranscode(inputStream, media) {
 			// Start at fragment 0
 			.addOption('-start_number', '0')
 			// Url to prepend to each fragment
-			.addOption('-hls_base_url', `http://127.0.0.1:${config.default.port}/${media._id}/`)
+			.addOption('-hls_base_url', `http://127.0.0.1:${config.default.port}/api/media/${media._id}/`)
 			// Set the list size to 0 = infinite
 			.addOption('-hls_list_size', 0)
 			// Output format is HLS

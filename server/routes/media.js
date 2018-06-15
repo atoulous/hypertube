@@ -54,7 +54,8 @@ router.get('/:mid/*.m3u8', (req, res) => {
 });
 
 router.get('/:mid/*.ts', (req, res) => {
-  const filePath = `${__dirname}/../controllers/streams${req.originalUrl}`;
+	const target = req.originalUrl.replace('/api/media', '')
+  const filePath = `${__dirname}/../controllers/streams${target}`;
   res.set('Content-type', 'application/octet-stream');
   serveWhenAvailable(res, filePath);
 });
