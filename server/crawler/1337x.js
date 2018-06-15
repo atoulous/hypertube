@@ -134,6 +134,37 @@ const getMagnet = async (torrent, mirror) => {
 	})
 }
 
+const finishTorrentParsing = async (categoryName, mirror, torrent) => {
+	return new Promise(async (resolve, reject) => {
+		torrent.magnet = await getMagnet(torrent.tmpUrl, mirror)
+
+		const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
+		if (olderTorrent) {
+			return resolve(olderTorrent)
+		}
+
+		torrent.name = Utils.beautifyTorrentName(torrent.name)
+		let searchTerm = torrent.name
+		if (categoryName === 'show') {
+			searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
+		}
+		torrent.metadatas = await getMediaMetadata(searchTerm)
+
+		const media = new Media({
+			displayName: torrent.name,
+			magnet: torrent.magnet,
+			status: 'listed',
+			source: '1337x',
+			mediaType: categoryName,
+			seeders: torrent.seeders,
+			leechers: torrent.leechers,
+			metadatas: torrent.metadatas
+		})
+		await media.save()
+		return resolve(media)
+	})
+}
+
 const crawl = async (category, categoryName) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - 1337x]', 'Started for category', category, '-', categoryName)
@@ -144,32 +175,14 @@ const crawl = async (category, categoryName) => {
 			const torrents = await parseHtml(html)
 			let i = 0
 
-			for (const torrent of torrents) {
-				torrent.magnet = await getMagnet(torrent.tmpUrl, mirror).catch(() => {
-					torrents.splice(i, 1)
-					console.log('Removed item', i)
-				})
-				torrent.name = Utils.beautifyTorrentName(torrent.name)
-				torrent.metadatas = await getMediaMetadata(torrent.name)
+			const promises = []
+			torrents.forEach((t) => {
+				promises.push(finishTorrentParsing(categoryName, mirror, t))
+			})
 
-				const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
-				if (!olderTorrent) {
-					const media = new Media({
-						displayName: torrent.name,
-						magnet: torrent.magnet,
-						status: 'listed',
-						source: '1337x',
-						mediaType: categoryName,
-						seeders: torrent.seeders,
-						leechers: torrent.leechers,
-						metadatas: torrent.metadatas
-					})
-					await media.save()
-				}
-				i += 1
-			}
+			const result = await Promise.all(promises)
 			console.log('[Crawler - 1337x]', 'Finished for category', category, '-', categoryName)
-			return resolve()
+			return resolve(result.filter(item => item))
 		} catch(err) {
 			console.log(err)
 			throw err
