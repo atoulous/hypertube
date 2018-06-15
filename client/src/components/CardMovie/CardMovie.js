@@ -76,6 +76,7 @@ class CardMovie extends PureComponent {
       </Grid>
     );
   }
+
 }
 
 CardMovie.propTypes = {
