@@ -91,11 +91,11 @@ async function generateMasterPlaylist(duration, media, srtArr) {
 			masterWriteStream.write('#EXTM3U\n')
 
 			if (srtArr.length !== 0) {
-				masterWriteStream.write(`#EXT-X-MEDIA:URI="http://127.0.0.1:${config.default.port}/${media._id}/stream_vtt.m3u8",TYPE=SUBTITLES,GROUP-ID="subs",LANGUAGE="en",NAME="English",DEFAULT=NO,FORCED=NO`)
+				masterWriteStream.write(`#EXT-X-MEDIA:URI="http://127.0.0.1:${config.default.port}/api/media/${media._id}/stream_vtt.m3u8",TYPE=SUBTITLES,GROUP-ID="subs",LANGUAGE="en",NAME="English",DEFAULT=NO,FORCED=NO`)
 				masterWriteStream.write('\n')
 			}
 			masterWriteStream.write('#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1533000,RESOLUTION=854x480,CODECS="avc1.4d001f, mp4a.40.5",SUBTITLES="subs"\n')
-			masterWriteStream.write(`http://127.0.0.1:${config.default.port}/${media._id}/ps.m3u8`)
+			masterWriteStream.write(`http://127.0.0.1:${config.default.port}/api/media/${media._id}/ps.m3u8`)
 			masterWriteStream.write('\n')
 			masterWriteStream.end()
 
