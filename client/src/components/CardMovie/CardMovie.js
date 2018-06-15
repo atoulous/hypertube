@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -10,97 +10,78 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-
-import PlayArrow from '@material-ui/icons/PlayArrow';
-import StarBorder from '@material-ui/icons/StarBorder';
+import StarIcon from '@material-ui/icons/Star';
 
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
 const styles = {
   card: {
-    width: '15rem',
-    height: '20rem',
+    width: 300,
+    height: 400,
+    '&:hover': {
+      boxShadow: '0 3px 5px 2px rgba(0, 0, 0, .30)',
+    },
+  },
+  link: {
+    textDecoration: 'none',
   },
   cardContent: {
-    height: '6rem',
-    overflowY: 'auto',
+    height: 150,
+    overflow: 'auto',
   },
   media: {
-    height: 0,
     paddingTop: '56.25%', // 16:9
   },
-  title: {
-    height: '15%',
+  rightButton: {
+    marginLeft: 'auto',
+  },
+  leftButton: {
+    marginRight: 'auto',
   },
 };
 
-class CardMovie extends Component {
-  state = {
-    learnMore: false,
-  };
-
-  handleLearnMore = () => {
-    this.setState({ learnMore: !this.state.learnMore });
+class CardMovie extends PureComponent {
+  handleStarred = (e) => {
+    e.preventDefault();
   };
 
   render() {
-    const { classes, title, magnet, imagePath, overview , mediaId} = this.props;
-    const { learnMore } = this.state;
-
-    const DisplayContent = () => {
-      if (learnMore) {
-        return (
-          <Typography className={classes.cardContent} component="p">
-            {overview || 'No overview available'}
-          </Typography>
-        );
-      }
-
-      return (
-        <Typography className={classes.title} gutterBottom variant="headline" component="h2">
-          {title}
-        </Typography>
-      );
-    };
+    const { classes, title, imagePath, overview, mediaId } = this.props;
 
     return (
       <Grid item xs={6} sm={3}>
-        <Card className={classes.card}>
-          <Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
+        <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
+          <Card className={classes.card}>
             <CardMedia
               className={classes.media}
               image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
               title={title}
             />
-          </Link>
-          <CardContent className={classes.cardContent}>
-            <DisplayContent />
-          </CardContent>
-          <CardActions>
-            <Button size="small" color="primary">
-              Starred
-              <StarBorder />
-
-            </Button>
-            <Button onClick={this.handleLearnMore} size="small" color="primary">
-              {
-                !learnMore ? 'Learn More' : 'back'
-              }
-              <Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
-                <PlayArrow />
-              </Link>
+            <CardContent className={classes.cardContent}>
+              <Typography className={classes.title} gutterBottom variant="headline" component="h2">
+                {title}
+              </Typography>
+              <Typography className={classes.cardContent} component="p">
+                {overview || 'No overview available'}
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button onClick={this.handleStarred} size="small" color="primary" className={classes.leftButton}>
+                {'Starred '}
+                <StarIcon />
               </Button>
-          </CardActions>
-        </Card>
+            </CardActions>
+          </Card>
+        </Link>
       </Grid>
-  );
+    );
   }
-};
+}
 
 CardMovie.propTypes = {
   classes: PropTypes.object.isRequired,
   title: PropTypes.string.isRequired,
-  magnet: PropTypes.string.isRequired,
+  mediaId: PropTypes.string.isRequired,
   imagePath: PropTypes.string,
   overview: PropTypes.string,
 };
