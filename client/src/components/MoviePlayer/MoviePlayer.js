@@ -33,13 +33,13 @@ class MoviePlayer extends Component {
         isLoading: false,
       });
 
-      const HLS = new hls();
-      HLS.loadSource(`/api/media/${movieId}/ps.m3u8`);
-      HLS.attachMedia(this.refs.video);
-      this.refs.video.play();
-    } catch (err) {
-      console.error('componentDidMount err: ', err);
-    }
+		const HLS = new hls();
+		HLS.loadSource(`/api/media/${movieId}/master.m3u8`)
+		HLS.attachMedia(this.refs.video);
+		this.refs.video.play();
+	} catch (err) {
+		console.error('componentDidMount err: ', err);
+	}
   }
 
   startMedia = async () => {
