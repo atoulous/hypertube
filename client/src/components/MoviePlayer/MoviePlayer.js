@@ -33,7 +33,7 @@ class MoviePlayer extends Component {
 		})
 
 		const HLS = new hls();
-		HLS.loadSource(`/api/media/${movieId}/ps.m3u8`)
+		HLS.loadSource(`/api/media/${movieId}/master.m3u8`)
 		HLS.attachMedia(this.refs.video);
 		this.refs.video.play();
 	} catch (err) {
