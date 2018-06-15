@@ -9,6 +9,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import StarIcon from '@material-ui/icons/Star';
 import ListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import VideoLibrary from '@material-ui/icons/VideoLibrary';
+import Divider from '@material-ui/core/Divider';
 
 const styles = {
   link: {
@@ -27,6 +28,8 @@ const Menu = ({ classes }) => (
       </ListItem>
     </Link>
 
+    <Divider />
+
     <Link to="/library" className={classes.link}>
       <ListItem button>
         <ListItemIcon>
@@ -35,6 +38,8 @@ const Menu = ({ classes }) => (
         <ListItemText primary="Top 10" />
       </ListItem>
     </Link>
+
+    <Divider />
 
     <Link to="/library" className={classes.link}>
       <ListItem button>

@@ -14,7 +14,7 @@ import StarIcon from '@material-ui/icons/Star';
 
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
-const styles = {
+const styles = theme => ({
   card: {
     width: 300,
     height: 400,
@@ -38,7 +38,7 @@ const styles = {
   leftButton: {
     marginRight: 'auto',
   },
-};
+});
 
 class CardMovie extends PureComponent {
   handleStarred = (e) => {
@@ -49,7 +49,7 @@ class CardMovie extends PureComponent {
     const { classes, title, imagePath, overview, mediaId } = this.props;
 
     return (
-      <Grid item xs={6} sm={3}>
+      <Grid item xs>
         <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
           <Card className={classes.card}>
             <CardMedia
