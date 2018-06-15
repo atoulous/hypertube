@@ -58,10 +58,6 @@ router.get('/:mid/*.ts', (req, res) => {
   const filePath = `${__dirname}/../controllers/streams${target}`;
   res.set('Content-type', 'application/octet-stream');
   serveWhenAvailable(res, filePath);
-});
-
-router.get('/play/:id', (req, res) => {
-  res.sendFile(`${__dirname}/player.html`);
-});
+})
 
 module.exports = router;
