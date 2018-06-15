@@ -78,6 +78,7 @@ class Library extends Component {
                   <CardMovie
                     key={media._id}
                     title={title}
+					mediaId={media._id}
                     magnet={media.magnet}
                     imagePath={imagePath}
                     resume={resume}

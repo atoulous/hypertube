@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -30,16 +31,18 @@ const styles = {
 };
 
 const CardMovie = (props) => {
-  const { classes, title, magnet, imagePath, resume } = props;
+  const { classes, title, magnet, imagePath, resume, mediaId } = props;
 
   return (
     <Grid item xs={6} sm={3}>
       <Card className={classes.card}>
-        <CardMedia
-          className={classes.media}
-          image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
-          title={title}
-        />
+	  	<Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
+	        <CardMedia
+	          className={classes.media}
+	          image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
+	          title={title}
+	        />
+		</Link>
         <CardContent>
           <Typography className={classes.title} gutterBottom variant="headline" component="h2">
             {title}
