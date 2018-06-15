@@ -33,10 +33,10 @@ async componentDidMount() {
       isLoading: false,
     });
 
-    const HLS = new Hls();
-    HLS.loadSource(`/api/media/${movieId}/ps.m3u8`);
-    HLS.attachMedia(this.refs.video);
-    this.refs.video.play();
+  const HLS = new hls();
+  HLS.loadSource(`/api/media/${movieId}/master.m3u8`)
+  HLS.attachMedia(this.refs.video);
+  this.refs.video.play();
   } catch (err) {
     console.error('componentDidMount err: ', err);
   }
