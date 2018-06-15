@@ -67,4 +67,10 @@ router.get('/:mid/*.ts', (req, res) => {
   serveWhenAvailable(res, filePath);
 })
 
+router.get('/:mid/*.vtt', (req, res) => {
+  const target = req.originalUrl.replace('/api/media', '')
+  const filePath = `${__dirname}/../controllers/streams${target}`;
+  serveWhenAvailable(res, filePath);
+})
+
 module.exports = router;
