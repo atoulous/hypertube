@@ -11,6 +11,10 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
+import PlayArrow from '@material-ui/icons/PlayArrow';
+import StarBorder from '@material-ui/icons/StarBorder';
+
+
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
 const styles = {
@@ -44,7 +48,7 @@ const CardMovie = (props) => {
 	        />
 		</Link>
         <CardContent>
-          <Typography className={classes.title} gutterBottom variant="headline" component="h2">
+          <Typography className={classes.title} variant="headline" gutterBottom component="h2">
             {title}
           </Typography>
           <Typography className={classes.cardContent} component="p">
@@ -53,10 +57,12 @@ const CardMovie = (props) => {
         </CardContent>
         <CardActions>
           <Button size="small" color="primary">
-            Starred
+            <StarBorder />
           </Button>
           <Button size="small" color="primary">
-            Learn More
+			  <Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
+			  	<PlayArrow />
+			  </Link>
           </Button>
         </CardActions>
       </Card>
