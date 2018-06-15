@@ -54,13 +54,14 @@ const serveWhenAvailable = async (res, filePath) => {
 };
 
 router.get('/:mid/*.m3u8', (req, res) => {
+  const target = req.originalUrl.replace('/api/media', '')
+  const filePath = `${__dirname}/../controllers/streams${target}`;
   res.set('Content-type', 'application/x-mpegURL');
-  const filePath = `${__dirname}/../controllers/streams/${req.params.mid}/ps.m3u8`;
   serveWhenAvailable(res, filePath);
 });
 
 router.get('/:mid/*.ts', (req, res) => {
-	const target = req.originalUrl.replace('/api/media', '')
+  const target = req.originalUrl.replace('/api/media', '')
   const filePath = `${__dirname}/../controllers/streams${target}`;
   res.set('Content-type', 'application/octet-stream');
   serveWhenAvailable(res, filePath);
