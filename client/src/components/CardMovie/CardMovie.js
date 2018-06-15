@@ -50,8 +50,8 @@ class CardMovie extends PureComponent {
 
     return (
       <Grid item xs={6} sm={3}>
-        <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
           <Card className={classes.card}>
+			  <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
             <CardMedia
               className={classes.media}
               image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
@@ -71,8 +71,8 @@ class CardMovie extends PureComponent {
                 <StarIcon />
               </Button>
             </CardActions>
+          </Link>
           </Card>
-        </Link>
       </Grid>
     );
   }
