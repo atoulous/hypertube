@@ -171,8 +171,6 @@ async function startTranscode(inputStream, media) {
 				// Replace our 'estimates' playlist with the actual one
 				fs.unlinkSync(__dirname + '/streams/' + media._id + '/ps.m3u8')
 				fs.renameSync(__dirname + '/streams/' + media._id + '/stream.m3u8', __dirname + '/streams/' + media._id + '/ps.m3u8')
-				media.status = 'downloaded'
-				media.save()
 			}).on('error', function(err) {
 				console.log('Ffmpeg error for target', media._id, 'error is:', err);
 				return reject(err.message)
