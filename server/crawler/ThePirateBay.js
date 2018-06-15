@@ -108,6 +108,37 @@ const getMediaMetadata = (mediaName) => {
 	})
 }
 
+const finishTorrentParsing = async (categoryName, torrent) => {
+	return new Promise(async (resolve, reject) => {
+		const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
+		if (olderTorrent) {
+			olderTorrent.seeders = torrent.seeders
+			olderTorrent.leechers = torrent.leechers
+			await olderTorrent.save()
+			return resolve(olderTorrent)
+		}
+		torrent.name = Utils.beautifyTorrentName(torrent.name)
+
+		let searchTerm = torrent.name
+		if (categoryName === 'show') {
+			searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
+		}
+		const metadatas = await getMediaMetadata(searchTerm)
+		const media = new Media({
+			displayName: torrent.name,
+			magnet: torrent.magnet,
+			status: 'listed',
+			source: 'ThePirateBay',
+			mediaType: categoryName,
+			seeders: torrent.seeders,
+			leechers: torrent.leechers,
+			metadatas: metadatas
+		})
+		await media.save()
+		return resolve(media)
+	})
+}
+
 const crawl = async (category, categoryName) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
@@ -116,37 +147,14 @@ const crawl = async (category, categoryName) => {
 			const html = await downloadHtml(mirror, '/top/' + category)
 			const torrents = await parseHtml(html)
 
-			let i = 0
-			torrents.map(async (torrent) => {
-				const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
-				if (olderTorrent) {
-					olderTorrent.seeders = torrent.seeders
-					olderTorrent.leechers = torrent.leechers
-					await olderTorrent.save()
-					return
-				}
-
-				torrent.name = Utils.beautifyTorrentName(torrent.name)
-
-				let searchTerm = torrent.name
-				if (categoryName === 'show') {
-					searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
-				}
-				const metadatas = await getMediaMetadata(searchTerm)
-				const media = new Media({
-					displayName: torrent.name,
-					magnet: torrent.magnet,
-					status: 'listed',
-					source: 'ThePirateBay',
-					mediaType: categoryName,
-					seeders: torrent.seeders,
-					leechers: torrent.leechers,
-					metadatas: metadatas
-				})
-				await media.save()
+			const promises = []
+			torrents.forEach((t) => {
+				promises.push(finishTorrentParsing(categoryName, t))
 			})
+
+			const result = await Promise.all(promises)
 			console.log('[Crawler - ThePirateBay]', 'Finished for category', category, '-', categoryName)
-			return resolve()
+			return resolve(result.filter(item => item))
 		} catch(err) {
 			console.log('[Crawler - ThePirateBay]', err)
 			return reject(err)
