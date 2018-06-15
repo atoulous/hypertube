@@ -12,34 +12,46 @@ const delay = async (ms) => {
 }
 
 // Determines the length of the media, in decimal seconds
-async function getMediaLength(magnet) {
+async function parseMedia(magnet) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			console.log('GetMediaLength()')
+			console.log('ParseMedia()')
 			const engine = torrentStream(magnet)
 			engine.on('ready', async () => {
 				engine.files.sort((a, b) => a.length < b.length)
 				const fileName = engine.files[0].name
 				const filePath = __dirname + '/streams/' + fileName
 
-				console.log('GetMediaLength', 'torrent engine ready, selected file is', fileName)
+				console.log('ParseMedia', 'torrent engine ready, selected file is', fileName)
 				const readStream = engine.files[0].createReadStream()
 				const writeStream = fs.createWriteStream(filePath)
 				readStream.pipe(writeStream)
 
 				const checkProbe = async () => {
-					console.log('GetMediaLength', 'Checking probe status')
+					console.log('ParseMedia', 'Checking probe status')
 					ffprobe(filePath, async (err, probeData) => {
 						if (err) {
-							console.log('GetMediaLength', 'Probe failed. Retrying in 2000ms')
+							console.log('ParseMedia', 'Probe failed. Retrying in 2000ms')
 							setTimeout(checkProbe, 2000)
 							return
 						}
-						console.log('GetMediaLength', 'Probe succeeded. Media length is', probeData.format.duration)
+						let i = 0
+						const srtArr = []
+						probeData.streams.forEach((stream) => {
+							if (stream.codec_type === 'subtitle') {
+								srtArr.push({
+									index: i,
+									name: stream['TAG:language'] || i
+								})
+							}
+							i++
+						})
+						console.log('ParseMedia', 'SRT data is', srtArr)
+						console.log('ParseMedia', 'Probe succeeded. Media length is', probeData.format.duration)
 						fs.unlinkSync(filePath)
 						engine.destroy(() => {
-							console.log('GetMediaLength', 'Engine destroyed. Resolving')
-							return resolve(probeData.format.duration)
+							console.log('ParseMedia', 'Engine destroyed. Resolving')
+							return resolve( [ probeData.format.duration, srtArr ] )
 						})
 					})
 				}
@@ -74,10 +86,25 @@ async function startTorrent(magnet) {
 // Generates a "fake" playlist with the appropriate number of segments.
 // Useful to trick the clients into thinking that the video is of a
 // specific length.
-async function generateMasterPlaylist(duration, media) {
+async function generateMasterPlaylist(duration, media, srtArr) {
 	return new Promise(async (resolve, reject) => {
 		try {
 			console.log('Started building the master playlist')
+			const masterWriteStream = fs.createWriteStream(__dirname + '/streams/' + media._id + '/master.m3u8')
+			masterWriteStream.write('#EXTM3U\n')
+
+			if (srtArr.length !== 0) {
+				masterWriteStream.write(`#EXT-X-MEDIA:URI="http://127.0.0.1:${config.default.port}/${media._id}/stream_vtt.m3u8",TYPE=SUBTITLES,GROUP-ID="subs",LANGUAGE="en",NAME="English",DEFAULT=NO,FORCED=NO`)
+				masterWriteStream.write('\n')
+			}
+			masterWriteStream.write('#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1533000,RESOLUTION=854x480,CODECS="avc1.4d001f, mp4a.40.5",SUBTITLES="subs"\n')
+			masterWriteStream.write(`http://127.0.0.1:${config.default.port}/${media._id}/ps.m3u8`)
+			masterWriteStream.write('\n')
+			masterWriteStream.end()
+
+			console.log('Finished building the video playlist - Started building the video playlist')
+
+
 			// Writing the playlist header
 			const writeStream = fs.createWriteStream(__dirname + '/streams/' + media._id + '/ps.m3u8')
 			writeStream.write('#EXTM3U\n')
@@ -97,7 +124,7 @@ async function generateMasterPlaylist(duration, media) {
 			writeStream.write('#EXT-X-ENDLIST\n')
 			writeStream.end()
 
-			console.log('Finished building the master playlist.')
+			console.log('Finished building the video playlist.')
 			return resolve()
 		} catch (e) {
 			return reject(e)
@@ -111,7 +138,7 @@ async function startTranscode(inputStream, media) {
 		try {
 			console.log('Transcoding started')
 
-			ffmpeg(inputStream)
+			const command = ffmpeg(inputStream)
 			// Use the original video codec
 			.videoCodec('copy')
 			// Use 64k AAC for the audio
@@ -138,6 +165,7 @@ async function startTranscode(inputStream, media) {
 			.addOption('-force_key_frames', 'expr:gte(t,n_forced*3)')
 			// Use 4 cores
 			.addOption('-threads', '4')
+			.output(__dirname + '/streams/' + media._id + '/stream.m3u8')
 			.on('start', (command) => {
 				console.log('Ffmpeg started with command', command)
 				return resolve()
@@ -151,7 +179,7 @@ async function startTranscode(inputStream, media) {
 			}).on('error', function(err) {
 				console.log('Ffmpeg error for target', media._id, 'error is:', err);
 				return reject(err.message)
-			}).save(__dirname + '/streams/' + media._id + '/stream.m3u8');
+			}).run()
 		} catch (e) {
 			return reject(e)
 		}
@@ -164,14 +192,15 @@ const downloadTorrent = async (media) => {
 		try {
 			fs.mkdirSync(__dirname + '/streams/' + media._id)
 
-			const mediaLength = await getMediaLength(media.magnet)
+			const [ mediaLength, srtArr ] = await parseMedia(media.magnet)
+			console.log(mediaLength, srtArr)
 			const inputStream = await startTorrent(media.magnet)
 
 			console.log('Waiting 10s for the torrent to start downloading.')
 			await delay(10000)
 			console.log('5s are up.')
 
-			await generateMasterPlaylist(mediaLength, media)
+			await generateMasterPlaylist(mediaLength, media, srtArr)
 			await startTranscode(inputStream, media)
 			media.status = 'downloading'
 			await media.save()
