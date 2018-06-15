@@ -50,7 +50,6 @@ class CardMovie extends PureComponent {
 
     return (
       <Grid item xs>
-        <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
           <Card className={classes.card}>
 			  <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
             <CardMedia
