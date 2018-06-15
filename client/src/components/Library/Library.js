@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -18,20 +19,22 @@ class Library extends Component {
   state = {
     tabsValue: this.props.match.params.tabsValue || 'all',
     medias: [],
+    skip: 0,
   };
 
   async componentDidMount() {
     try {
-      const medias = await this.getMedias();
+      const { tabsValue } = this.state;
+      const medias = await this.getMedias({ type: tabsValue });
       this.setState({ medias });
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
   }
 
-  getMedias = async (type = 'all') => {
+  getMedias = async ({ type = 'all', skip = 0 }) => {
     try {
-      const response = await fetch(`/api/media/${type}`);
+      const response = await fetch(`/api/media/${type}/${skip}`);
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.message);
@@ -45,11 +48,23 @@ class Library extends Component {
   handleTabs = async (event, value) => {
     try {
       if (this.state.tabsValue !== value) {
-        const medias = await this.getMedias(value);
+        const medias = await this.getMedias({ type: value });
         await this.setState({ medias, tabsValue: value });
       }
     } catch (err) {
       console.error('handleTabs err: ', err);
+    }
+  };
+
+  handleLoading = async () => {
+    try {
+      const { medias, tabsValue, skip } = this.state;
+      const newSkip = skip + 10;
+      const newMedias = await this.getMedias({ type: tabsValue, skip: newSkip });
+
+      this.setState({ medias: medias.concat(newMedias), skip: newSkip });
+    } catch (err) {
+      console.error('handleLoading err: ', err);
     }
   };
 
@@ -63,13 +78,21 @@ class Library extends Component {
           Library
         </Typography>
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
-        <Grid container spacing={24}>
-          {
+
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={this.handleLoading}
+          hasMore
+          loader={<div className="loader" key={0}>Loading ...</div>}
+          useWindow
+        >
+          <Grid container spacing={24} style={{ overflow: 'auto' }}>
+            {
               medias.map((media) => {
                 // console.log('media==', media);
 
                 const title = media.metadatas ? media.metadatas.name : media.displayName;
-                const resume = media.metadatas ? media.metadatas.overview : null;
+                const overview = media.metadatas ? media.metadatas.overview : null;
                 let imagePath = media.metadatas ? media.metadatas.posterPath : null;
                 if (!imagePath && media.metadatas) {
                   imagePath = media.metadatas.backdropPath || null;
@@ -81,12 +104,14 @@ class Library extends Component {
 					mediaId={media._id}
                     magnet={media.magnet}
                     imagePath={imagePath}
-                    resume={resume}
+                    overview={overview}
                   />
                 );
               })
             }
-        </Grid>
+
+          </Grid>
+        </InfiniteScroll>
       </div>
     );
   }

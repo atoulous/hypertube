@@ -4,20 +4,26 @@ const fs = require('fs');
 const Media = require('../models/Media');
 const MediaController = require('../controllers/MediaController');
 
-router.get('/all', (req, res) => {
-  Media.find({}).limit(30)
+router.get('/all/:skip', (req, res) => {
+  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
+
+  Media.find({}).limit(10).skip(skip)
     .then(medias => res.status(200).json(medias))
     .catch((err) => { console.log('err==', err); });
 });
 
-router.get('/movies', (req, res) => {
-  Media.find({}).where('mediaType').equals('movie').limit(30)
+router.get('/movies/:skip', (req, res) => {
+  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
+
+  Media.find({}).where('mediaType').equals('movie').limit(10).skip(skip)
     .then(medias => res.status(200).json(medias))
     .catch((err) => { console.log('err==', err); });
 });
 
-router.get('/shows', (req, res) => {
-  Media.find({}).where('mediaType').equals('show').limit(30)
+router.get('/shows/:skip', (req, res) => {
+  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
+
+  Media.find({}).where('mediaType').equals('show').limit(10).skip(skip)
     .then(medias => res.status(200).json(medias))
     .catch((err) => { console.log('/shows err==', err); });
 });

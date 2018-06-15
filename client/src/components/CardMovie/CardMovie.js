@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -14,15 +14,15 @@ import Grid from '@material-ui/core/Grid';
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import StarBorder from '@material-ui/icons/StarBorder';
 
-
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
 const styles = {
   card: {
-    maxWidth: 345,
+    width: '15rem',
+    height: '20rem',
   },
   cardContent: {
-    height: 100,
+    height: '6rem',
     overflowY: 'auto',
   },
   media: {
@@ -30,44 +30,71 @@ const styles = {
     paddingTop: '56.25%', // 16:9
   },
   title: {
-    height: 80,
+    height: '15%',
   },
 };
 
-const CardMovie = (props) => {
-  const { classes, title, magnet, imagePath, resume, mediaId } = props;
+class CardMovie extends Component {
+  state = {
+    learnMore: false,
+  };
 
-  return (
-    <Grid item xs={6} sm={3}>
-      <Card className={classes.card}>
-	  	<Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
-	        <CardMedia
-	          className={classes.media}
-	          image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
-	          title={title}
-	        />
-		</Link>
-        <CardContent>
-          <Typography className={classes.title} variant="headline" gutterBottom component="h2">
-            {title}
-          </Typography>
+  handleLearnMore = () => {
+    this.setState({ learnMore: !this.state.learnMore });
+  };
+
+  render() {
+    const { classes, title, magnet, imagePath, overview , mediaId} = this.props;
+    const { learnMore } = this.state;
+
+    const DisplayContent = () => {
+      if (learnMore) {
+        return (
           <Typography className={classes.cardContent} component="p">
-            {resume || 'No resume available'}
+            {overview || 'No overview available'}
           </Typography>
-        </CardContent>
-        <CardActions>
-          <Button size="small" color="primary">
-            <StarBorder />
-          </Button>
-          <Button size="small" color="primary">
-			  <Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
-			  	<PlayArrow />
-			  </Link>
-          </Button>
-        </CardActions>
-      </Card>
-    </Grid>
+        );
+      }
+
+      return (
+        <Typography className={classes.title} gutterBottom variant="headline" component="h2">
+          {title}
+        </Typography>
+      );
+    };
+
+    return (
+      <Grid item xs={6} sm={3}>
+        <Card className={classes.card}>
+          <Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
+            <CardMedia
+              className={classes.media}
+              image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
+              title={title}
+            />
+          </Link>
+          <CardContent className={classes.cardContent}>
+            <DisplayContent />
+          </CardContent>
+          <CardActions>
+            <Button size="small" color="primary">
+              Starred
+              <StarBorder />
+
+            </Button>
+            <Button onClick={this.handleLearnMore} size="small" color="primary">
+              {
+                !learnMore ? 'Learn More' : 'back'
+              }
+              <Link to={`/movie/${mediaId}`} title="Home" className={classes.startMovie}>
+                <PlayArrow />
+              </Link>
+              </Button>
+          </CardActions>
+        </Card>
+      </Grid>
   );
+  }
 };
 
 CardMovie.propTypes = {
@@ -75,7 +102,7 @@ CardMovie.propTypes = {
   title: PropTypes.string.isRequired,
   magnet: PropTypes.string.isRequired,
   imagePath: PropTypes.string,
-  resume: PropTypes.string,
+  overview: PropTypes.string,
 };
 
 export default withStyles(styles)(CardMovie);
