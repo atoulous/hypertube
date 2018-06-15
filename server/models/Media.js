@@ -5,7 +5,7 @@ const MediaSchema = mongoose.Schema({
   magnet: String,
   status: {
     type: String,
-    enum: ['listed', 'downloading', 'ok'],
+    enum: ['listed', 'downloading'],
   },
   mediaType: {
     type: String,
