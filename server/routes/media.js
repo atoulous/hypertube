@@ -29,19 +29,20 @@ router.get('/shows/:skip', (req, res) => {
 });
 
 router.get('/startmedia/:id', async (req, res) => {
-  Media.findOne({ _id: req.params.id })
-    .then(async (media) => {
-      if (!media) return res.status(404).end('that does not exist');
+	return res.status(422).json({ error: 'This media could not be played, either it does not have enough seeders, or it was corrupted.' })
+	Media.findOne({ _id: req.params.id })
+	.then(async (media) => {
+  		if (!media) res.status(404).json({ error: 'This media does not exist.:' + err })
 
-      // Media is not dowloaded or downloading, start it.
-      if (media.status === 'listed') {
-        await MediaController.downloadTorrent(media);
-      }
-
-      // temporary :)
-      setTimeout(() => res.status(200).json(media).end(), 1000);
-    })
-    .catch(err => res.status(404).end('that does not exist', err));
+		// Media is not dowloaded or downloading, start it.
+		if (media.status === 'listed') {
+			MediaController.downloadTorrent(media).then(() => {
+				return res.status(200).json(media).end()
+			}).catch(() => {
+				return res.status(422).json({ error: 'This media could not be played, either it does not have enough seeders, or it was corrupted.' })
+			})
+		}
+	}).catch(err => res.status(404).json({ error: 'This media could not be played, for this reason:' + err }));
 });
 
 const serveWhenAvailable = async (res, filePath) => {
@@ -53,24 +54,23 @@ const serveWhenAvailable = async (res, filePath) => {
   return null;
 };
 
+const serveStaticFile = (req, res, mime) => {
+	const target = req.originalUrl.replace('/api/media', '')
+    const filePath = `${__dirname}/../controllers/streams${target}`;
+    res.set('Content-type', mime);
+    serveWhenAvailable(res, filePath);
+}
+
 router.get('/:mid/*.m3u8', (req, res) => {
-  const target = req.originalUrl.replace('/api/media', '')
-  const filePath = `${__dirname}/../controllers/streams${target}`;
-  res.set('Content-type', 'application/x-mpegURL');
-  serveWhenAvailable(res, filePath);
+	serveStaticFile(req, res, 'application/x-mpegURL')
 });
 
 router.get('/:mid/*.ts', (req, res) => {
-  const target = req.originalUrl.replace('/api/media', '')
-  const filePath = `${__dirname}/../controllers/streams${target}`;
-  res.set('Content-type', 'application/octet-stream');
-  serveWhenAvailable(res, filePath);
+	serveStaticFile(req, res, 'application/octet-stream')
 })
 
 router.get('/:mid/*.vtt', (req, res) => {
-  const target = req.originalUrl.replace('/api/media', '')
-  const filePath = `${__dirname}/../controllers/streams${target}`;
-  serveWhenAvailable(res, filePath);
+	serveStaticFile(req, res, 'text/vtt')
 })
 
 module.exports = router;
