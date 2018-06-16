@@ -1,8 +1,12 @@
 var LocalStrategy = require('passport-local').Strategy
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 var qdStrategy = require('passport-42').Strategy
+const passportJWT = require("passport-jwt")
+const jwtstrategy = passportJWT.Strategy
+const ExtractJwt = passportJWT.ExtractJwt
 var Secu = require('../models/secu.js')
 var fs = require('fs')
+const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz'
 
 var User = require('./../models/users')
 
@@ -27,27 +31,19 @@ module.exports = (passport) => {
 	},
 	function(req, email, password, done) {
 		process.nextTick(() => {
-			if (!Secu.verif(req.body.login) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
-				return done(null, false, req.flash('signupMessage', 'Complete all sections of the form.'))
-			}
-			else if (!Secu.isGoodPassword(req.body.password)) {
-				return done(null, false, req.flash('signupMessage', 'A strong password consists of a combination of upper and lowercase letters and numbers.'))
-			}
-			else if (!Secu.isEmail(req.body.email)) {
-				return done(null, false, req.flash('signupMessage', 'Incorrect Email.'))
-			}
-			else {
-				User.findOne({ 'local.email' :  email }, (err, user) => {
+		console.log('la')
+				User.findOne({ 'local.email' :  req.body.email }, (err, user) => {
 					if (err)
 						return done(err)
 					if (user) {
-						return done(null, false, req.flash('signupMessage', 'That email is already taken.'))
+					console.log('MAIL')
+						return done(null, false, 'That email is already taken.')
 					} else {
 						User.findOne({ 'local.name' :  req.body.login }, (err, user) => {
 							if (err)
 								return done(err)
 							 if (user) {
-								return done(null, false, req.flash('signupMessage', 'That login is already taken.'))
+								return done(null, 'That login is already taken.')
 							} else {
 								var newUser = new User()
 								newUser.local.email = req.body.email
@@ -61,13 +57,12 @@ module.exports = (passport) => {
 								newUser.local.picture = 'http://localhost:8100/uploads/' + req.body.login
 								newUser.save((err) => {
 									if (err) throw err
-									return done(null, newUser)
+									return done(null, newUser, 'success')
 								})
 							}
 						})
 					}
 				})
-			}
 		})
 	}))
 
@@ -154,4 +149,24 @@ module.exports = (passport) => {
 			});
 		});
 	}));
+
+	passport.use(new jwtstrategy({
+		jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+		secretOrKey: jwtsecret
+	}, (jwtPayload, cb) => {
+		console.log(jwtPayload)
+		User.findById(jwtPayload._id, (err, user) => {
+			console.log(user)
+			if (err)
+				return cb(err)
+			if (user)
+				return cb(null, user)
+			else
+				return cb('fail')
+			})
+		
+	}))
+
+
+
 }

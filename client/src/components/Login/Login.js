@@ -1,11 +1,49 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-const Login = () => (
+class Login extends Component{
+	constructor(props) {
+		super(props);
+		this.tryLogin = this.tryLogin.bind(this);
+	}
+	state = {
+    response: '',
+  };
+
+	tryLogin(e) {
+	e.preventDefault()
+    this.callApi(e)
+      .then(res => {
+	  console.log(res)
+			this.setState({ response: res.message })
+			if (res.message === 'succes') {
+				sessionStorage.setItem('jwtToken', res.token)
+				this.props.history.push("/Profile")
+			}
+	  })
+      .catch(err => console.log(err));
+  }
+
+  callApi = async (e) => {
+	const data = new FormData(e.target)
+    const response = await fetch('/login', {
+		method: 'POST',
+		body: data
+	});
+    const body = await response.json();
+
+    if (response.status !== 200) throw Error(body.message);
+
+    return body;
+  };
+
+	render() {
+		return (
 		<div class="container">
 			<div class="col-sm-6 col-sm-offset-3">
+				<p>{this.state.response}</p>
 				<h1><span class="fa fa-sign-in"></span>Login</h1>
-				<form action="/login" method="post">
+				<form onSubmit={this.tryLogin} method="post">
 					<div class="form-group">
 						<label>Email</label>
 						<input type="text" class="form-control" name="email"/>
@@ -15,7 +53,7 @@ const Login = () => (
 						<input type="password" class="form-control" name="password"/>
 					</div>
 
-					<button type="submit" class="btn btn-warning btn-lg">Login</button>
+					<button type="submit" class="btn btn-warning btn-lg" >Login</button>
 				</form>
 				<hr/>
 				<p>Need an account? <Link to="/signup">Signup</Link></p>
@@ -23,6 +61,8 @@ const Login = () => (
 				<p>Or go <Link to="/">home</Link>.</p>
 			</div>
 		</div>
-);
+		)
+	}
+};
 
 export default Login;

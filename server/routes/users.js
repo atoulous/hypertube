@@ -2,39 +2,66 @@ var User = require('./../models/users')
 var sendMail = require('./../models/sendmail')
 var Secu = require('../models/secu.js')
 var urls = 'http://5.196.225.53:8100'
+const jwt = require('jsonwebtoken')
+const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz'
 
 module.exports = (app, passport) => {
-
-	app.get('/', (req, res) => {
-		res.render('index.ejs')
-	})
 
 	app.get('/login', (req, res) => {
 		res.render('login.ejs', { message: req.flash('loginMessage') })
 	})
 
-	app.post('/login', passport.authenticate('local-login', {
-		successRedirect : '/profile',
-		failureRedirect : '/login',
-		failureFlash : true
-	}))
-
-
-
-	app.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/profile',
-		failureRedirect : '/signup',
-		failureFlash : true
-	}))
-
-	app.get('/signup', (req, res) => {
-		res.render('signup.ejs', { message: req.flash('signupMessage') });
+	app.post('/login', (req, res, next) => {
+		passport.authenticate('local-login', {session: false}, (err, user, info) => {
+			if (err) { return res.status(400).json({message: err}) }
+			if (!user) {return res.status(400).json({message: 'fail to login'}) }
+			req.login(user, {session: false}, (err) => {
+				if (err) { return next(err)}
+				const token = jwt.sign(user.toJSON(), jwtsecret)
+				return res.json({message: 'succes', user, token})
+			})
+		})(req, res, next)
 	})
 
-	app.get('/profile', isLoggedIn, (req, res) => {
-		res.render('profile.ejs', {
-			user : req.user
-		})
+
+	app.post('/signup', (req, res, next) => { 
+			if (!Secu.verif(req.body.login) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
+			console.log('ici')
+				return res.json({reperror: 'Complete all sections of the form.'})
+			}
+			else if (!Secu.isGoodPassword(req.body.password)) {
+				res.json({'error' : 'A strong password consists of a combination of upper and lowercase letters and numbers.'})
+			}
+			else if (!Secu.isEmail(req.body.email)) {
+				res.json({'error' : 'Incorrect Email.'})
+			}
+			else {
+				passport.authenticate('local-signup', (err, user, info) => {
+					if (err) { return res.json({error: err}) }
+					if (!user) { 
+						return res.json(info) 
+					}
+					req.login(user, (err) => {
+						if (err) { return next(err)}
+						const token = jwt.sign(user.toJSON(), jwtsecret)
+						console.log(user)
+						return res.json({message: 'succes', user, token})
+					})
+				})(req, res, next)
+			}
+	})
+
+	app.get('/profile', (req, res, next) => {
+		passport.authenticate('jwt', (err, user, info) => {
+			if (err) { return res.json({error: 'pouet'}) }
+			if (!user) { 
+				return res.json({error: 'fail'}) 
+			}
+			req.login(user, (err) => {
+				if (err) { return next(err)}
+				return res.json({message: 'succes', user})
+			})
+		})(req, res, next)
 	})
 
 
