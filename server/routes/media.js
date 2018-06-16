@@ -41,7 +41,7 @@ router.get('/startmedia/:id', async (req, res) => {
 				return res.status(422).json({ error: 'This media could not be played, either it does not have enough seeders, or it was corrupted.' })
 			})
 		}
-	}).catch(err => res.status(404).json({ error: 'This media could not be played, for this reason:' + err }));
+	}).catch(err => res.status(404).json({ error: 'This media could not be played.' }));
 });
 
 const serveWhenAvailable = async (res, filePath) => {
