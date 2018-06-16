@@ -76,4 +76,13 @@ router.get('/:mid/*.vtt', (req, res) => {
 	serveStaticFile(req, res, 'text/vtt')
 })
 
+router.get('/search/:term', async (req, res) => {
+	const results = await Crawler.search(req.params.term)
+	const localResults = await Media.find({displayName: new RegExp(req.params.term, 'i') }).limit(5)
+	return res.status(200).json({
+		local: localResults,
+		distant: results
+	})
+})
+
 module.exports = router;
