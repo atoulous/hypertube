@@ -5,8 +5,8 @@ module.exports = {
 		'callbackURL'   : 'http://localhost:8100/auth/google/callback'
 	},
 	'qdAuth': {
-		'clientID': 'z',
-		'clientSecret': 'a',
-		'callbackURL'   : 'http://localhost:8100/auth/qd/callback'
+		'clientID': '',
+		'clientSecret': '',
+		'callbackURL'   : 'http://localhost:5000/auth/qd/callback'
 	}
 }

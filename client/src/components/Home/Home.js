@@ -46,7 +46,7 @@ class Home extends Component {
 
 
 
-			<Link to="/Qd" class="btn btn-dark"><span class="fa fa-user"></span> Born 2 Code</Link>
+			<a href="http://localhost:5000/auth/qd" class="btn btn-dark"><span class="fa fa-user"></span> Born 2 Code</a>
 		</div>
 	</div>
     );

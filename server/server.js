@@ -10,6 +10,13 @@ var multer  = require('multer')
 var upload = multer({ dest: 'server/uploads/' })
 var cors = require('cors')
 
+var corsOption = {
+	origin: true,
+	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+	credentials: true,
+	exposedHeaders: ['x-auth-token']
+};
+
 mongoose.connect(configDB.url)
 
 require('./config/passport')(passport); // pass passport for configuration
@@ -23,10 +30,9 @@ var app = express()
 	saveUninitialized: true,
 	cookie: {secure: false}
 })*/
-
 app.use('/uploads', express.static(__dirname + '/serrver/uploads'))
 app.use(cookieParser())
-app.use(cors())
+app.use(cors(corsOption))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(upload.single('file'))

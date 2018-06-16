@@ -14,7 +14,9 @@ class Qd extends Component {
   }
 
   callApi = async () => {
-    const response = await fetch('/auth/qd',
+    const response = await fetch('/auth/qd', {
+		mode: "no-cors",
+		}
 	);
     const body = await response.json();
 

@@ -4,6 +4,7 @@ var Secu = require('../models/secu.js')
 var urls = 'http://5.196.225.53:8100'
 const jwt = require('jsonwebtoken')
 const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz'
+import Cookies from 'universal-cookie'
 
 module.exports = (app, passport) => {
 
@@ -44,7 +45,6 @@ module.exports = (app, passport) => {
 					req.login(user, (err) => {
 						if (err) { return next(err)}
 						const token = jwt.sign(user.toJSON(), jwtsecret)
-						console.log(user)
 						return res.json({message: 'succes', user, token})
 					})
 				})(req, res, next)
@@ -114,10 +114,21 @@ module.exports = (app, passport) => {
 
 	//42
 	app.get('/auth/qd', passport.authenticate('42', { scope : ['public'] }));
-	app.get('/auth/qd/callback', passport.authenticate('42', {
-		successRedirect : '/profile',
-		failureRedirect : '/'
-	}))
+	app.get('/auth/qd/callback', (req, res, next) => {
+		passport.authenticate('42', (err, user, info) => {
+			if (err) { return res.json({error: 'pouet'}) }
+			if (!user) { 
+				return res.json({error: 'fail'}) 
+			}
+			req.login(user, (err) => {
+				if (err) { return next(err)}
+				const token = jwt.sign(user.toJSON(), jwtsecret)
+				const cookies = new Cookies();
+				cookies.set('authtoken', token, { path: '/' });
+				return res.redirect('http://localhost:3000/profile')
+			})
+		})(req, res, next)
+	})
 
 	//GOOGLE
 	app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));

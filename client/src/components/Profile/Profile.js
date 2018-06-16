@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import cookie from 'react-cookies'
 //import { Link } from 'react-router-dom';
 
 import './Profile.css';
@@ -9,7 +10,9 @@ class Profile extends Component {
   };
 
   componentDidMount() {
-	const token = sessionStorage.getItem('jwtToken')
+	//const token = sessionStorage.getItem('jwtToken') || cookie.load('authtoken')
+	const token = cookie.load('authtoken');
+		console.log(token)
 	if (!token || token === '')
 		this.props.history.push("/login")
 	else {
