@@ -39,7 +39,7 @@ router.get('/startmedia/:id', async (req, res) => {
       }
 
       // temporary :)
-      setTimeout(() => res.status(200).json({}).end(), 1000);
+      setTimeout(() => res.status(200).json(media).end(), 1000);
     })
     .catch(err => res.status(404).end('that does not exist', err));
 });
