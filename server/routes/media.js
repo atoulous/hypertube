@@ -40,6 +40,8 @@ router.get('/startmedia/:id', async (req, res) => {
 			}).catch(() => {
 				return res.status(422).json({ error: 'This media could not be played, either it does not have enough seeders, or it was corrupted.' })
 			})
+		} else {
+			return res.status(200).json(media).end()
 		}
 	}).catch(err => res.status(404).json({ error: 'This media could not be played.' }));
 });
