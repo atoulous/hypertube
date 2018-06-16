@@ -110,6 +110,7 @@ class Library extends Component {
                     magnet={media.magnet}
                     imagePath={imagePath}
                     overview={overview}
+					media={media}
                   />
                 );
               })

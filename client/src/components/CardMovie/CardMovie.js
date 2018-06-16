@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import StarIcon from '@material-ui/icons/Star';
+import Chip from '@material-ui/core/Chip';
 
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
@@ -61,6 +62,16 @@ class CardMovie extends PureComponent {
               <Typography className={classes.title} gutterBottom variant="headline" component="h2">
                 {title}
               </Typography>
+
+			  <Grid container spacing={10}>
+			  	<Grid item xs={6}>
+				  <Chip label={`${this.props.media.seeders} seeders`} />
+				</Grid>
+				<Grid item xs={6}>
+				  <Chip label={`${this.props.media.leechers} leechers`} />
+				</Grid>
+			  </Grid>
+			  <br/>
               <Typography className={classes.cardContent} component="p">
                 {overview || 'No overview available'}
               </Typography>
