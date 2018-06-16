@@ -20,8 +20,8 @@ const mirrorList = Utils.shuffle([
 const selectMirror = async() => {
 	return new Promise((resolve, reject) => {
 		mirrorList.forEach((mirror) => {
-			request(mirror, { method: 'HEAD' }, async (err, res) => {
-				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299)) {
+			request(mirror + '/search/avengers/0/99/201', { method: 'GET' }, async (err, res, body) => {
+				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299) && body.indexOf("We're experiencing some issues with the database. Please try again soon.") === -1) {
 					return resolve(mirror)
 				}
 			})
