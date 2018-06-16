@@ -4,6 +4,8 @@ const fs = require('fs');
 const Media = require('../models/Media');
 const MediaController = require('../controllers/MediaController');
 
+const Crawler = require('../crawler/crawler')
+
 router.get('/all/:skip', (req, res) => {
   const skip = req.params ? parseInt(req.params.skip, 10) : 0;
 

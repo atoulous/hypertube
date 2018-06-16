@@ -139,13 +139,18 @@ const finishTorrentParsing = async (categoryName, torrent) => {
 	})
 }
 
-const crawl = async (category, categoryName) => {
+const crawl = async (category, categoryName, limit) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
 			const mirror = await selectMirror()
-			const html = await downloadHtml(mirror, '/top/' + category)
-			const torrents = await parseHtml(html)
+			console.log(mirror)
+			const html = await downloadHtml(mirror, category)
+			let torrents = await parseHtml(html)
+
+			if (limit && limit !== -1) {
+				torrents = torrents.slice(0, limit)
+			}
 
 			const promises = []
 			torrents.forEach((t) => {

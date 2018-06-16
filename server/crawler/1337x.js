@@ -165,15 +165,18 @@ const finishTorrentParsing = async (categoryName, mirror, torrent) => {
 	})
 }
 
-const crawl = async (category, categoryName) => {
+const crawl = async (category, categoryName, limit) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - 1337x]', 'Started for category', category, '-', categoryName)
 		try {
 			const mirror = await selectMirror()
 			const html = await downloadHtml(mirror, category)
 
-			const torrents = await parseHtml(html)
-			let i = 0
+			let torrents = await parseHtml(html)
+
+			if (limit && limit !== -1) {
+				torrents = torrents.slice(0, limit)
+			}
 
 			const promises = []
 			torrents.forEach((t) => {
