@@ -24,12 +24,16 @@ async function parseMedia(magnet) {
         const writeStream = fs.createWriteStream(filePath)
         readStream.pipe(writeStream)
 
-        const checkProbe = async () => {
-          console.log('ParseMedia', 'Checking probe status')
+        const checkProbe = async (pass) => {
+          console.log('ParseMedia', 'Checking probe status, pass #', pass, ' / 19')
           ffprobe(filePath, async (err, probeData) => {
             if (err) {
               console.log('ParseMedia', 'Probe failed. Retrying in 2000ms')
-              setTimeout(checkProbe, 2000)
+			  if (pass >= 20) {
+				  console.log('ParseMedia', 'Probe failed 20 times, aborting torrent. Probably not enough seeders or corrupted/incompatible input file.')
+				  return reject('Probe failed 20 times, aborting torrent. Probably not enough seeders or corrupted/incompatible input file.')
+			  }
+              setTimeout(() => { checkProbe(pass + 1) }, 2000)
               return
             }
             let i = 0
@@ -52,7 +56,7 @@ async function parseMedia(magnet) {
             })
           })
         }
-        setTimeout(checkProbe, 2000)
+        setTimeout(() => { checkProbe(0) }, 2000)
       })
     } catch (e) {
       return reject(e)
