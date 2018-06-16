@@ -7,6 +7,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
+import MediaDetails from '../MediaDetails'
+
 const styles = {
   title: {
     textAlign: 'center',
@@ -16,21 +18,23 @@ const styles = {
   },
   loadingText: {
     marginTop: 70,
-  },
+}
 };
 
 class MoviePlayer extends Component {
 state = {
   isLoading: true,
+  media: {}
 };
 
 async componentDidMount() {
   try {
-    await this.startMedia();
+    const media = await this.startMedia();
     const movieId = this.props.match.params.movieId;
 
     this.setState({
       isLoading: false,
+	  media: media
     });
 
   const HLS = new hls();
@@ -64,16 +68,26 @@ renderLoading(classes) {
 
       <Grid item>
         <Typography variant="display2" className={classes.loadingText} gutterBottom>
-Please wait, your movie is being loaded. This can take up to 40 seconds.
+			Please wait, your movie is being loaded. This can take up to 40 seconds.
         </Typography>
       </Grid>
     </Grid>
   );
 }
 
-renderLoaded() {
+renderLoaded(classes) {
   return (
-    <video width="100%" ref="video" controls autoPlay />
+	<Grid container spacing={24}>
+		<Grid item xs={12}>
+			<video width="100%" ref="video" className={classes.videoPlayer} controls autoPlay />
+		</Grid>
+
+		<Grid item xs={12}>
+			<MediaDetails
+				media={this.state.media} />
+		</Grid>
+	</Grid>
+
   );
 }
 
