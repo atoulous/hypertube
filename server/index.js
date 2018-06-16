@@ -16,7 +16,7 @@ app.all('/*', function(req, res, next) {
 
 mongoose.connect(config.db.url);
 
-crawler.startCrawling();
+// crawler.startCrawling();
 
 app.use(morgan('dev'));
 app.use('/api', routes);
