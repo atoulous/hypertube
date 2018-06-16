@@ -12,18 +12,16 @@ const request = require('request'),
 
 const mirrorList = Utils.shuffle([
 	'https://pirateproxy.sh',
-	'https://thepiratebay-org.prox.space',
-	'https://cruzing.xyz',
-	'https://tpbproxy.nl',
-	'https://thepiratebay.rocks',
+	// 'https://thepiratebay-org.prox.space',
+	// 'https://cruzing.xyz',
 	'https://proxydl.cf',
 ])
 
 const selectMirror = async() => {
 	return new Promise((resolve, reject) => {
 		mirrorList.forEach((mirror) => {
-			request(mirror, { method: 'HEAD' }, async (err, res) => {
-				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299)) {
+			request(mirror + '/search/avengers/0/99/201', { method: 'GET' }, async (err, res, body) => {
+				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299) && body.indexOf("We're experiencing some issues with the database. Please try again soon.") === -1) {
 					return resolve(mirror)
 				}
 			})
@@ -139,13 +137,18 @@ const finishTorrentParsing = async (categoryName, torrent) => {
 	})
 }
 
-const crawl = async (category, categoryName) => {
+const crawl = async (category, categoryName, limit) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
 			const mirror = await selectMirror()
-			const html = await downloadHtml(mirror, '/top/' + category)
-			const torrents = await parseHtml(html)
+			console.log(mirror)
+			const html = await downloadHtml(mirror, category)
+			let torrents = await parseHtml(html)
+
+			if (limit && limit !== -1) {
+				torrents = torrents.slice(0, limit)
+			}
 
 			const promises = []
 			torrents.forEach((t) => {
