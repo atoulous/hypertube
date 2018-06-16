@@ -12,10 +12,8 @@ const request = require('request'),
 
 const mirrorList = Utils.shuffle([
 	'https://pirateproxy.sh',
-	'https://thepiratebay-org.prox.space',
-	'https://cruzing.xyz',
-	'https://tpbproxy.nl',
-	'https://thepiratebay.rocks',
+	// 'https://thepiratebay-org.prox.space',
+	// 'https://cruzing.xyz',
 	'https://proxydl.cf',
 ])
 
