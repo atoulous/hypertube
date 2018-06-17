@@ -4,22 +4,18 @@ var Secu = require('../models/secu.js')
 var urls = 'http://5.196.225.53:8100'
 const jwt = require('jsonwebtoken')
 const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz'
-import Cookies from 'universal-cookie'
+const fs = require('fs');
 
 module.exports = (app, passport) => {
 
-	app.get('/login', (req, res) => {
-		res.render('login.ejs', { message: req.flash('loginMessage') })
-	})
-
 	app.post('/login', (req, res, next) => {
 		passport.authenticate('local-login', {session: false}, (err, user, info) => {
-			if (err) { return res.status(400).json({message: err}) }
-			if (!user) {return res.status(400).json({message: 'fail to login'}) }
+			if (err) { return res.status(400).json({message: err, login:false}) }
+			if (!user) {return res.status(400).json({message: 'fail to login', login: false}) }
 			req.login(user, {session: false}, (err) => {
 				if (err) { return next(err)}
 				const token = jwt.sign(user.toJSON(), jwtsecret)
-				return res.json({message: 'succes', user, token})
+				return res.json({message: 'success', user, login: true, token: token})
 			})
 		})(req, res, next)
 	})
@@ -27,25 +23,25 @@ module.exports = (app, passport) => {
 
 	app.post('/signup', (req, res, next) => { 
 			if (!Secu.verif(req.body.login) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
-			console.log('ici')
-				return res.json({reperror: 'Complete all sections of the form.'})
+				return res.json({message: 'Complete all sections of the form.', login: false})
 			}
 			else if (!Secu.isGoodPassword(req.body.password)) {
-				res.json({'error' : 'A strong password consists of a combination of upper and lowercase letters and numbers.'})
+				res.json({message : 'A strong password consists of a combination of upper and lowercase letters and numbers.', login:false})
 			}
 			else if (!Secu.isEmail(req.body.email)) {
-				res.json({'error' : 'Incorrect Email.'})
+				res.json({message : 'Incorrect Email.', login: false})
 			}
 			else {
 				passport.authenticate('local-signup', (err, user, info) => {
-					if (err) { return res.json({error: err}) }
+					if (err) { return res.json({message: err, login: false}) }
 					if (!user) { 
-						return res.json(info) 
+						return res.json({login: false, message: 'inccorect user.'})
 					}
 					req.login(user, (err) => {
 						if (err) { return next(err)}
 						const token = jwt.sign(user.toJSON(), jwtsecret)
-						return res.json({message: 'succes', user, token})
+                        res.cookie('authtoken' ,token);
+                        return res.json({message: 'success', user, login: true})
 					})
 				})(req, res, next)
 			}
@@ -53,30 +49,25 @@ module.exports = (app, passport) => {
 
 	app.get('/profile', (req, res, next) => {
 		passport.authenticate('jwt', (err, user, info) => {
-			if (err) { return res.json({error: 'pouet'}) }
+			if (err) { return res.json({message: err, login: false}) }
 			if (!user) { 
-				return res.json({error: 'fail'}) 
+				return res.json({message: 'incorrect user'})
 			}
-			req.login(user, (err) => {
-				if (err) { return next(err)}
-				return res.json({message: 'succes', user})
-			})
+				return res.json({message: 'success', user})
 		})(req, res, next)
 	})
 
 
-	app.post('/profile', isLoggedIn, (req, res) => {
+	app.post('/profile', (req, res, next) => {
+        passport.authenticate('jwt', (err, userlogin, info) => {
 		if (!Secu.verif(req.body.firstname) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.email)) {
-			req.flash('signupMessage', 'Empty form field.')
-			res.redirect('/profile')
+            res.json({message: 'Empty form field.', change: false})
 		}
 		else if (!Secu.isEmail(req.body.email)) {
-			req.flash('signupMessage', 'Incorrect Email.')
-			res.redirect('/profile')
-		
+            res.json({message: 'Incorrect Email.', change: false})
 		}
 		else {
-			User.findOne({ 'local.name' :  req.user.local.name}, (err, user) => {
+			User.findOne({ 'local.name' :  userlogin.name}, (err, user) => {
 				if (err) throw err
 				if (user) {
 					user.local.email = req.body.email
@@ -90,20 +81,22 @@ module.exports = (app, passport) => {
 							req.flash('signupMessage', 'A strong password consists of a combination of upper and lowercase letters and numbers.')
 					}
 					if (req.file) {
-						fs.rename(__dirname + '/../uploads/' + req.file.filename, __dirname + '/../uploads/' + user.local.picture, (err) => {
+						fs.rename(__dirname + '/../uploads/' + req.file.filename, __dirname + '/../uploads/' + userlogin.name, (err) => {
 							if (err) throw err
 						})
 					}
 					user.save((err) => {
 						if (err) throw err
-						res.render('profile.ejs', {
-							user : user
-						})
+                        console.log('profil ok')
+                        res.json({message: 'success', change: true, user: {login: user.local.login, picture: user.local.picture}})
 					})
 				}
+				else
+                    res.json({message: 'Incorrect user', change: false})
 			})
 
 		}
+        })(req, res, next)
 	})
 
 	app.get('/logout', (req, res) => {
@@ -112,19 +105,35 @@ module.exports = (app, passport) => {
 	})
 
 
-	//42
-	app.get('/auth/qd', passport.authenticate('42', { scope : ['public'] }));
-	app.get('/auth/qd/callback', (req, res, next) => {
-		passport.authenticate('42', (err, user, info) => {
-			if (err) { return res.json({error: 'pouet'}) }
+    //42
+    app.get('/auth/qd', passport.authenticate('42', { scope : ['public'] }));
+    app.get('/auth/qd/callback', (req, res, next) => {
+        passport.authenticate('42', (err, user, info) => {
+            if (err) { return res.json({message: err, login: false}) }
+            if (!user) {
+                return res.json({message: 'incorrect user', login: false})
+            }
+            req.login(user, (err) => {
+                if (err) { return next(err)}
+                const token = jwt.sign(user.toJSON(), jwtsecret)
+                res.cookie('authtoken' ,token);
+                return res.redirect('http://localhost:3000/profile')
+            })
+        })(req, res, next)
+    })
+
+	//github
+	app.get('/auth/github', passport.authenticate('github', { scope : ['user:email'] }));
+	app.get('/auth/github/callback', (req, res, next) => {
+		passport.authenticate('github', (err, user, info) => {
+			if (err) { return res.json({message: err, login: false}) }
 			if (!user) { 
-				return res.json({error: 'fail'}) 
+				return res.json({message: 'incorrect user', login: false})
 			}
 			req.login(user, (err) => {
 				if (err) { return next(err)}
 				const token = jwt.sign(user.toJSON(), jwtsecret)
-				const cookies = new Cookies();
-				cookies.set('authtoken', token, { path: '/' });
+                res.cookie('authtoken' ,token);
 				return res.redirect('http://localhost:3000/profile')
 			})
 		})(req, res, next)
@@ -132,10 +141,21 @@ module.exports = (app, passport) => {
 
 	//GOOGLE
 	app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
-	app.get('/auth/google/callback', passport.authenticate('google', {
-		successRedirect : '/profile',
-		failureRedirect : '/'
-	}))
+	app.get('/auth/google/callback', (req, res, next) => {
+		passport.authenticate('google', (err, user, next) => {
+            if (err) { return res.json({message: err, login: false}) }
+            if (!user) {
+                return res.json({message: 'incorrect user', login: false})
+            }
+            req.login(user, (err) => {
+                if (err) { return next(err)}
+                const token = jwt.sign(user.toJSON(), jwtsecret)
+                res.cookie('authtoken' ,token);
+
+                return res.redirect('http://localhost:3000/profile')
+            })
+        })(req, res, next)
+    })
 
 	app.get('/resetpasswd', (req, res) => {
 		res.locals.code = req.query.code

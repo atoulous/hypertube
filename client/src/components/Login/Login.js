@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import cookie from 'universal-cookie'
 
 class Login extends Component{
 	constructor(props) {
@@ -14,10 +15,10 @@ class Login extends Component{
 	e.preventDefault()
     this.callApi(e)
       .then(res => {
-	  console.log(res)
 			this.setState({ response: res.message })
-			if (res.message === 'succes') {
-				sessionStorage.setItem('jwtToken', res.token)
+			if (res.message === 'success') {
+                const cookies = new cookie()
+                cookies.set('authtoken', res.token, {path: '/'});
 				this.props.history.push("/Profile")
 			}
 	  })
@@ -45,8 +46,8 @@ class Login extends Component{
 				<h1><span class="fa fa-sign-in"></span>Login</h1>
 				<form onSubmit={this.tryLogin} method="post">
 					<div class="form-group">
-						<label>Email</label>
-						<input type="text" class="form-control" name="email"/>
+						<label>Login</label>
+						<input type="text" class="form-control" name="name"/>
 					</div>
 					<div class="form-group">
 						<label>Password</label>

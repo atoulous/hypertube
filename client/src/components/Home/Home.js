@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { GoogleLogin } from 'react-google-login';
-//import { Login42 } from 'react-42-login';
 
 import './Home.css';
 
@@ -26,9 +24,6 @@ class Home extends Component {
   };
 */
   render() {
-  const responseGoogle = (response) => {
-    console.log(response);
-	}
     return (
 	<div class="container">
 		<div class="jumbotron text-center">
@@ -36,17 +31,9 @@ class Home extends Component {
 			<p>Login or Register with:</p>
 			<Link to="/login" class="btn btn-default"><span class="fa fa-user"></span> Local Login</Link>
 			<Link to="/signup" class="btn btn-default"><span class="fa fa-user"></span> Local Signup</Link>
-			<Link to="/Google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google</Link>
-<GoogleLogin
-    clientId=""
-	    buttonText="Login"
-		    onSuccess={responseGoogle}
-			    onFailure={responseGoogle}
-				  />,
-
-
-
+			<a href="http://localhost:5000/auth/google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google</a>
 			<a href="http://localhost:5000/auth/qd" class="btn btn-dark"><span class="fa fa-user"></span> Born 2 Code</a>
+      		<a href="http://localhost:5000/auth/github" class="btn btn-dark"><span class="fa fa-user"></span> Github</a>
 		</div>
 	</div>
     );

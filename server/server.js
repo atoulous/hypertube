@@ -30,7 +30,7 @@ var app = express()
 	saveUninitialized: true,
 	cookie: {secure: false}
 })*/
-app.use('/uploads', express.static(__dirname + '/serrver/uploads'))
+app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(cookieParser())
 app.use(cors(corsOption))
 app.use(bodyParser.urlencoded({ extended: true }))

@@ -20,6 +20,15 @@ var userSchema = mongoose.Schema({
 		lastname: String,
 		picture: String
 	},
+    github: {
+        id: String,
+        token: String,
+        email: String,
+        name: String,
+        firstname: String,
+        lastname: String,
+        picture: String
+    },
 	qd: {
 		id: String,
 		token: String,
