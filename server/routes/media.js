@@ -6,26 +6,34 @@ const MediaController = require('../controllers/MediaController');
 
 const Crawler = require('../crawler/crawler')
 
-router.get('/all/:skip', (req, res) => {
+router.get('/all/:skip/:term', (req, res) => {
   const skip = req.params ? parseInt(req.params.skip, 10) : 0;
+  const term = req.params ? req.params.term : null;
+  const search = term !== 'null' ? { displayName: term } : {};
 
-  Media.find({}).limit(10).skip(skip)
+  console.log('skip/term/search', skip, term, search);
+
+	Media.find(search).limit(10).skip(skip)
+		.then(medias => res.status(200).json(medias))
+		.catch((err) => { console.log('err==', err); });
+});
+
+router.get('/movies/:skip/:term', (req, res) => {
+  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
+  const term = req.params ? req.params.term : null;
+  const search = term !== 'null' ? { displayName: term } : {};
+
+  Media.find(search).where('mediaType').equals('movie').limit(10).skip(skip)
     .then(medias => res.status(200).json(medias))
     .catch((err) => { console.log('err==', err); });
 });
 
-router.get('/movies/:skip', (req, res) => {
+router.get('/shows/:skip/:term', (req, res) => {
   const skip = req.params ? parseInt(req.params.skip, 10) : 0;
+  const term = req.params ? req.params.term : null;
+  const search = term !== 'null' ? { displayName: term } : {};
 
-  Media.find({}).where('mediaType').equals('movie').limit(10).skip(skip)
-    .then(medias => res.status(200).json(medias))
-    .catch((err) => { console.log('err==', err); });
-});
-
-router.get('/shows/:skip', (req, res) => {
-  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
-
-  Media.find({}).where('mediaType').equals('show').limit(10).skip(skip)
+  Media.find(search).where('mediaType').equals('show').limit(10).skip(skip)
     .then(medias => res.status(200).json(medias))
     .catch((err) => { console.log('/shows err==', err); });
 });
@@ -84,5 +92,24 @@ router.get('/search/:term', async (req, res) => {
 		distant: results
 	})
 })
+
+router.get('/searchLocal/all/:term', async (req, res) => {
+  const localResults = await Media.find({ displayName: new RegExp(req.params.term, 'i') }, 'displayName');
+
+  return res.status(200).json(localResults);
+});
+
+
+router.get('/searchLocal/movies/:term', async (req, res) => {
+  const localResults = await Media.find({ displayName: new RegExp(req.params.term, 'i') }, 'displayName').where('mediaType').equals('movie');
+
+  return res.status(200).json(localResults);
+});
+
+router.get('/searchLocal/shows/:term', async (req, res) => {
+  const localResults = await Media.find({ displayName: new RegExp(req.params.term, 'i') }, 'displayName').where('mediaType').equals('show');
+
+  return res.status(200).json(localResults);
+});
 
 module.exports = router;

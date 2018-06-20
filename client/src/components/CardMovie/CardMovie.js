@@ -15,7 +15,7 @@ import Chip from '@material-ui/core/Chip';
 
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
-const styles = theme => ({
+const styles = () => ({
   card: {
     width: 300,
     height: 400,
@@ -47,12 +47,12 @@ class CardMovie extends PureComponent {
   };
 
   render() {
-    const { classes, title, imagePath, overview, mediaId } = this.props;
+    const { classes, title, imagePath, overview, mediaId, seeders, leechers } = this.props;
 
     return (
       <Grid item xs>
-          <Card className={classes.card}>
-			  <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
+        <Card className={classes.card}>
+          <Link to={`/movie/${mediaId}`} title="watch" className={classes.link}>
             <CardMedia
               className={classes.media}
               image={imagePath ? `http://image.tmdb.org/t/p/w200${imagePath}` : defaultImage}
@@ -63,15 +63,15 @@ class CardMovie extends PureComponent {
                 {title}
               </Typography>
 
-			  <Grid container spacing={10}>
-			  	<Grid item xs={6}>
-				  <Chip label={`${this.props.media.seeders} seeders`} />
-				</Grid>
-				<Grid item xs={6}>
-				  <Chip label={`${this.props.media.leechers} leechers`} />
-				</Grid>
-			  </Grid>
-			  <br/>
+              <Grid container>
+                <Grid item xs>
+                  <Chip label={`${seeders} seeders`} />
+                </Grid>
+                <Grid item xs>
+                  <Chip label={`${leechers} leechers`} />
+                </Grid>
+              </Grid>
+              <br />
               <Typography className={classes.cardContent} component="p">
                 {overview || 'No overview available'}
               </Typography>
@@ -83,11 +83,10 @@ class CardMovie extends PureComponent {
               </Button>
             </CardActions>
           </Link>
-          </Card>
+        </Card>
       </Grid>
     );
   }
-
 }
 
 CardMovie.propTypes = {
@@ -96,6 +95,8 @@ CardMovie.propTypes = {
   mediaId: PropTypes.string.isRequired,
   imagePath: PropTypes.string,
   overview: PropTypes.string,
+  seeders: PropTypes.number.isRequired,
+  leechers: PropTypes.number.isRequired,
 };
 
 export default withStyles(styles)(CardMovie);

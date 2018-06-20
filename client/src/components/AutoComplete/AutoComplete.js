@@ -11,43 +11,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
-const suggestions = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-  { label: 'American Samoa' },
-  { label: 'Andorra' },
-  { label: 'Angola' },
-  { label: 'Anguilla' },
-  { label: 'Antarctica' },
-  { label: 'Antigua and Barbuda' },
-  { label: 'Argentina' },
-  { label: 'Armenia' },
-  { label: 'Aruba' },
-  { label: 'Australia' },
-  { label: 'Austria' },
-  { label: 'Azerbaijan' },
-  { label: 'Bahamas' },
-  { label: 'Bahrain' },
-  { label: 'Bangladesh' },
-  { label: 'Barbados' },
-  { label: 'Belarus' },
-  { label: 'Belgium' },
-  { label: 'Belize' },
-  { label: 'Benin' },
-  { label: 'Bermuda' },
-  { label: 'Bhutan' },
-  { label: 'Bolivia, Plurinational State of' },
-  { label: 'Bonaire, Sint Eustatius and Saba' },
-  { label: 'Bosnia and Herzegovina' },
-  { label: 'Botswana' },
-  { label: 'Bouvet Island' },
-  { label: 'Brazil' },
-  { label: 'British Indian Ocean Territory' },
-  { label: 'Brunei Darussalam' },
-];
-
 const renderInput = (inputProps) => {
   const { classes, ref, ...other } = inputProps;
 
@@ -66,8 +29,8 @@ const renderInput = (inputProps) => {
 };
 
 const renderSuggestion = (suggestion, { query, isHighlighted }) => {
-  const matches = match(suggestion.label, query);
-  const parts = parse(suggestion.label, matches);
+  const matches = match(suggestion.displayName, query);
+  const parts = parse(suggestion.displayName, matches);
 
   return (
     <MenuItem selected={isHighlighted} component="div">
@@ -98,17 +61,16 @@ const renderSuggestionsContainer = (options) => {
 
 const getSuggestionValue = suggestion => suggestion.label;
 
-const getSuggestions = (value) => {
-  const inputValue = value.trim().toLowerCase();
-  const inputLength = inputValue.length;
-  let count = 0;
+const getSuggestions = async (value, tabsValue) => {
+  try {
+    const inputValue = value.trim().toLowerCase();
 
-  return inputLength === 0 ? [] : suggestions.filter((suggestion) => {
-    const keep = count < 5 && suggestion.label.toLowerCase().slice(0, inputLength) === inputValue;
-    if (keep) count += 1;
+    const response = await fetch(`api/media/searchLocal/${tabsValue}/${inputValue}`);
+    const body = await response.json();
 
-    return keep;
-  });
+    return body || [];
+  } catch (err) {
+  }
 };
 
 const styles = theme => ({
@@ -142,9 +104,11 @@ class IntegrationAutosuggest extends Component {
     suggestions: [],
   };
 
-  handleSuggestionsFetchRequested = ({ value }) => {
+  handleSuggestionsFetchRequested = async ({ value }) => {
+    const { tabsValue } = this.props;
+
     this.setState({
-      suggestions: getSuggestions(value),
+      suggestions: await getSuggestions(value, tabsValue),
     });
   };
 
@@ -154,10 +118,13 @@ class IntegrationAutosuggest extends Component {
     });
   };
 
+  handleSuggestionSelected = async (event, { suggestion }) => {
+    const term = suggestion.displayName;
+    this.props.handleAutoComplete({ term });
+  };
+
   handleChange = (event, { newValue }) => {
-    this.setState({
-      value: newValue,
-    });
+    this.setState({ value: newValue || '' });
   };
 
   render() {
@@ -175,12 +142,13 @@ class IntegrationAutosuggest extends Component {
         suggestions={this.state.suggestions}
         onSuggestionsFetchRequested={this.handleSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.handleSuggestionsClearRequested}
+        onSuggestionSelected={this.handleSuggestionSelected}
         renderSuggestionsContainer={renderSuggestionsContainer}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={renderSuggestion}
         inputProps={{
           classes,
-          placeholder: 'Search a country (start with a)',
+          placeholder: 'Search in library',
           value: this.state.value,
           onChange: this.handleChange,
           startAdornment: (
@@ -196,6 +164,8 @@ class IntegrationAutosuggest extends Component {
 
 IntegrationAutosuggest.propTypes = {
   classes: PropTypes.object.isRequired,
+  handleAutoComplete: PropTypes.func.isRequired,
+  tabsValue: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(IntegrationAutosuggest);

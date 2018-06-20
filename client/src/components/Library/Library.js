@@ -29,16 +29,16 @@ class Library extends Component {
   async componentDidMount() {
     try {
       const { tabsValue } = this.state;
-      const medias = await this.getMedias({ type: tabsValue });
+      const medias = await this.getMedias({ tabsValue });
       this.setState({ medias });
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
   }
 
-  getMedias = async ({ type = 'all', skip = 0 }) => {
+  getMedias = async ({ tabsValue = 'all', skip = 0, term = null }) => {
     try {
-      const response = await fetch(`/api/media/${type}/${skip}`);
+      const response = await fetch(`/api/media/${tabsValue}/${skip}/${term}`);
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.message);
@@ -52,7 +52,7 @@ class Library extends Component {
   handleTabs = async (event, value) => {
     try {
       if (this.state.tabsValue !== value) {
-        const medias = await this.getMedias({ type: value });
+        const medias = await this.getMedias({ tabsValue: value });
         await this.setState({ medias, tabsValue: value });
       }
     } catch (err) {
@@ -64,11 +64,21 @@ class Library extends Component {
     try {
       const { medias, tabsValue, skip } = this.state;
       const newSkip = skip + 10;
-      const newMedias = await this.getMedias({ type: tabsValue, skip: newSkip });
+      const newMedias = await this.getMedias({ tabsValue, skip: newSkip });
 
       this.setState({ medias: medias.concat(newMedias), skip: newSkip });
     } catch (err) {
       console.error('handleLoading err: ', err);
+    }
+  };
+
+  handleAutoComplete = async ({ term }) => {
+    try {
+      const { tabsValue } = this.state;
+      const medias = await this.getMedias({ tabsValue, term });
+      this.setState({ medias });
+    } catch (err) {
+      console.error('handleAutoComplete err: ', err);
     }
   };
 
@@ -81,7 +91,7 @@ class Library extends Component {
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Library
         </Typography>
-        <AutoComplete />
+        <AutoComplete tabsValue={tabsValue} handleAutoComplete={this.handleAutoComplete} />
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
 
         <InfiniteScroll
@@ -110,7 +120,8 @@ class Library extends Component {
                     magnet={media.magnet}
                     imagePath={imagePath}
                     overview={overview}
-					media={media}
+                    seeders={media.seeders}
+                    leechers={media.leechers}
                   />
                 );
               })
