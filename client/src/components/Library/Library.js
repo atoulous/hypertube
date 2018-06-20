@@ -17,6 +17,9 @@ const styles = {
   root: {
     flexGrow: 1,
   },
+  loader: {
+    margin: 'auto',
+  },
 };
 
 class Library extends Component {
@@ -24,6 +27,7 @@ class Library extends Component {
     tabsValue: this.props.match.params.tabsValue || 'all',
     medias: [],
     skip: 0,
+    hasMore: true,
   };
 
   async componentDidMount() {
@@ -66,7 +70,9 @@ class Library extends Component {
       const newSkip = skip + 10;
       const newMedias = await this.getMedias({ tabsValue, skip: newSkip });
 
-      this.setState({ medias: medias.concat(newMedias), skip: newSkip });
+      const hasMore = !!newMedias.length;
+
+      this.setState({ medias: medias.concat(newMedias), skip: newSkip, hasMore });
     } catch (err) {
       console.error('handleLoading err: ', err);
     }
@@ -84,7 +90,7 @@ class Library extends Component {
 
   render() {
     const { classes } = this.props;
-    const { medias, tabsValue } = this.state;
+    const { medias, tabsValue, hasMore } = this.state;
 
     return (
       <div className={classes.root}>
@@ -97,8 +103,8 @@ class Library extends Component {
         <InfiniteScroll
           pageStart={0}
           loadMore={this.handleLoading}
-          hasMore
-          loader={<div className="loader" key={0}>Loading ...</div>}
+          hasMore={hasMore}
+          loader={<div className={classes.loader} key={0}>Loading ...</div>}
           useWindow
         >
           <Grid container spacing={24} style={{ margin: 'auto' }}>

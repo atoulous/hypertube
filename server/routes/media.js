@@ -11,8 +11,6 @@ router.get('/all/:skip/:term', (req, res) => {
   const term = req.params ? req.params.term : null;
   const search = term !== 'null' ? { displayName: term } : {};
 
-  console.log('skip/term/search', skip, term, search);
-
 	Media.find(search).limit(10).skip(skip)
 		.then(medias => res.status(200).json(medias))
 		.catch((err) => { console.log('err==', err); });
