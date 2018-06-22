@@ -10,21 +10,12 @@ const request = require('request'),
 	MovieDB = require('moviedb')(config.default.movieDbApiKey)
 
 
-const mirrorList = Utils.shuffle([
-	'https://pirateproxy.sh',
-	// 'https://thepiratebay-org.prox.space',
-	// 'https://cruzing.xyz',
-	'https://proxydl.cf',
-])
-
-const selectMirror = async() => {
+const testMirror = async(mirror) => {
 	return new Promise((resolve, reject) => {
-		mirrorList.forEach((mirror) => {
-			request(mirror + '/search/avengers/0/99/201', { method: 'GET' }, async (err, res, body) => {
-				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299) && body.indexOf("We're experiencing some issues with the database. Please try again soon.") === -1) {
-					return resolve(mirror)
-				}
-			})
+		request(mirror + '/search/avengers/0/99/201', { method: 'GET' }, async (err, res, body) => {
+			if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299) && body.indexOf("We're experiencing some issues with the database. Please try again soon.") === -1) {
+				return resolve(mirror)
+			}
 		})
 	})
 }
@@ -141,8 +132,15 @@ const crawl = async (category, categoryName, limit) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
-			const mirror = await selectMirror()
-			console.log(mirror)
+			const mirror = await Promise.race([
+				testMirror('https://pirateproxy.mx'),
+				testMirror('https://thepbproxy.com'),
+				testMirror('https://pirateproxy.sh'),
+				testMirror('https://thepiratebay-org.prox.space'),
+				testMirror('https://cruzing.xyz'),
+				testMirror('https://proxydl.cf')
+			])
+
 			const html = await downloadHtml(mirror, category)
 			let torrents = await parseHtml(html)
 
