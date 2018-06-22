@@ -62,7 +62,8 @@ class Library extends Component {
   handleTabs = async (event, value) => {
     try {
       if (this.state.tabsValue !== value) {
-        const medias = await this.getMedias({ tabsValue: value });
+        const { term } = this.state;
+        const medias = await this.getMedias({ tabsValue: value, term });
         await this.setState({ medias, tabsValue: value });
       }
     } catch (err) {
@@ -71,12 +72,10 @@ class Library extends Component {
   };
 
   handleLoading = async () => {
-    console.log('handleLoading', this.state);
     try {
       const { medias, tabsValue, skip, term } = this.state;
       const newSkip = skip + nbMediasPerPage;
       const newMedias = await this.getMedias({ tabsValue, skip: newSkip, term });
-      console.log('handleLoading newMedias== ', newMedias);
 
       const hasMore = newMedias.length === nbMediasPerPage;
 
@@ -89,18 +88,15 @@ class Library extends Component {
   };
 
   handleAutoComplete = async ({ term }) => {
-    console.log('handleAutoComplete');
     try {
-      const { tabsValue } = this.state;
-      console.log('handleAutoComplete term==', term);
+      if (term) {
+        const { tabsValue } = this.state;
 
-      this.setState({ term });
+        const medias = await this.getMedias({ tabsValue, term });
+        const hasMore = medias.length === nbMediasPerPage;
 
-      const medias = await this.getMedias({ tabsValue, term });
-      console.log('handleAutoComplete medias==', medias);
-      const hasMore = medias.length === nbMediasPerPage;
-
-      this.setState({ medias, hasMore });
+        this.setState({ medias, hasMore, term });
+      }
     } catch (err) {
       console.error('handleAutoComplete err: ', err);
     }

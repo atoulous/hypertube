@@ -6,39 +6,33 @@ const MediaController = require('../controllers/MediaController');
 
 const Crawler = require('../crawler/crawler')
 
-router.get('/all/:skip/:term', async (req, res) => {
+/**
+ * Main route to find medias in db from type, by skip, by term of name
+ */
+router.get('/:type/:skip/:term', async (req, res) => {
   try {
     const skip = parseInt(req.params.skip, 10);
-    const { term } = req.params;
+    const { term, type } = req.params;
     const termRegex = new RegExp(term, 'i');
     const search = term !== 'null' ? { displayName: termRegex } : {};
 
-    const medias = await Media.find(search).limit(10).skip(skip);
+    let medias = [];
+    switch (type) {
+      case 'all':
+        medias = await Media.find(search).limit(10).skip(skip);
+        break;
+      case 'movies':
+        medias = await Media.find(search).where('mediaType').equals('movie').limit(10).skip(skip);
+        break;
+      case 'shows':
+        medias = await Media.find(search).where('mediaType').equals('show').limit(10).skip(skip);
+        break;
+    }
 
     res.status(200).json(medias);
   } catch (err) {
     console.error('media/all err', err);
   }
-});
-
-router.get('/movies/:skip/:term', (req, res) => {
-  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
-  const term = req.params ? req.params.term : null;
-  const search = term !== 'null' ? { displayName: term } : {};
-
-  Media.find(search).where('mediaType').equals('movie').limit(10).skip(skip)
-    .then(medias => res.status(200).json(medias))
-    .catch((err) => { console.log('err==', err); });
-});
-
-router.get('/shows/:skip/:term', (req, res) => {
-  const skip = req.params ? parseInt(req.params.skip, 10) : 0;
-  const term = req.params ? req.params.term : null;
-  const search = term !== 'null' ? { displayName: term } : {};
-
-  Media.find(search).where('mediaType').equals('show').limit(10).skip(skip)
-    .then(medias => res.status(200).json(medias))
-    .catch((err) => { console.log('/shows err==', err); });
 });
 
 router.get('/startmedia/:id', async (req, res) => {
