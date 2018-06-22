@@ -47,7 +47,7 @@ class MoviePlayer extends Component {
 			this.setState({
 				error: false,
 				isLoading: false,
-				media: media
+				media: media.media
 			});
 
 			const HLS = new hls();
