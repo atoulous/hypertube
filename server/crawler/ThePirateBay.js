@@ -4,10 +4,7 @@ const request = require('request'),
 	htmlparser = require("htmlparser2"),
 	Media = require('../models/Media'),
 	Utils = require('./utils'),
-	config = {default: {
-	  movieDbApiKey: 'd322868ef91d1fef2ba68c167a37c56a'
-  	}},
-	MovieDB = require('moviedb')(config.default.movieDbApiKey)
+	MetadatasHelper = require('./MetadatasHelper')
 
 
 const testMirror = async(mirror) => {
@@ -71,33 +68,7 @@ const parseHtml = async (html) => {
 	})
 }
 
-const getMediaMetadata = (mediaName) => {
-	return new Promise((resolve, reject) => {
-		MovieDB.searchMovie({ query: mediaName }, async (mDbErr, mDbRes) => {
-			if (mDbErr && mDbErr.status === 429 && mDbErr.response.header['retry-after']) {
-				// We hit the rate limit, re-call this function after the delay
-				await Utils.timeout(parseInt(mDbErr.response.header['retry-after'], 10) / 1000)
-				const response = await getMediaMetadata(mediaName)
-				return resolve(response)
-			}
-
-			const mdbData = (mDbErr || !mDbRes || !mDbRes.results || !mDbRes.results[0]) ? null : mDbRes.results[0]
-
-			// No response from TheMovieDB, set the metadata to a null
-			if (!mdbData) return resolve(null)
-
-			// We found the data, return it!
-			return resolve({
-				name: mdbData.title,
-				posterPath: mdbData.poster_path,
-				backdropPath: mdbData.backdrop_path,
-				overview: mdbData.overview
-			})
-		})
-	})
-}
-
-const finishTorrentParsing = async (categoryName, torrent) => {
+const finishTorrentParsing = async (categoryName, torrent, doFetchMetadatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
 		if (olderTorrent) {
@@ -112,7 +83,6 @@ const finishTorrentParsing = async (categoryName, torrent) => {
 		if (categoryName === 'show') {
 			searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
 		}
-		const metadatas = await getMediaMetadata(searchTerm)
 		const media = new Media({
 			displayName: torrent.name,
 			magnet: torrent.magnet,
@@ -120,15 +90,16 @@ const finishTorrentParsing = async (categoryName, torrent) => {
 			source: 'ThePirateBay',
 			mediaType: categoryName,
 			seeders: torrent.seeders,
-			leechers: torrent.leechers,
-			metadatas: metadatas
+			leechers: torrent.leechers
 		})
+
+		await MetadatasHelper.fetchMetadatas(media, doFetchMetadatas, mediaType)
 		await media.save()
 		return resolve(media)
 	})
 }
 
-const crawl = async (category, categoryName, limit) => {
+const crawl = async (category, categoryName, limit, doFetchMetadatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
@@ -150,7 +121,7 @@ const crawl = async (category, categoryName, limit) => {
 
 			const promises = []
 			torrents.forEach((t) => {
-				promises.push(finishTorrentParsing(categoryName, t))
+				promises.push(finishTorrentParsing(categoryName, t, doFetchMetadatas, mediaType))
 			})
 
 			const result = await Promise.all(promises)

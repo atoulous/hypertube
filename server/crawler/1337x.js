@@ -4,10 +4,7 @@ const request = require('request'),
 	htmlparser = require("htmlparser2"),
 	Media = require('../models/Media'),
 	Utils = require('./utils'),
-	config = {default: {
-	  movieDbApiKey: 'd322868ef91d1fef2ba68c167a37c56a'
-	}},
-	MovieDB = require('moviedb')(config.default.movieDbApiKey)
+	MetadatasHelper = require('./MetadatasHelper')
 
 
 const fetchHtml = async (uri) => {
@@ -118,7 +115,7 @@ const getMagnet = async (torrent, mirror) => {
 	})
 }
 
-const finishTorrentParsing = async (categoryName, mirror, torrent) => {
+const finishTorrentParsing = async (categoryName, mirror, torrent, doFetchMetadatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		torrent.magnet = await getMagnet(torrent.tmpUrl, mirror)
 
@@ -132,7 +129,6 @@ const finishTorrentParsing = async (categoryName, mirror, torrent) => {
 		if (categoryName === 'show') {
 			searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
 		}
-		torrent.metadatas = await getMediaMetadata(searchTerm)
 
 		const media = new Media({
 			displayName: torrent.name,
@@ -141,15 +137,16 @@ const finishTorrentParsing = async (categoryName, mirror, torrent) => {
 			source: '1337x',
 			mediaType: categoryName,
 			seeders: torrent.seeders,
-			leechers: torrent.leechers,
-			metadatas: torrent.metadatas
+			leechers: torrent.leechers
 		})
+
+		await MetadatasHelper.fetchMetadatas(media, doFetchMetadatas, mediaType)
 		await media.save()
 		return resolve(media)
 	})
 }
 
-const crawl = async (category, categoryName, limit) => {
+const crawl = async (category, categoryName, limit, doFetchMetadatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - 1337x]', 'Started for category', category, '-', categoryName)
 		try {
@@ -164,7 +161,7 @@ const crawl = async (category, categoryName, limit) => {
 
 			const promises = []
 			torrents.forEach((t) => {
-				promises.push(finishTorrentParsing(categoryName, mirror, t))
+				promises.push(finishTorrentParsing(categoryName, mirror, t, doFetchMetadatas, mediaType))
 			})
 
 			const result = await Promise.all(promises)
