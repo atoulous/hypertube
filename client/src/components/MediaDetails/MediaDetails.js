@@ -43,12 +43,12 @@ class MediaDetails extends Component {
 						{ media.metadatas ? media.metadatas.name : media.displayName }
 					</Typography>
 					<Typography variant="display1" className={classes.mediaSubtitle} gutterBottom>
-						{ media.metadatas.tagline ? media.metadatas.tagline : '' }
+						{ media.metadatas && media.metadatas.tagline ? media.metadatas.tagline : '' }
 					</Typography>
 				</Grid>
 				<Grid item xs={2}>
 					<Typography variant="display3" gutterBottom align='right'>
-						<Rating value={media.metadatas.score} />
+						<Rating value={media.metadatas ? media.metadatas.score : 0 } />
 					</Typography>
 				</Grid>
 
@@ -75,7 +75,7 @@ class MediaDetails extends Component {
 							<Typography className={classes.heading}>Cast detail</Typography>
 						</ExpansionPanelSummary>
 						<ExpansionPanelDetails>
-							<CastGrid cast={media.metadatas.cast} />
+							<CastGrid cast={media.metadatas ? media.metadatas.cast : []} />
 						</ExpansionPanelDetails>
 					</ExpansionPanel>
 					<ExpansionPanel>
@@ -83,7 +83,7 @@ class MediaDetails extends Component {
 							<Typography className={classes.heading}>Crew details</Typography>
 						</ExpansionPanelSummary>
 						<ExpansionPanelDetails>
-							<CrewGrid crew={media.metadatas.crew} />
+							<CrewGrid crew={media.metadatas ? media.metadatas.crew : []} />
 						</ExpansionPanelDetails>
 					</ExpansionPanel>
 
