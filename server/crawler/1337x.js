@@ -10,22 +10,6 @@ const request = require('request'),
 	MovieDB = require('moviedb')(config.default.movieDbApiKey)
 
 
-const mirrorList = Utils.shuffle([
-	'http://1337x.to'
-])
-
-const selectMirror = async() => {
-	return new Promise(async (resolve, reject) => {
-		mirrorList.forEach((mirror) => {
-			request(mirror, { method: 'HEAD' }, async (err, res) => {
-				if (!err && res && (res.statusCode >= 200 && res.statusCode <= 299)) {
-					return resolve(mirror)
-				}
-			})
-		})
-	})
-}
-
 const fetchHtml = async (uri) => {
 	return new Promise(async (resolve, reject) => {
 		request(uri, async (err, res, body) => {
@@ -169,7 +153,7 @@ const crawl = async (category, categoryName, limit) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - 1337x]', 'Started for category', category, '-', categoryName)
 		try {
-			const mirror = await selectMirror()
+			const mirror = 'http://1337x.to'
 			const html = await downloadHtml(mirror, category)
 
 			let torrents = await parseHtml(html)
