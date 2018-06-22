@@ -17,8 +17,8 @@ const fetchCast = async (id, mediaType) => {
 			if (mDbErr) return reject(mDbErr)
 			if (!mdbRes) return resolve(null)
 
-			mdbRes.crew = mdbRes.crew.splice(0, 5)
-			mdbRes.cast = mdbRes.cast.splice(0, 5)
+			mdbRes.crew = mdbRes.crew.splice(0, 6)
+			mdbRes.cast = mdbRes.cast.splice(0, 6)
 			return resolve(mdbRes)
 		}
 
