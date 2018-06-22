@@ -125,11 +125,6 @@ const finishTorrentParsing = async (categoryName, mirror, torrent, doFetchMetada
 		}
 
 		torrent.name = Utils.beautifyTorrentName(torrent.name)
-		let searchTerm = torrent.name
-		if (categoryName === 'show') {
-			searchTerm = torrent.name.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/g, '')
-		}
-
 		const media = new Media({
 			displayName: torrent.name,
 			magnet: torrent.magnet,

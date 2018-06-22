@@ -80,9 +80,16 @@ const getMediaId = async (mediaName, mediaType) => {
 const fetchMetadatas = async (media, doFetchMetadatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		if (doFetchMetadatas) {
-			const mediaId = await getMediaId(media.displayName, mediaType)
+
+			let searchTerm = media.displayName
+			if (mediaType === 'tv') {
+				searchTerm = media.displayName.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/gi, '')
+				searchTerm = media.displayName.replace(/(S[0-9]{1,2})(.*)/gi, '')
+			}
+
+			const mediaId = await getMediaId(searchTerm, mediaType)
 			if (!mediaId) {
-				console.log('no match')
+				console.log('no match', media.displayName, mediaType)
 				media.metadatas = null
 				return resolve(media)
 			}
@@ -99,6 +106,9 @@ const fetchMetadatas = async (media, doFetchMetadatas, mediaType) => {
 			metadatas.posterPath = metadatas.poster_path
 			metadatas.backdropPath = metadatas.backdrop_path
 			metadatas.name = metadatas.title
+			if (!metadatas.name) {
+				metadatas.name = media.displayName
+			}
 			metadatas.score = metadatas.vote_average
 			metadatas.productionDate = metadatas.release_date
 			metadatas.duration = metadatas.runtime
