@@ -15,15 +15,15 @@ const crawl = async () => {
   }
 };
 
-const search = async (searchTerm) => {
-	const results = await Promise.all([
-		ThePirateBay.crawl(`/search/${searchTerm}/0/99/201`, 'movie', 2),
-		ThePirateBay.crawl(`/search/${searchTerm}/0/99/205`, 'show', 2),
-		Crawler1337x.crawl(`/category-search/${searchTerm}/Movies/1/`, 'movie', 2),
-		Crawler1337x.crawl(`/category-search/${searchTerm}/TV/1/`, 'movie', 2)
+const search = async (searchTerm, limit) => {
+	const [res1, res2, res3, res4] = await Promise.all([
+		ThePirateBay.crawl(`/search/${searchTerm}/0/99/201`, 'movie', limit),
+		ThePirateBay.crawl(`/search/${searchTerm}/0/99/205`, 'show', limit),
+		Crawler1337x.crawl(`/category-search/${searchTerm}/Movies/1/`, 'movie', limit),
+		Crawler1337x.crawl(`/category-search/${searchTerm}/TV/1/`, 'show', limit),
 	])
 
-	return results
+	return [...res1, ...res2, ...res3, ...res4];
 }
 
 const startCrawling = () => {

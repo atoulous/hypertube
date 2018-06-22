@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
+import uniqBy from 'lodash/uniqBy';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -9,6 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import TabsLibrary from './TabsLibrary';
 import CardMovie from '../CardMovie';
 import AutoComplete from '../AutoComplete';
+
+const nbMediasPerPage = 10;
 
 const styles = {
   title: {
@@ -27,14 +30,17 @@ class Library extends Component {
     tabsValue: this.props.match.params.tabsValue || 'all',
     medias: [],
     skip: 0,
-    hasMore: true,
+    hasMore: false,
+    term: null,
   };
 
   async componentDidMount() {
     try {
       const { tabsValue } = this.state;
       const medias = await this.getMedias({ tabsValue });
-      this.setState({ medias });
+      const hasMore = medias.length === nbMediasPerPage;
+
+      this.setState({ medias, hasMore });
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
@@ -65,24 +71,36 @@ class Library extends Component {
   };
 
   handleLoading = async () => {
+    console.log('handleLoading', this.state);
     try {
-      const { medias, tabsValue, skip } = this.state;
-      const newSkip = skip + 10;
-      const newMedias = await this.getMedias({ tabsValue, skip: newSkip });
+      const { medias, tabsValue, skip, term } = this.state;
+      const newSkip = skip + nbMediasPerPage;
+      const newMedias = await this.getMedias({ tabsValue, skip: newSkip, term });
+      console.log('handleLoading newMedias== ', newMedias);
 
-      const hasMore = !!newMedias.length;
+      const hasMore = newMedias.length === nbMediasPerPage;
 
-      this.setState({ medias: medias.concat(newMedias), skip: newSkip, hasMore });
+      const mediasToDisplay = uniqBy(medias.concat(newMedias), '_id');
+
+      this.setState({ medias: mediasToDisplay, skip: newSkip, hasMore });
     } catch (err) {
       console.error('handleLoading err: ', err);
     }
   };
 
   handleAutoComplete = async ({ term }) => {
+    console.log('handleAutoComplete');
     try {
       const { tabsValue } = this.state;
+      console.log('handleAutoComplete term==', term);
+
+      this.setState({ term });
+
       const medias = await this.getMedias({ tabsValue, term });
-      this.setState({ medias });
+      console.log('handleAutoComplete medias==', medias);
+      const hasMore = medias.length === nbMediasPerPage;
+
+      this.setState({ medias, hasMore });
     } catch (err) {
       console.error('handleAutoComplete err: ', err);
     }
@@ -97,7 +115,7 @@ class Library extends Component {
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Library
         </Typography>
-        <AutoComplete tabsValue={tabsValue} handleAutoComplete={this.handleAutoComplete} />
+        <AutoComplete handleAutoComplete={this.handleAutoComplete} />
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
 
         <InfiniteScroll
