@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const fs = require('fs');
-
 const Media = require('../models/Media');
 const MediaController = require('../controllers/MediaController');
 
 const Crawler = require('../crawler/crawler')
+const MetadatasHelper = require('../crawler/MetadatasHelper')
 
 router.get('/all/:skip/:term', (req, res) => {
   const skip = req.params ? parseInt(req.params.skip, 10) : 0;
@@ -40,6 +40,12 @@ router.get('/startmedia/:id', async (req, res) => {
 	Media.findOne({ _id: req.params.id })
 	.then(async (media) => {
   		if (!media) res.status(404).json({ error: 'This media does not exist.:' + err })
+		if (media.needFetchMetadata) {
+			console.log('media needs metadatas')
+			await MetadatasHelper.fetchMetadatas(media, true, media.mediaType === 'movie' ? 'movie' : 'tv')
+			await media.save()
+			console.log('media metadatas fetched :)')
+		}
 
 		// Media is not dowloaded or downloading, start it.
 		if (media.status === 'listed') {
