@@ -136,7 +136,6 @@ const finishTorrentParsing = async (categoryName, mirror, torrent, mediaType) =>
 		})
 
 		await MetadatasHelper.fetchMetadatas(media, false, mediaType)
-		await media.save()
 		return resolve(media)
 	})
 }
