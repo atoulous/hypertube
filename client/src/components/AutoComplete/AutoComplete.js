@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Autosuggest from 'react-autosuggest';
+import debounce from 'lodash/debounce';
 
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
+
+const debounceTime = 1000;
 
 const renderInput = (inputProps) => {
   const { classes, ref, ...other } = inputProps;
@@ -39,17 +42,27 @@ class IntegrationAutosuggest extends Component {
     value: '',
   };
 
-  handleSuggestionsFetchRequested = async ({ value }) => {
-    const inputValue = value.trim().toLowerCase();
-    this.props.handleSearch({ term: inputValue });
+  handleFetch = async (reason) => {
+    if (reason === 'input-changed') {
+      console.log('handleSuggestionsFetchRequested', reason);
+
+      const inputValue = this.state.value.trim().toLowerCase();
+      await this.props.handleSearch({ term: inputValue });
+    }
+  };
+
+  handleDebounce = debounce(this.handleFetch, debounceTime);
+
+  handleSuggestionsFetchRequested = ({ reason }) => {
+    this.handleDebounce(reason)
   };
 
   handleSuggestionsClearRequested = () => {
     this.props.handleClearSearch();
   };
 
-  handleChange = (event, { newValue }) => {
-    this.setState({ value: newValue || '' });
+  handleChange = (event, props) => {
+    this.setState({ value: props.newValue || '' });
   };
 
   render() {
@@ -68,7 +81,7 @@ class IntegrationAutosuggest extends Component {
         suggestions={[]}
         inputProps={{
           classes,
-          placeholder: 'Search in library',
+          placeholder: 'Search',
           value: this.state.value,
           onChange: this.handleChange,
           startAdornment: (

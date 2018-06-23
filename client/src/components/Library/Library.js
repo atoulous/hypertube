@@ -111,8 +111,6 @@ class Library extends Component {
   handleAutoComplete = async ({ term }) => {
     try {
       if (term) {
-
-      }
         const { tabsValue } = this.state;
 
         this.setState({ loading: true });
@@ -121,6 +119,7 @@ class Library extends Component {
         const hasMore = medias.length === nbMediasPerPage;
 
         this.setState({ medias, hasMore, term, loading: false });
+      }
     } catch (err) {
       console.error('handleAutoComplete err: ', err);
     }
@@ -165,14 +164,10 @@ class Library extends Component {
           <Grid container spacing={24} style={{ margin: 'auto' }}>
             {
               medias.map((media) => {
-                // console.log('media==', media);
-
                 const title = media.metadatas ? media.metadatas.name : media.displayName;
                 const overview = media.metadatas ? media.metadatas.overview : null;
-                let imagePath = media.metadatas ? media.metadatas.posterPath : null;
-                if (!imagePath && media.metadatas) {
-                  imagePath = media.metadatas.backdropPath || null;
-                }
+                let imagePath = media.metadatas ? media.metadatas.posterPath || media.metadatas.backdropPath : null;
+
                 return (
                   <CardMovie
                     key={media._id}
