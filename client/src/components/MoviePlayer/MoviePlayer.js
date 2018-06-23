@@ -129,7 +129,7 @@ class MoviePlayer extends Component {
 
 	render() {
 		const { classes } = this.props;
-		const { isLoading, error } = this.state;
+		const { isLoading } = this.state;
 
 		if (isLoading) {
 			return this.renderLoading(classes);
