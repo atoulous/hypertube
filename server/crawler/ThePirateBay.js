@@ -68,7 +68,7 @@ const parseHtml = async (html) => {
 	})
 }
 
-const finishTorrentParsing = async (categoryName, torrent, doFetchMetadatas, mediaType) => {
+const finishTorrentParsing = async (categoryName, torrent, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		const olderTorrent = await Media.findOne({ magnet: torrent.magnet })
 		if (olderTorrent) {
@@ -89,13 +89,13 @@ const finishTorrentParsing = async (categoryName, torrent, doFetchMetadatas, med
 			leechers: torrent.leechers
 		})
 
-		await MetadatasHelper.fetchMetadatas(media, doFetchMetadatas, mediaType)
+		await MetadatasHelper.fetchMetadatas(media, false, mediaType)
 		await media.save()
 		return resolve(media)
 	})
 }
 
-const crawl = async (category, categoryName, limit, doFetchMetadatas, mediaType) => {
+const crawl = async (category, categoryName, limit, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
@@ -117,7 +117,7 @@ const crawl = async (category, categoryName, limit, doFetchMetadatas, mediaType)
 
 			const promises = []
 			torrents.forEach((t) => {
-				promises.push(finishTorrentParsing(categoryName, t, doFetchMetadatas, mediaType))
+				promises.push(finishTorrentParsing(categoryName, t, mediaType))
 			})
 
 			const result = await Promise.all(promises)

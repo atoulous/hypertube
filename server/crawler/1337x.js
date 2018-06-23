@@ -115,7 +115,7 @@ const getMagnet = async (torrent, mirror) => {
 	})
 }
 
-const finishTorrentParsing = async (categoryName, mirror, torrent, doFetchMetadatas, mediaType) => {
+const finishTorrentParsing = async (categoryName, mirror, torrent, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		torrent.magnet = await getMagnet(torrent.tmpUrl, mirror)
 
@@ -135,13 +135,13 @@ const finishTorrentParsing = async (categoryName, mirror, torrent, doFetchMetada
 			leechers: torrent.leechers
 		})
 
-		await MetadatasHelper.fetchMetadatas(media, doFetchMetadatas, mediaType)
+		await MetadatasHelper.fetchMetadatas(media, false, mediaType)
 		await media.save()
 		return resolve(media)
 	})
 }
 
-const crawl = async (category, categoryName, limit, doFetchMetadatas, mediaType) => {
+const crawl = async (category, categoryName, limit, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - 1337x]', 'Started for category', category, '-', categoryName)
 		try {
@@ -156,7 +156,7 @@ const crawl = async (category, categoryName, limit, doFetchMetadatas, mediaType)
 
 			const promises = []
 			torrents.forEach((t) => {
-				promises.push(finishTorrentParsing(categoryName, mirror, t, doFetchMetadatas, mediaType))
+				promises.push(finishTorrentParsing(categoryName, mirror, t, mediaType))
 			})
 
 			const result = await Promise.all(promises)

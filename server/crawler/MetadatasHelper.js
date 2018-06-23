@@ -53,20 +53,20 @@ const fetchMetadata = async (id, mediaType) => {
 	})
 }
 
-const getMediaId = async (mediaName, mediaType) => {
+const getMediaInfo = async (mediaName, mediaType) => {
 	return new Promise((resolve, reject) => {
 		const mediaCallback = async (mDbErr, mdbRes) => {
 			if (mDbErr && mDbErr.status === 429 && mDbErr.response.header['retry-after']) {
 				// We hit the rate limit, re-call this function after the delay
 				await Utils.timeout(parseInt(mDbErr.response.header['retry-after'], 10) / 1000)
-				const response = await getMediaId(mediaName, mediaType)
+				const response = await getMediaInfo(mediaName, mediaType)
 				return resolve(response)
 			}
 
 			if (mDbErr) return reject(mDbErr)
 			if (!mdbRes || !mdbRes.total_results || mdbRes.total_results === 0 || !mdbRes.results) return resolve(null)
 
-			return resolve(mdbRes.results[0].id)
+			return resolve(mdbRes.results[0])
 		}
 
 		if (mediaType === 'tv') {
@@ -77,72 +77,80 @@ const getMediaId = async (mediaName, mediaType) => {
 	})
 }
 
-const fetchMetadatas = async (media, doFetchMetadatas, mediaType) => {
+const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
-		if (doFetchMetadatas) {
+		if (doFetchExtendedDatas && media.movieDbId && media.metadatas && !media.hasExtendedMetadatas) {
+			// Fetch extended metadatas (ie cast, crew, ...) if the media already has
+			// basic metadatas.
 
+			const metadatas = await fetchMetadata(media.movieDbId, mediaType)
+			if (!metadatas) {
+				media.metadatas = null
+				await media.save()
+				return resolve(media)
+			}
+			const cast = await fetchCast(media.movieDbId, mediaType)
+			media.metadatas.productionDate = metadatas.release_date
+			media.metadatas.duration = metadatas.runtime
+			media.metadatas.tagline = metadatas.tagline
+
+			if (cast && cast.cast && cast.cast.length !== 0)
+				media.metadatas.cast = cast.cast
+
+			if (cast && cast.crew && cast.crew.length !== 0)
+				media.metadatas.crew = cast.crew
+			media.hasExtendedMetadatas = true
+			await media.save()
+			return resolve(media)
+		} else if (!doFetchExtendedDatas && !media.hasExtendedMetadatas) {
 			let searchTerm = media.displayName
 			if (mediaType === 'tv') {
 				searchTerm = media.displayName.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/gi, '')
 				searchTerm = media.displayName.replace(/(S[0-9]{1,2})(.*)/gi, '')
 			}
 
-			const mediaId = await getMediaId(searchTerm, mediaType)
-			if (!mediaId) {
+			const mediaInfo = await getMediaInfo(searchTerm, mediaType)
+			if (!mediaInfo) {
 				console.log('no match', media.displayName, mediaType)
 				media.metadatas = null
+				media.movieDbId = null
+				await media.save()
 				return resolve(media)
 			}
+			const mediaId = mediaInfo.id
 
-			const metadatas = await fetchMetadata(mediaId, mediaType)
-			if (!metadatas) {
-
-				media.metadatas = null
-				return resolve(media)
+			mediaInfo.posterPath = mediaInfo.poster_path
+			mediaInfo.backdropPath = mediaInfo.backdrop_path
+			mediaInfo.name = mediaInfo.title
+			mediaInfo.score = mediaInfo.vote_average
+			if (!mediaInfo.name) {
+				mediaInfo.name = media.displayName
 			}
-
-			const cast = await fetchCast(mediaId, mediaType)
-
-			metadatas.posterPath = metadatas.poster_path
-			metadatas.backdropPath = metadatas.backdrop_path
-			metadatas.name = metadatas.title
-			if (!metadatas.name) {
-				metadatas.name = media.displayName
-			}
-			metadatas.score = metadatas.vote_average
-			metadatas.productionDate = metadatas.release_date
-			metadatas.duration = metadatas.runtime
-
-			if (cast && cast.cast && cast.cast.length !== 0)
-				metadatas.cast = cast.cast
-
-			if (cast && cast.crew && cast.crew.length !== 0)
-				metadatas.crew = cast.crew
-
-			media.metadatas = metadatas
-			media.needFetchMetadata = false
-			return resolve(media)
-		} else {
-			media.needFetchMetadata = true
-			media.metadatas = null
+			media.metadatas = mediaInfo
+			media.movieDbId = mediaInfo.id
+			await media.save()
 			return resolve(media)
 		}
+
+		return resolve(media)
 	})
 }
 
 module.exports = {
 	fetchMetadatas
 }
-//
+
 // const mongoose = require('mongoose')
 // mongoose.connect('mongodb://localhost:27017/hypertube');
 //
-// const Media = require('./models/Media')
+// const Media = require('../models/Media')
 //
 // const a = async () => {
-// 	const media = await Media.findOne({ _id: '5b240d8327bdbcf7084222c7' })
+// 	const media = await Media.findOne({ _id: '5b2d2980840aad4545c56304' })
 //
-// 	await MetadataFetcher(media, true, 'movie')
-// 	console.log(media)
+// 	await fetchMetadatas(media, false, 'movie')
+// 	await fetchMetadatas(media, true, 'movie')
+//
+// 	console.log('s',media)
 // }
 // a()

@@ -14,7 +14,8 @@ const MediaSchema = mongoose.Schema({
   source: String,
   seeders: Number,
   leechers: Number,
-  needFetchMetadata: Boolean,
+  hasExtendedMetadatas: Boolean,
+  movieDbId: String,
   metadatas: {
     name: String,
 	tagline: String,
