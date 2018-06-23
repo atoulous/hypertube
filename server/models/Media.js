@@ -14,11 +14,27 @@ const MediaSchema = mongoose.Schema({
   source: String,
   seeders: Number,
   leechers: Number,
+  hasExtendedMetadatas: Boolean,
+  movieDbId: String,
   metadatas: {
     name: String,
+	tagline: String,
     posterPath: String,
     backdropPath: String,
     overview: String,
+	score: String,
+	productionDate: String,
+	duration: String,
+	cast: [{
+		character: String,
+		name: String,
+		profile_path: String
+	}], crew: [{
+		department: String,
+		job: String,
+		name: String,
+		profile_path: String
+	}]
   },
 });
 

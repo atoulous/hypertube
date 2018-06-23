@@ -2,6 +2,7 @@
 
 const beautifyTorrentName = (name) => {
 	name = name.replace(/\./g, ' ')
+	name = name.replace('[DivX]', '')
 	name = name.split("1080p")[0]
 	name = name.split("720p")[0]
 	name = name.split("Bluray")[0]
@@ -10,6 +11,7 @@ const beautifyTorrentName = (name) => {
 	name = name.split("[WEB]")[0]
 	name = name.split("HDRip")[0]
 	name = name.split("HDTV")[0]
+	name = name.split("2160p")[0]
 	name = name.split("WEB")[0]
 	name = name.replace(/([sS][0-9]{1,2}[eE][0-9]{1,2})(.*)/g, '$1')
 
