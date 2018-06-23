@@ -41,11 +41,11 @@ class IntegrationAutosuggest extends Component {
 
   handleSuggestionsFetchRequested = async ({ value }) => {
     const inputValue = value.trim().toLowerCase();
-    this.props.handleAutoComplete({ term: inputValue });
+    this.props.handleSearch({ term: inputValue });
   };
 
   handleSuggestionsClearRequested = () => {
-    this.props.handleAutoComplete({});
+    this.props.handleClearSearch();
   };
 
   handleChange = (event, { newValue }) => {
@@ -84,7 +84,8 @@ class IntegrationAutosuggest extends Component {
 
 IntegrationAutosuggest.propTypes = {
   classes: PropTypes.object.isRequired,
-  handleAutoComplete: PropTypes.func.isRequired,
+  handleSearch: PropTypes.func.isRequired,
+  handleClearSearch: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(IntegrationAutosuggest);

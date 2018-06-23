@@ -6,6 +6,7 @@ import uniqBy from 'lodash/uniqBy';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import TabsLibrary from './TabsLibrary';
 import CardMovie from '../CardMovie';
@@ -22,6 +23,7 @@ const styles = {
   },
   loader: {
     margin: 'auto',
+    textAlign: 'center',
   },
 };
 
@@ -32,12 +34,13 @@ class Library extends Component {
     skip: 0,
     hasMore: false,
     term: null,
+    loading: false,
   };
 
   async componentDidMount() {
     try {
       const { tabsValue } = this.state;
-      const medias = await this.getMedias({ tabsValue });
+      const medias = await this.getLocalMedias({ tabsValue });
       const hasMore = medias.length === nbMediasPerPage;
 
       this.setState({ medias, hasMore });
@@ -46,9 +49,22 @@ class Library extends Component {
     }
   }
 
-  getMedias = async ({ tabsValue = 'all', skip = 0, term = null }) => {
+  getCrawlerMedias = async ({ tabsValue = 'all', term = null }) => {
     try {
-      const response = await fetch(`/api/media/${tabsValue}/${skip}/${term}`);
+      const response = await fetch(`/api/media/crawler/${tabsValue}/${term}`);
+      const body = await response.json();
+
+      if (response.status !== 200) throw Error(body.message);
+
+      return body;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null }) => {
+    try {
+      const response = await fetch(`/api/media/local/${tabsValue}/${skip}/${term}`);
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.message);
@@ -63,7 +79,12 @@ class Library extends Component {
     try {
       if (this.state.tabsValue !== value) {
         const { term } = this.state;
-        const medias = await this.getMedias({ tabsValue: value, term });
+        let medias = [];
+        if (term && term !== '') {
+          medias = await this.getCrawlerMedias({ tabsValue: value, term });
+        } else {
+          medias = await this.getLocalMedias({ tabsValue: value });
+        }
         await this.setState({ medias, tabsValue: value });
       }
     } catch (err) {
@@ -75,7 +96,7 @@ class Library extends Component {
     try {
       const { medias, tabsValue, skip, term } = this.state;
       const newSkip = skip + nbMediasPerPage;
-      const newMedias = await this.getMedias({ tabsValue, skip: newSkip, term });
+      const newMedias = await this.getLocalMedias({ tabsValue, skip: newSkip, term });
 
       const hasMore = newMedias.length === nbMediasPerPage;
 
@@ -90,35 +111,55 @@ class Library extends Component {
   handleAutoComplete = async ({ term }) => {
     try {
       if (term) {
+
+      }
         const { tabsValue } = this.state;
 
-        const medias = await this.getMedias({ tabsValue, term });
+        this.setState({ loading: true });
+
+        const medias = await this.getCrawlerMedias({ tabsValue, term });
         const hasMore = medias.length === nbMediasPerPage;
 
-        this.setState({ medias, hasMore, term });
-      }
+        this.setState({ medias, hasMore, term, loading: false });
     } catch (err) {
       console.error('handleAutoComplete err: ', err);
     }
   };
 
-  render() {
+  handleClearSearch = async () => {
+    try {
+      const { tabsValue } = this.state;
+      const medias = await this.getLocalMedias({ tabsValue });
+      const hasMore = medias.length === nbMediasPerPage;
+
+      this.setState({ medias, hasMore });
+    } catch (err) {
+      console.error('handleClearSearch err: ', err);
+    }
+  };
+
+    render() {
     const { classes } = this.props;
-    const { medias, tabsValue, hasMore } = this.state;
+    const { medias, tabsValue, hasMore, loading } = this.state;
+
+    const Loader = () => (<div className={classes.loader}><CircularProgress /></div>);
 
     return (
       <div className={classes.root}>
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Library
         </Typography>
-        <AutoComplete handleAutoComplete={this.handleAutoComplete} />
+        <AutoComplete handleSearch={this.handleAutoComplete} handleClearSearch={this.handleClearSearch} />
+
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
+
+        { loading && <Loader /> }
 
         <InfiniteScroll
           pageStart={0}
           loadMore={this.handleLoading}
           hasMore={hasMore}
-          loader={<div className={classes.loader} key={0}>Loading ...</div>}
+          loader={<Loader key={0} />}
           useWindow
         >
           <Grid container spacing={24} style={{ margin: 'auto' }}>
