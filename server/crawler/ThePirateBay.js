@@ -6,6 +6,20 @@ const request = require('request'),
 	Utils = require('./utils'),
 	MetadatasHelper = require('./MetadatasHelper')
 
+let mirrorArr = [
+	'https://pirateproxy.mx',
+	'https://thepbproxy.com',
+	'https://pirateproxy.sh',
+	'https://thepiratebay-org.prox.space',
+	'https://cruzing.xyz',
+	'https://proxydl.cf'
+]
+
+const getNewMirror = async() => {
+	return new Promise(async(resolve, reject) => {
+		await Promise.race(mirrorArr.map(mirror => testMirror(mirror)))
+	})
+}
 
 const testMirror = async(mirror) => {
 	return new Promise((resolve, reject) => {
@@ -23,7 +37,8 @@ const downloadHtml = async (host, url) => {
 			if (err) return reject(err)
 			if (res.statusCode < 200 || res.statusCode > 299) {
 				// The mirror crapped its pants. Pick a new one and restart operation
-				const newMirror = await selectMirror()
+				mirrorArr = mirrorArr.filter(el => el !== host)
+				const newMirror = await getNewMirror()
 				const html = await downloadHtml(newMirror, url)
 				return resolve(html)
 			}
@@ -98,14 +113,7 @@ const crawl = async (category, categoryName, limit, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		console.log('[Crawler - ThePirateBay]', 'Started for category', category, '-', categoryName)
 		try {
-			const mirror = await Promise.race([
-				testMirror('https://pirateproxy.mx'),
-				testMirror('https://thepbproxy.com'),
-				testMirror('https://pirateproxy.sh'),
-				testMirror('https://thepiratebay-org.prox.space'),
-				testMirror('https://cruzing.xyz'),
-				testMirror('https://proxydl.cf')
-			])
+			const mirror = await getNewMirror()
 
 			const html = await downloadHtml(mirror, category)
 			let torrents = await parseHtml(html)
