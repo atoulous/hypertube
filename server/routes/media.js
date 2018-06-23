@@ -3,7 +3,6 @@ const fs = require('fs');
 const Media = require('../models/Media');
 const MediaController = require('../controllers/MediaController');
 
-const Crawler = require('../crawler/crawler')
 const MetadatasHelper = require('../crawler/MetadatasHelper')
 import _ from 'lodash';
 import Crawler from '../crawler/crawler';
