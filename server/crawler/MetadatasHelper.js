@@ -139,18 +139,3 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 module.exports = {
 	fetchMetadatas
 }
-
-// const mongoose = require('mongoose')
-// mongoose.connect('mongodb://localhost:27017/hypertube');
-//
-// const Media = require('../models/Media')
-//
-// const a = async () => {
-// 	const media = await Media.findOne({ _id: '5b2d2980840aad4545c56304' })
-//
-// 	await fetchMetadatas(media, false, 'movie')
-// 	await fetchMetadatas(media, true, 'movie')
-//
-// 	console.log('s',media)
-// }
-// a()
