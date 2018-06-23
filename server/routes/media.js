@@ -7,9 +7,6 @@ const MetadatasHelper = require('../crawler/MetadatasHelper')
 import _ from 'lodash';
 import Crawler from '../crawler/crawler';
 
-/**
- * Main route to find medias in db from type, by skip, by term of name
- */
 router.get('/local/:type/:skip/:term', async (req, res) => {
   try {
     const skip = parseInt(req.params.skip, 10);
