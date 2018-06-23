@@ -40,12 +40,7 @@ router.get('/startmedia/:id', async (req, res) => {
 	Media.findOne({ _id: req.params.id })
 	.then(async (media) => {
   		if (!media) res.status(404).json({ error: 'This media does not exist.:' + err })
-		if (media.needFetchMetadata) {
-			console.log('media needs metadatas')
-			await MetadatasHelper.fetchMetadatas(media, true, media.mediaType === 'movie' ? 'movie' : 'tv')
-			await media.save()
-			console.log('media metadatas fetched :)')
-		}
+		await MetadatasHelper.fetchMetadatas(media, true, media.mediaType === 'movie' ? 'movie' : 'tv')
 
 		// Media is not dowloaded or downloading, start it.
 		if (media.status === 'listed') {
