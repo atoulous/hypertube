@@ -17,7 +17,8 @@ let mirrorArr = [
 
 const getNewMirror = async() => {
 	return new Promise(async(resolve, reject) => {
-		await Promise.race(mirrorArr.map(mirror => testMirror(mirror)))
+		const mirror = await Promise.race(mirrorArr.map(mirror => testMirror(mirror)))
+		return resolve(mirror)
 	})
 }
 
