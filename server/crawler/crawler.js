@@ -15,12 +15,12 @@ const crawl = async () => {
   }
 };
 
-const search = async (searchTerm) => {
+const search = async (searchTerm, limit) => {
 	const results = await Promise.all([
-		ThePirateBay.crawl(`/search/${searchTerm}/1/99/201`, 			'movie', 	2, 'movie'),
-		ThePirateBay.crawl(`/search/${searchTerm}/1/99/205`, 			'show', 	2, 'tv'),
-		Crawler1337x.crawl(`/sort-category-search/${searchTerm}/Movies/seeders/desc/1/`, 	'movie', 	2, 'movie'),
-		Crawler1337x.crawl(`/sort-category-search/${searchTerm}/TV/seeders/desc/1/`, 		'show', 	2, 'tv')
+		ThePirateBay.crawl(`/search/${searchTerm}/1/99/201`, 			'movie', 	limit, 'movie'),
+		ThePirateBay.crawl(`/search/${searchTerm}/1/99/205`, 			'show', 	limit, 'tv'),
+		Crawler1337x.crawl(`/sort-category-search/${searchTerm}/Movies/seeders/desc/1/`, 	'movie', 	limit, 'movie'),
+		Crawler1337x.crawl(`/sort-category-search/${searchTerm}/TV/seeders/desc/1/`, 		'show', 	limit, 'tv')
 	])
 
 	return results
