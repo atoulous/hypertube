@@ -43,8 +43,6 @@ router.get('/local/:type/:skip/:term', async (req, res) => {
 
     medias = _.uniqBy(medias, 'displayName');
 
-    console.log('local len===', medias.length);
-
     res.status(200).json(medias);
   } catch (err) {
     console.error('media/all err', err);
