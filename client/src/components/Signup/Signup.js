@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import cookie from 'universal-cookie'
 
 class Signup extends Component{
 	constructor(props) {
@@ -13,8 +14,13 @@ class Signup extends Component{
 	onSubmit(e) {
 		e.preventDefault()
 		this.callApi(e)
-		  .then(res => console.log(res.reperror))
-		  //this.setState({ response: res.reperror }))
+		  .then(res => {
+		  	if (res.message === 'success') {
+                const cookies = new cookie()
+                cookies.set('authtoken', res.token, {path: '/'});
+                this.props.history.push("/Profile")
+			}
+		  })
 		  .catch(err => console.log(err));
   }
 

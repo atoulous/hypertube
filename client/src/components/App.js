@@ -5,7 +5,8 @@ import Home from './Home';
 import Signup from './Signup';
 import Login from './Login';
 import Profile from './Profile';
-import Qd from './Qd';
+import Fpassword from './Fpassword';
+import ResetPassword from './ResetPassword';
 
 const App = () => (
   <BrowserRouter>
@@ -14,7 +15,8 @@ const App = () => (
       <Route exact path="/Signup" component={Signup} />
       <Route exact path="/Login" component={Login} />
       <Route exact path="/Profile" component={Profile} />
-      <Route exact path="/Qd" component={Qd} />
+      <Route exact path="/Fpassword" component={Fpassword} />
+      <Route exact path="/ResetPassword" component={ResetPassword} />
       <Route component={Home} />
     </Switch>
   </BrowserRouter>

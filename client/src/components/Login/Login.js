@@ -1,25 +1,25 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import cookie from 'universal-cookie'
+import { Redirect } from 'react-router'
 
 class Login extends Component{
 	constructor(props) {
 		super(props);
 		this.tryLogin = this.tryLogin.bind(this);
 	}
-	state = {
-    response: '',
-  };
+    state = {
+        active: false,
+    };
 
 	tryLogin(e) {
 	e.preventDefault()
     this.callApi(e)
       .then(res => {
-			this.setState({ response: res.message })
 			if (res.message === 'success') {
                 const cookies = new cookie()
                 cookies.set('authtoken', res.token, {path: '/'});
-				this.props.history.push("/Profile")
+                this.setState({active: true})
 			}
 	  })
       .catch(err => console.log(err));
@@ -39,8 +39,13 @@ class Login extends Component{
   };
 
 	render() {
+        let active
+        if (this.state.active) {
+            active = <Redirect to="/profile"/>
+        }
 		return (
 		<div class="container">
+			{active}
 			<div class="col-sm-6 col-sm-offset-3">
 				<p>{this.state.response}</p>
 				<h1><span class="fa fa-sign-in"></span>Login</h1>
@@ -58,7 +63,7 @@ class Login extends Component{
 				</form>
 				<hr/>
 				<p>Need an account? <Link to="/signup">Signup</Link></p>
-				<p>Forgot your password ? <Link to="/fpassword">Send</Link></p>
+				<p>Forgot your password ? <Link to="/Fpassword">Send</Link></p>
 				<p>Or go <Link to="/">home</Link>.</p>
 			</div>
 		</div>
