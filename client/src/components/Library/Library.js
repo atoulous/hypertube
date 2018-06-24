@@ -41,7 +41,7 @@ class Library extends Component {
     try {
       const { tabsValue } = this.state;
       const medias = await this.getLocalMedias({ tabsValue });
-      const hasMore = medias.length === nbMediasPerPage;
+      const hasMore = !!medias.length;
 
       this.setState({ medias, hasMore });
     } catch (err) {
@@ -98,7 +98,7 @@ class Library extends Component {
       const newSkip = skip + nbMediasPerPage;
       const newMedias = await this.getLocalMedias({ tabsValue, skip: newSkip, term });
 
-      const hasMore = newMedias.length === nbMediasPerPage;
+      const hasMore = !!newMedias.length;
 
       const mediasToDisplay = uniqBy(medias.concat(newMedias), '_id');
 
@@ -116,7 +116,7 @@ class Library extends Component {
         this.setState({ loading: true });
 
         const medias = await this.getCrawlerMedias({ tabsValue, term });
-        const hasMore = medias.length === nbMediasPerPage;
+        const hasMore = !!medias.length;
 
         this.setState({ medias, hasMore, term, loading: false });
       }
@@ -129,7 +129,7 @@ class Library extends Component {
     try {
       const { tabsValue } = this.state;
       const medias = await this.getLocalMedias({ tabsValue });
-      const hasMore = medias.length === nbMediasPerPage;
+      const hasMore = !!medias.length;
 
       this.setState({ medias, hasMore });
     } catch (err) {
@@ -166,6 +166,7 @@ class Library extends Component {
               medias.map((media) => {
                 const title = media.metadatas ? media.metadatas.name : media.displayName;
                 const overview = media.metadatas ? media.metadatas.overview : null;
+                const score = media.metadatas ? media.metadatas.score : null;
                 let imagePath = media.metadatas ? media.metadatas.posterPath || media.metadatas.backdropPath : null;
 
                 return (
@@ -178,6 +179,7 @@ class Library extends Component {
                     overview={overview}
                     seeders={media.seeders}
                     leechers={media.leechers}
+                    score={score}
                   />
                 );
               })

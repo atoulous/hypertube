@@ -44,8 +44,6 @@ class IntegrationAutosuggest extends Component {
 
   handleFetch = async (reason) => {
     if (reason === 'input-changed') {
-      console.log('handleSuggestionsFetchRequested', reason);
-
       const inputValue = this.state.value.trim().toLowerCase();
       await this.props.handleSearch({ term: inputValue });
     }
@@ -54,11 +52,14 @@ class IntegrationAutosuggest extends Component {
   handleDebounce = debounce(this.handleFetch, debounceTime);
 
   handleSuggestionsFetchRequested = ({ reason }) => {
-    this.handleDebounce(reason)
+    this.handleDebounce(reason);
   };
 
   handleSuggestionsClearRequested = () => {
-    this.props.handleClearSearch();
+    const { value } = this.state;
+    if (!value || value === '') {
+      this.props.handleClearSearch();
+    }
   };
 
   handleChange = (event, props) => {
