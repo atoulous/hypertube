@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import cookie from 'universal-cookie'
+import PropTypes from 'prop-types';
 
-import './Home.css';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+
+import './Home.scss';
+
+const styles = {
+  title: {
+    textAlign: 'center',
+  },
+};
 
 class Home extends Component {
   state = {
@@ -11,35 +19,29 @@ class Home extends Component {
   };
 
   componentDidMount() {
-      const cookies = new cookie();
-      const merror = cookies.get('error');
-      if (merror) {
-      	this.setState({merror: merror})
-          cookies.remove('error');
-	  }
-
+    
   }
 
-
   render() {
-  	let merror
-	  if (this.state.merror)
-	  	merror = this.state.merror
+    const { classes } = this.props;
+
     return (
-	<div class="container">
-		{merror}
-		<div class="jumbotron text-center">
-			<h1><span class="fa fa-lock"></span> Node Authentication</h1>
-			<p>Login or Register with:</p>
-			<Link to="/login" class="btn btn-default"><span class="fa fa-user"></span> Local Login</Link>
-			<Link to="/signup" class="btn btn-default"><span class="fa fa-user"></span> Local Signup</Link>
-			<a href="http://localhost:5000/auth/google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google</a>
-			<a href="http://localhost:5000/auth/qd" class="btn btn-dark"><span class="fa fa-user"></span> Born 2 Code</a>
-      		<a href="http://localhost:5000/auth/github" class="btn btn-dark"><span class="fa fa-user"></span> Github</a>
-		</div>
-	</div>
+      <div className="App">
+        <Typography className={classes.title} gutterBottom variant="headline" component="h1">
+          Home
+        </Typography>
+
+        <Typography className={classes.title}>
+          {this.state.response}
+        </Typography>
+      </div>
     );
   }
 }
 
-export default Home;
+
+Home.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(Home);
