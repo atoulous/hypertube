@@ -17,6 +17,8 @@ const app = express();
 
 // crawler.startCrawling();
 
+mongoose.connect(config.db.url);
+
 const corsOption = {
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
