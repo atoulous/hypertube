@@ -88,7 +88,7 @@ class Fpassword extends Component {
 
 	  const { classes } = this.props;
 
-    return (<Grid container spacing={24} className={classes.centerV}>
+    return (<Grid container  className={classes.centerV}>
 			<Grid item xs={4}></Grid>
 			<Grid item xs={4}>
 				<Paper>
