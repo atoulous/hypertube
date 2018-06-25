@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import cookie from 'universal-cookie'
+import { Redirect } from 'react-router'
 
 class Signup extends Component{
 	constructor(props) {
@@ -8,17 +9,21 @@ class Signup extends Component{
 		this.onSubmit = this.onSubmit.bind(this);
 	}
 	state = {
-    response: '',
+    merror: '',
+	active: false
   };
 
 	onSubmit(e) {
 		e.preventDefault()
 		this.callApi(e)
 		  .then(res => {
-		  	if (res.message === 'success') {
+		  	if (res.login) {
                 const cookies = new cookie()
                 cookies.set('authtoken', res.token, {path: '/'});
-                this.props.history.push("/Profile")
+                this.setState({active: true})
+			}
+			else {
+		  		this.setState({merror: res.merror})
 			}
 		  })
 		  .catch(err => console.log(err));
@@ -38,37 +43,42 @@ class Signup extends Component{
   };
 
 	render() {
+        let active
+        if (this.state.active) {
+            active = <Redirect to="/profile"/>
+        }
 		return (
-			<div class="container">
-				<div class="col-sm-6 col-sm-offset-3">
-				<p>{this.state.response}</p>
-					<h1><span class="fa fa-sign-in"></span> Signup</h1>
-					<form onSubmit={this.onSubmit} encType="multipart/form-data">
-						<div class="form-group">
+			<div>
+				<div >
+			{ active }
+				<p>{this.state.merror}</p>
+				<h1>Signup</h1>
+				<form onSubmit={this.onSubmit} encType="multipart/form-data">
+						<div>
 							<label>Login</label>
-							<input type="text" class="form-control" name="name"/>
+							<input type="text" name="name"/>
 						</div>
-						<div class="form-group">
+						<div >
 							<label>Firstname</label>
-							<input type="text" class="form-control" name="firstname"/>
+							<input type="text"  name="firstname"/>
 						</div>
-						<div class="form-group">
+						<div >
 							<label>Lastname</label>
-							<input type="text" class="form-control" name="lastname"/>
+							<input type="text" name="lastname"/>
 						</div>
-						<div class="form-group">
+						<div>
 							<label>Email</label>
-							<input type="text" class="form-control" name="email"/>
+							<input type="text" name="email"/>
 						</div>
-						<div class="form-group">
+						<div>
 							<label>Password</label>
-							<input type="password" class="form-control" name="password"/>
+							<input type="password" name="password"/>
 						</div>
 						<div>
 							<input type='file' id='file' name='file' />
 						</div>
 
-						<button type="submit" class="btn btn-warning btn-lg">Signup</button>
+						<button type="submit">Signup</button>
 					</form>
 
 					<hr/>

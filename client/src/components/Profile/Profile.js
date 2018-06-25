@@ -15,12 +15,16 @@ class Profile extends Component {
   }
   state = {
     auth: '',
-	  login: '',
+	  name: '',
 	  picture: '',
 	  email: '',
     lastname: '',
     firstname: '',
+      active: false,
+      merror: '',
+      msuccess: ''
   };
+
 
   componentDidMount() {
     const cookies = new cookie();
@@ -30,7 +34,7 @@ class Profile extends Component {
       this.callApi(token)
         .then((res) => {
           if (res.message === 'success') {
-            this.setState({ login: res.user.login, firstname: res.user.firstname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth });
+            this.setState({ login: res.user.name, firstname: res.user.firstname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth });
           }
         })
 		  .catch(err => console.log(err));
@@ -67,10 +71,11 @@ class Profile extends Component {
 	  e.preventDefault();
 	  this.saveProfil(e)
 	    .then((res) => {
-	      console.log(res.merror)
-	      if (res.message === 'success') {
-	        this.setState({ login: res.user.login, firstname: res.user.firsname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth });
-	      } else { console.log(res.message); }
+	      if (res.change) {
+	        this.setState({ firstname: res.user.firsname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth, msuccess: 'Profile updated' });
+	      } else {
+	          this.setState({merror: res.merror})
+          }
 	    })
 	    .catch(err => console.log(err));
 	}
@@ -97,10 +102,10 @@ class Profile extends Component {
     render() {
       let auth;
       if (this.state.auth === 'local') {
-        auth = <div className="form-group"><label>Password</label><input type="password" className="form-control" name="password" /></div>;
+        auth = <div><label>Password</label><input type="password" name="password" /></div>;
       }
       return (
-        <div className="container">
+        <div>
           <form onSubmit={this.onSubmit}>
             <p>{this.state.login}</p>
 
