@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import config from './config';
 import routes from './routes';
-import crawler from './crawler/crawler';
+import crawler from './crawler/crawler'
 import  multer  from 'multer';
 import passport from 'passport';
 import session from 'express-session';
@@ -15,10 +15,7 @@ const upload = multer({ dest: 'server/uploads/'});
 
 const app = express();
 
-mongoose.connect(config.db.url);
-
 // crawler.startCrawling();
-
 
 const corsOption = {
     origin: true,

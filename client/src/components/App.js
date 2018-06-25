@@ -25,7 +25,7 @@ const App = () => (
         <Route exact path="/Profile" component={Profile} />
         <Route exact path="/Fpassword" component={Fpassword} />
         <Route exact path="/ResetPassword" component={ResetPassword} />
-        
+
         <Route exact path="/library" component={Library} />
         <Route exact path="/library/:tabsValue" component={Library} />
         <Route exact path="/movie/:movieId" component={MoviePlayer} />
