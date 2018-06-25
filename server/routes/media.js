@@ -66,6 +66,7 @@ router.get('/crawler/:type/:term', async (req, res) => {
         break;
     }
 
+	medias = medias.sort((a, b) => a.seeders <= b.seeders)
     medias = _.uniqBy(medias, 'displayName');
     medias = _.sortBy(medias, 'displayName');
 
