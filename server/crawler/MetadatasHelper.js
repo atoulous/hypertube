@@ -23,9 +23,9 @@ const fetchCast = async (id, mediaType) => {
 		}
 
 		if (mediaType === 'tv') {
-			MovieDB.tvCredits( { id: id }, mediaCallback)
+			MovieDB.tvCredits( { id: id, language:'en' }, mediaCallback)
 		} else {
-			MovieDB.movieCredits( { id: id }, mediaCallback)
+			MovieDB.movieCredits( { id: id, language:'en' }, mediaCallback)
 		}
 	})
 }
@@ -46,9 +46,9 @@ const fetchMetadata = async (id, mediaType) => {
 		}
 
 		if (mediaType === 'tv') {
-			MovieDB.tvInfo( { id: id }, mediaCallback)
+			MovieDB.tvInfo( { id: id, language:'en' }, mediaCallback)
 		} else {
-			MovieDB.movieInfo( { id: id }, mediaCallback)
+			MovieDB.movieInfo( { id: id, language:'en' }, mediaCallback)
 		}
 	})
 }
@@ -70,9 +70,9 @@ const getMediaInfo = async (mediaName, mediaType) => {
 		}
 
 		if (mediaType === 'tv') {
-			MovieDB.searchTv({ query: mediaName }, mediaCallback)
+			MovieDB.searchTv({ query: mediaName, language:'en' }, mediaCallback)
 		} else {
-			MovieDB.searchMovie({ query: mediaName }, mediaCallback)
+			MovieDB.searchMovie({ query: mediaName, language:'en' }, mediaCallback)
 		}
 	})
 }
