@@ -198,48 +198,6 @@ class Signup extends Component{
 					</Paper>
 				</Grid>
 			</Grid>
-
-			// <div>
-			// 	<div >
-			// { active }
-			// 	<p>{this.state.merror}</p>
-			// 	<h1>Signup</h1>
-			// 	<form onSubmit={this.onSubmit} encType="multipart/form-data">
-			// 			<div>
-			// 				<label>Login</label>
-			// 				<input type="text" name="name"/>
-			// 			</div>
-			// 			<div >
-			// 				<label>Firstname</label>
-			// 				<input type="text"  name="firstname"/>
-			// 			</div>
-			// 			<div >
-			// 				<label>Lastname</label>
-			// 				<input type="text" name="lastname"/>
-			// 			</div>
-			// 			<div>
-			// 				<label>Email</label>
-			// 				<input type="text" name="email"/>
-			// 			</div>
-			// 			<div>
-			// 				<label>Password</label>
-			// 				<input type="password" name="password"/>
-			// 			</div>
-			// 			<div>
-			// 				<input type='file' id='file' name='file' />
-			// 			</div>
-			//
-			// 			<button type="submit">Signup</button>
-			// 		</form>
-			//
-			// 		<hr/>
-			//
-			// 		<p>Already have an account? <Link to="/login">Login</Link></p>
-			// 		<p>Or go <Link to="/">home</Link>.</p>
-			//
-			// 	</div>
-			//
-			// </div>
 		)
 	};
 
