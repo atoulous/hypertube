@@ -18,8 +18,8 @@ const crawl = async () => {
 const searchAll = async (searchTerm, limit) => {
   try {
     const [res1, res2, res3, res4] = await Promise.all([
-      ThePirateBay.crawl(`/search/${searchTerm}/0/99/201`, 'movie', limit, 'movie'),
-      ThePirateBay.crawl(`/search/${searchTerm}/0/99/205`, 'show', limit, 'tv'),
+      ThePirateBay.crawl(`/search/${searchTerm}/0/7/201`, 'movie', limit, 'movie'),
+      ThePirateBay.crawl(`/search/${searchTerm}/0/7/205`, 'show', limit, 'tv'),
       Crawler1337x.crawl(`/category-search/${searchTerm}/Movies/1/`, 'movie', limit, 'movie'),
       Crawler1337x.crawl(`/category-search/${searchTerm}/TV/1/`, 'show', limit, 'tv'),
     ]);
@@ -33,7 +33,7 @@ const searchAll = async (searchTerm, limit) => {
 const searchMovie = async (searchTerm, limit) => {
   try {
     const [resPirateBay, res1337x] = await Promise.all([
-      ThePirateBay.crawl(`/search/${searchTerm}/0/99/201`, 'movie', limit, 'movie'),
+      ThePirateBay.crawl(`/search/${searchTerm}/0/7/201`, 'movie', limit, 'movie'),
       Crawler1337x.crawl(`/category-search/${searchTerm}/Movies/1/`, 'movie', limit, 'movie'),
     ]);
 
@@ -46,7 +46,7 @@ const searchMovie = async (searchTerm, limit) => {
 const searchShow = async (searchTerm, limit) => {
   try {
     const [resPirateBay, res1337x] = await Promise.all([
-      ThePirateBay.crawl(`/search/${searchTerm}/0/99/205`, 'show', limit, 'tv'),
+      ThePirateBay.crawl(`/search/${searchTerm}/0/7/205`, 'show', limit, 'tv'),
       Crawler1337x.crawl(`/category-search/${searchTerm}/TV/1/`, 'show', limit, 'tv'),
     ]);
 
