@@ -204,8 +204,8 @@ module.exports = (passport) => {
     secretOrKey: jwtsecret,
   }, (jwtPayload, cb) => {
     User.findById(jwtPayload._id, (err, user) => {
-      if (err) { return cb(err); }
-      if (!user) { return cb('fail') }
+      if (err) { return cb(err, {login: false}); }
+      if (!user) { return cb('fail', {login: false}) }
       const name = user.name;
       const picture = user.picture;
       const email = user.email;
@@ -213,8 +213,8 @@ module.exports = (passport) => {
       const lastname = user.lastname;
       const auth = user.auth;
       if (!name || !picture || !email || !firstname || !lastname)
-          return cb(null, {name, email, picture, firstname, lastname, auth, profile: false } );
-      return cb(null, {name, email, picture, firstname, lastname, auth, profile: true } );
+          return cb(null, {name, email, picture, firstname, lastname, auth, profile: false, login:true } );
+      return cb(null, {name, email, picture, firstname, lastname, auth, profile: true, login: true } );
 
     });
   }));
