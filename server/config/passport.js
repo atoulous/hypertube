@@ -3,6 +3,9 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const qdStrategy = require('passport-42').Strategy;
 const githubStrategy = require('passport-github2').Strategy;
 const passportJWT = require('passport-jwt');
+const readchunk = require('read-chunk')
+const isPng = require('is-png')
+const isJpg = require('is-jpg')
 
 const jwtstrategy = passportJWT.Strategy;
 const ExtractJwt = passportJWT.ExtractJwt;
@@ -26,9 +29,9 @@ module.exports = (passport) => {
     });
   });
 
-  // LOCAL sign-in
+  // LOCAL sign-up
   passport.use('local-signup', new LocalStrategy({
-    usernameField: 'login',
+    usernameField: 'name',
     passwordField: 'password',
     passReqToCallback: true, // allows us to pass back the entire request to the callback
   },
@@ -39,7 +42,7 @@ module.exports = (passport) => {
           if (user) {
             return done(null, false, 'That email is already taken.');
           }
-          User.findOne({ 'name': req.body.login }, (err, user) => {
+          User.findOne({ 'name': req.body.name }, (err, user) => {
             if (err) { return done(err); }
             if (user) {
               return done(null, false, 'That login is already taken.');
@@ -48,15 +51,30 @@ module.exports = (passport) => {
             newUser.email = req.body.email;
             newUser.firstname = req.body.firstname;
             newUser.lastname = req.body.lastname;
-            newUser.name = req.body.login;
+            newUser.name = req.body.name;
             newUser.auth = 'local'
             newUser.password = newUser.generateHash(req.body.password);
-            fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${req.body.login}`, (err) => {
-              if (err) throw err;
-            });
-            newUser.picture = `http://localhost:5000/uploads/${req.body.login}`;
-            newUser.save((err) => {
-              if (err) throw err;
+              if (req.file) {
+                  if (fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+                      const type = readchunk.sync(`${__dirname}/../uploads/${req.file.filename}`, 0, 8)
+                      if (!isPng(type) && !isJpg(type))
+                      {
+                          fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                              if (err) throw err;
+                          })
+                          return done(null, false, 'Incorrect picture file.');
+                      }
+                      else {
+                          const ext = isJpg(type) ? 'jpg' : 'png'
+                          newUser.picture = `http://localhost:5000/uploads/${req.body.name}.${ext}`;
+                          fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${req.body.name}.${ext}`, (err) => {
+                              if (err) throw err;
+                          });
+                      }
+                  }
+              }
+              newUser.save((err) => {
+                if (err) throw err;
               return done(null, newUser, 'success');
             });
           });
@@ -186,7 +204,6 @@ module.exports = (passport) => {
     secretOrKey: jwtsecret,
   }, (jwtPayload, cb) => {
     User.findById(jwtPayload._id, (err, user) => {
-        console.log(user)
       if (err) { return cb(err); }
       if (!user) { return cb('fail') }
       const name = user.name;
@@ -195,7 +212,9 @@ module.exports = (passport) => {
       const firstname = user.firstname;
       const lastname = user.lastname;
       const auth = user.auth;
-      if (user) { return cb(null, {name, email, picture, firstname, lastname, auth } ); }
+      if (!name || !picture || !email || !firstname || !lastname)
+          return cb(null, {name, email, picture, firstname, lastname, auth, profile: false } );
+      return cb(null, {name, email, picture, firstname, lastname, auth, profile: true } );
 
     });
   }));

@@ -7,7 +7,7 @@ var flash    = require('connect-flash')
 var cookieParser = require('cookie-parser')
 var configDB = require('./config/database.js')
 var multer  = require('multer')
-var upload = multer({ dest: 'server/uploads/' })
+var upload = multer({ dest: 'server/uploads/'})
 var cors = require('cors')
 
 var corsOption = {

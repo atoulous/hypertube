@@ -1,6 +1,9 @@
 const User = require('./../models/users');
 const sendMail = require('./../models/sendmail');
 const Secu = require('../models/secu.js');
+const readchunk = require('read-chunk')
+const isPng = require('is-png')
+const isJpg = require('is-jpg')
 
 const urls = 'http://5.196.225.53:8100';
 const jwt = require('jsonwebtoken');
@@ -25,7 +28,8 @@ module.exports = (app, passport) => {
 
 
   app.post('/signup', (req, res, next) => {
-    if (!Secu.verif(req.body.login) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
+      console.log(req.file)
+    if (!Secu.verif(req.body.name) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
       return res.json({ message: 'Complete all sections of the form.', login: false });
     } else if (!Secu.isGoodPassword(req.body.password)) {
       res.json({ message: 'A strong password consists of a combination of upper and lowercase letters and numbers.', login: false });
@@ -33,6 +37,7 @@ module.exports = (app, passport) => {
       res.json({ message: 'Incorrect Email.', login: false });
     } else {
       passport.authenticate('local-signup', (err, user, info) => {
+
         if (err) { return res.json({ message: err, login: false }); }
         if (!user) {
           return res.json({ login: false, message: 'incorrect user.' });
@@ -57,19 +62,34 @@ module.exports = (app, passport) => {
 
   app.post('/profile', (req, res, next) => {
     passport.authenticate('jwt', (err, userlogin, info) => {
-      let message = '';
+      let merror = ''
       if (!Secu.verif(req.body.firstname) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.email)) {
-        res.json({ message: 'Empty form field.', change: false });
+          if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+              fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                  if (err) throw err;
+              })
+          }
+        res.json({ merror: 'Empty form field.', change: false });
       } else if (!Secu.isEmail(req.body.email)) {
-        res.json({ message: 'Incorrect Email.', change: false });
+          if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+              fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                  if (err) throw err;
+              })
+          }
+        res.json({ merror: 'Incorrect Email.', change: false });
       } else {
         User.findOne({ name: userlogin.name }, (err, user) => {
           if (err) throw err;
           if (user) {
-              User.findOne({ email: req.body.email }, (err, auser) => {
+              User.findOne({ email: req.body.email, name: {$ne: userlogin.name}}, (err, auser) => {
                   if (err) throw err;
                   if (auser) {
-                      res.json({ message: 'Email already used.', change: false });
+                      if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+                          fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                              if (err) throw err;
+                          })
+                      }
+                      res.json({ merror: 'Email already used.', change: false });
                   }
                   else {
                       user.email = req.body.email;
@@ -77,24 +97,37 @@ module.exports = (app, passport) => {
                       user.lastname = req.body.lastname;
                       if (Secu.verif(req.body.password)) {
                           if (user.auth !== 'local') {
-                              message = 'Only local account can change password.';
+                              merror = 'Only local account can change password.';
                           } else if (Secu.isGoodPassword(req.body.password)) {
                               user.password = user.generateHash(req.body.password);
                           } else {
-                              message = 'A strong password consists of a combination of upper and lowercase letters and numbers.';
+                              merror = 'A strong password consists of a combination of upper and lowercase letters and numbers.';
                           }
                       }
                       if (req.file) {
-                          // protect no file
-                          user.picture = `http://localhost:5000/uploads/${userlogin.name}`;
-                          fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${userlogin.name}`, (err) => {
-                              if (err) throw err;
-                          });
+                          if (fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+                              const type = readchunk.sync(`${__dirname}/../uploads/${req.file.filename}`, 0, 8)
+                              if (!isPng(type) && !isJpg(type))
+                              {
+                                  fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                                      if (err) throw err;
+                                  })
+                                  merror = 'Incorrect picture file.'
+                              }
+                              else {
+                                  const ext = isJpg(type) ? 'jpg' : 'png'
+                                  user.picture = `http://localhost:5000/uploads/${userlogin.name}.${ext}`;
+                                  fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${userlogin.name}.${ext}`, (err) => {
+                                      if (err) throw err;
+                                  });
+                              }
+                          }
                       }
                       user.save((err) => {
                           if (err) throw err;
                           res.json({
                               message: 'success',
+                              merror: merror,
                               change: true,
                               user: {
                                   auth: user.auth,

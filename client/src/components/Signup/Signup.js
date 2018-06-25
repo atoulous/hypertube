@@ -46,7 +46,7 @@ class Signup extends Component{
 					<form onSubmit={this.onSubmit} encType="multipart/form-data">
 						<div class="form-group">
 							<label>Login</label>
-							<input type="text" class="form-control" name="login"/>
+							<input type="text" class="form-control" name="name"/>
 						</div>
 						<div class="form-group">
 							<label>Firstname</label>

@@ -55,7 +55,7 @@ class Profile extends Component {
 	}
 
 	changeFirstname(e) {
-	  this.setState({ firsname: e.target.value });
+	  this.setState({ firstname: e.target.value });
 	}
 
 	changeLastname(e) {
@@ -67,6 +67,7 @@ class Profile extends Component {
 	  e.preventDefault();
 	  this.saveProfil(e)
 	    .then((res) => {
+	      console.log(res.merror)
 	      if (res.message === 'success') {
 	        this.setState({ login: res.user.login, firstname: res.user.firsname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth });
 	      } else { console.log(res.message); }
