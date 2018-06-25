@@ -14,26 +14,47 @@ import Profile from './Profile';
 import Fpassword from './Fpassword';
 import ResetPassword from './ResetPassword';
 
+
+
+import Cookies from 'universal-cookie'
+import { Redirect } from 'react-router'
+
+const cookies = new Cookies();
+
+const SecureRoute = ({path, component}) => {
+    if (cookies.get('authtoken')) {
+        return (
+            <Route exact path={path} component={component}/>
+        )
+    } else {
+        return (
+            <Redirect to='/Login' />
+        );
+    }
+}
+
 const App = () => (
   <BrowserRouter>
-    <Layout>
       <Switch>
         <Route exact path="/" component={Home} />
-        
+
         <Route exact path="/Signup" component={Signup} />
         <Route exact path="/Login" component={Login} />
-        <Route exact path="/Profile" component={Profile} />
         <Route exact path="/Fpassword" component={Fpassword} />
         <Route exact path="/ResetPassword" component={ResetPassword} />
 
-        <Route exact path="/library" component={Library} />
-        <Route exact path="/library/:tabsValue" component={Library} />
-        <Route exact path="/movie/:movieId" component={MoviePlayer} />
-        <Route exact path="/starred" component={Starred} />
-        <Route exact path="/top10" component={Top10} />
-        <Route exact path="/saw" component={Saw} />
+        <Layout>
+            <SecureRoute path="/library" component={Library} />
+            <SecureRoute path="/library/:tabsValue" component={Library} />
+            <SecureRoute path="/movie/:movieId" component={MoviePlayer} />
+            <SecureRoute path="/starred" component={Starred} />
+            <SecureRoute path="/top10" component={Top10} />
+            <SecureRoute path="/saw" component={Saw} />
+            <SecureRoute exact path="/Profile" component={Profile} />
+        </Layout>
       </Switch>
-    </Layout>
+
+
   </BrowserRouter>
 );
 
