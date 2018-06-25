@@ -10,16 +10,20 @@ class Login extends Component{
 	}
     state = {
         active: false,
+		merror: ''
     };
 
 	tryLogin(e) {
 	e.preventDefault()
     this.callApi(e)
       .then(res => {
-			if (res.message === 'success') {
+			if (res.login) {
                 const cookies = new cookie()
                 cookies.set('authtoken', res.token, {path: '/'});
                 this.setState({active: true})
+			}
+			else {
+                this.setState({merror: res.merror})
 			}
 	  })
       .catch(err => console.log(err));
@@ -33,8 +37,6 @@ class Login extends Component{
 	});
     const body = await response.json();
 
-    if (response.status !== 200) throw Error(body.message);
-
     return body;
   };
 
@@ -44,22 +46,22 @@ class Login extends Component{
             active = <Redirect to="/profile"/>
         }
 		return (
-		<div class="container">
+		<div>
 			{active}
-			<div class="col-sm-6 col-sm-offset-3">
-				<p>{this.state.response}</p>
-				<h1><span class="fa fa-sign-in"></span>Login</h1>
+			<div >
+				<p>{this.state.merror}</p>
+				<h1>Login</h1>
 				<form onSubmit={this.tryLogin} method="post">
-					<div class="form-group">
+					<div>
 						<label>Login</label>
-						<input type="text" class="form-control" name="name"/>
+						<input type="text" name="name"/>
 					</div>
-					<div class="form-group">
+					<div>
 						<label>Password</label>
-						<input type="password" class="form-control" name="password"/>
+						<input type="password" name="password"/>
 					</div>
 
-					<button type="submit" class="btn btn-warning btn-lg" >Login</button>
+					<button type="submit">Login</button>
 				</form>
 				<hr/>
 				<p>Need an account? <Link to="/signup">Signup</Link></p>

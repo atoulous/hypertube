@@ -23,7 +23,7 @@ class Logout extends Component {
   render() {
       let active
       if (this.state.active) {
-      active = <Redirect to="/Home"/>
+      active = <Redirect to="/"/>
   }
     return (
       <div>

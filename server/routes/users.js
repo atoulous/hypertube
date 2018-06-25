@@ -15,36 +15,33 @@ module.exports = (app, passport) => {
 
   app.post('/login', (req, res, next) => {
     passport.authenticate('local-login', { session: false }, (err, user, info) => {
-      if (err) { return res.status(400).json({ message: err, login: false }); }
-      if (!user) { return res.status(400).json({ message: 'fail to login', login: false }); }
-
-
+      if (err) { return res.status(400).json({ merror: err, login: false }); }
+      if (!user) { return res.status(400).json({ merror: 'fail to login', login: false }); }
         const token = jwt.sign(user.toJSON(), jwtsecret);
         res.cookie('authtoken', token);
-        return res.json({ message: 'success', user, login: true, token });
+        return res.json({ merror: 'success', user, login: true, token });
 
     })(req, res, next);
   });
 
 
   app.post('/signup', (req, res, next) => {
-      console.log(req.file)
     if (!Secu.verif(req.body.name) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
-      return res.json({ message: 'Complete all sections of the form.', login: false });
+      return res.json({ merror: 'Complete all sections of the form.', login: false });
     } else if (!Secu.isGoodPassword(req.body.password)) {
-      res.json({ message: 'A strong password consists of a combination of upper and lowercase letters and numbers.', login: false });
+      res.json({ merror: 'A strong password consists of a combination of upper and lowercase letters and numbers.', login: false });
     } else if (!Secu.isEmail(req.body.email)) {
-      res.json({ message: 'Incorrect Email.', login: false });
+      res.json({ merror: 'Incorrect Email.', login: false });
     } else {
       passport.authenticate('local-signup', (err, user, info) => {
 
-        if (err) { return res.json({ message: err, login: false }); }
+        if (err) { return res.json({ merror: err, login: false }); }
         if (!user) {
-          return res.json({ login: false, message: 'incorrect user.' });
+          return res.json({ login: false, merror: info });
         }
         const token = jwt.sign(user.toJSON(), jwtsecret);
         res.cookie('authtoken', token);
-        return res.json({ message: 'success', user, login: true, token });
+        return res.json({ merror: 'success', user, login: true, profile: true, token });
       })(req, res, next);
     }
   });
@@ -53,9 +50,9 @@ module.exports = (app, passport) => {
     passport.authenticate('jwt', (err, user, info) => {
       if (err) { return res.json({ message: err, login: false }); }
       if (!user) {
-        return res.json({ message: 'incorrect user' });
+        return res.json({ message: 'incorrect user', login: false });
       }
-      return res.json({ message: 'success', user });
+      return res.json({ message: 'success', login: true, user });
     })(req, res, next);
   });
 
