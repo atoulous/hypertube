@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import hls from 'hls.js';
 
+import Palette from 'react-palette'
+
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
@@ -14,11 +16,9 @@ const styles = {
 		textAlign: 'center',
 	},
 	loadingContainer: {
-		marginTop: 230,
-		marginBottom: 230
 	},
 	loadingText: {
-		marginTop: 10,
+		marginTop: 10
 	}
 };
 
@@ -79,18 +79,39 @@ class VideoPlayer extends Component {
 	}
 
 	renderLoading(classes) {
-		return (
-			<Grid container spacing={16} className={classes.loadingContainer} alignItems="center" direction="column" justify="center">
-				<Grid item>
-					<CircularProgress className={classes.progress} size={200} color="primary" />
-				</Grid>
+		const { media } = this.props
 
-				<Grid item>
-					<Typography align='center' variant="display2" className={classes.loadingText} gutterBottom>
-						Please wait, your movie is being loaded. This can take up to 40 seconds.
-					</Typography>
-				</Grid>
-			</Grid>
+		return (
+			<Palette image={'https://image.tmdb.org/t/p/original' + this.props.media.metadatas.backdropPath}>
+				{palette => (
+
+					<div>
+						<Grid container className={classes.loadingContainer} style={{background: 'linear-gradient(80deg, ' + palette.vibrant + ' 0%, ' + palette.darkMuted + ' 100%)', boxShadow: '25px 26px 118px -24px rgba(255,255,255,0.57)'}}>
+							<Grid item xs={1}></Grid>
+							<Grid item xs={10}>
+								<img src={'https://image.tmdb.org/t/p/original' + this.props.media.metadatas.backdropPath} style={{width: '100%'}} />
+							</Grid>
+
+
+
+							<Grid item xs={2}></Grid>
+							<Grid item xs={1}>
+								<br /><br /><br />
+								<CircularProgress className={classes.progress} size={40} color="primary" />
+							</Grid>
+							<Grid item xs={7}>
+								<br /><br /><br />
+								<Typography align='center' variant="title" className={classes.loadingText} gutterBottom>
+									Please wait, your movie is being loaded. This can take up to a minute...
+								</Typography>
+								<br /><br /><br />
+							</Grid>
+						</Grid>
+
+
+					</div>
+				)}
+			</Palette>
 		);
 	}
 

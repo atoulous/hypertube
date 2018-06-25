@@ -71,7 +71,7 @@ class MoviePlayer extends Component {
 		return (
 			<Grid container spacing={24}>
 				<Grid item xs={12}>
-					<VideoPlayer mediaId={this.state.media._id} />
+					<VideoPlayer media={this.state.media} mediaId={this.state.media._id} />
 				</Grid>
 
 				<Grid item xs={12}>
