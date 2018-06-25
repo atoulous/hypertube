@@ -56,13 +56,13 @@ router.get('/crawler/:type/:term', async (req, res) => {
     let medias = [];
     switch (type) {
       case 'all':
-        medias = await Crawler.searchAll(term, 5);
+        medias = await Crawler.searchAll(term, 3);
         break;
       case 'movies':
-        medias = await Crawler.searchMovie(term, 5);
+        medias = await Crawler.searchMovie(term, 3);
         break;
       case 'shows':
-        medias = await Crawler.searchShow(term, 5);
+        medias = await Crawler.searchShow(term, 3);
         break;
     }
 
