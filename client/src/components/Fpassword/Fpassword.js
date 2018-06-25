@@ -1,8 +1,51 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router'
+import { withStyles } from '@material-ui/core/styles';
+
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import KeyboardBackspace from '@material-ui/icons/KeyboardBackspace';
 
 import './Fpassword.css';
+
+const styles = {
+	title: {
+		textAlign: 'center',
+		fontSize: 70,
+		fontWeight: 800,
+		paddingTop: 25,
+		fontFamily: 'Noto Sans'
+	}, centerV: {
+		marginTop: '20vh',
+		margin: 0,
+	    padding: 0,
+	    background: 'linear-gradient(to left, #4b79a1, #283e51)'
+	}, username: {
+		margin: 32,
+		width: 'calc(100% - 64px)',
+		marginBottom: 30,
+		marginTop: 20
+	}, buttonLogin: {
+		margin: 32,
+		marginTop: 10,
+		width: 'calc(100% - 64px)'
+	}, back: {
+		position: 'relative',
+		color: 'rgb(98, 98, 98)',
+		top: 32,
+		left: 32
+	}, error: {
+		marginLeft: 32,
+		marginRight: 32,
+		marginBottom: 10,
+		marginTop: 50,
+		color: '#ff0033'
+	}
+};
 
 class Fpassword extends Component {
     constructor(props) {
@@ -39,29 +82,44 @@ class Fpassword extends Component {
     };
 
   render() {
-      let active
       if (this.state.active) {
-          active = <Redirect to="/ResetPassword"/>
+          return (<Redirect to="/ResetPassword"/>);
       }
-    return (
-		<div class="container">
-			{active}
-			<div class="col-sm-6 col-sm-offset-3">
-				<h1><span class="fa fa-sign-in"></span>Forgot Password :</h1>
-				<form onSubmit={this.sendpassword} method="post">
-					<div class="form-group">
-						<label>Login</label>
-						<input type="text" class="form-control" name="name"/>
-					</div>
-					<button type="submit" class="btn btn-warning btn-lg" >Send</button>
-				</form>
-				<hr/>
-				<p>Need an account? <Link to="/signup">Signup</Link></p>
-				<p>Or go <Link to="/">home</Link>.</p>
-			</div>
-		</div>
+
+	  const { classes } = this.props;
+
+    return (<Grid container spacing={24} className={classes.centerV}>
+			<Grid item xs={4}></Grid>
+			<Grid item xs={4}>
+				<Paper>
+					<Link to='/' className={classes.back}>
+						<KeyboardBackspace/>
+					</Link>
+
+
+					<Typography className={classes.title} gutterBottom variant="display4" component="h1">
+					  Reset password
+					</Typography>
+
+					<form onSubmit={this.sendpassword} method="post">
+						<TextField
+							id="name"
+							name="name"
+							label="Username"
+							className={classes.username}
+							margin="normal" />
+
+						<Button type='submit' variant="contained" color="primary" className={classes.buttonLogin}>
+							Send
+						</Button>
+					</form>
+
+					<br />
+				</Paper>
+			</Grid>
+		</Grid>
     );
   }
 }
 
-export default Fpassword;
+export default withStyles(styles)(Fpassword);
