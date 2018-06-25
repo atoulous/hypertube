@@ -25,6 +25,12 @@ const MediaSchema = mongoose.Schema({
 	score: String,
 	productionDate: String,
 	duration: String,
+	isEpisode: Boolean,
+	episodeGuestStars: [{
+		character: String,
+		name: String,
+		profile_path: String
+	}],
 	cast: [{
 		character: String,
 		name: String,

@@ -5,10 +5,10 @@ import config from '../config';
 const crawl = async () => {
   try {
     Promise.resolve([
-      ThePirateBay.crawl('/top/201', 'movie', -1, 'movie'),
+      // ThePirateBay.crawl('/top/201', 'movie', -1, 'movie'),
       ThePirateBay.crawl('/top/205', 'show', -1, 'tv'),
       Crawler1337x.crawl('/trending/w/tv/', 'show', -1, 'tv'),
-      Crawler1337x.crawl('/trending/w/movies/', 'movie', -1, 'movie'),
+      // Crawler1337x.crawl('/trending/w/movies/', 'movie', -1, 'movie'),
     ]);
   } catch (err) {
     throw err;
