@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Typography from '@material-ui/core/Typography';
 
 import MediaDetails from '../MediaDetails'
 import VideoPlayer from '../VideoPlayer'
@@ -11,7 +13,16 @@ import Divider from '@material-ui/core/Divider';
 
 
 const styles = {
-
+	title: {
+		textAlign: 'center',
+	},
+	loadingContainer: {
+		marginTop: 230,
+		marginBottom: 230
+	},
+	loadingText: {
+		marginTop: 10,
+	}
 };
 
 class MoviePlayer extends Component {
@@ -42,7 +53,17 @@ class MoviePlayer extends Component {
 
 	renderLoading(classes) {
 		return (
-			<p>loading</p>
+			<Grid container spacing={16} className={classes.loadingContainer} alignItems="center" direction="column" justify="center">
+				<Grid item>
+					<CircularProgress className={classes.progress} size={200} color="primary" />
+				</Grid>
+
+				<Grid item>
+					<Typography align='center' variant="display2" className={classes.loadingText} gutterBottom>
+						Please wait, your movie is being loaded. This can take up to 40 seconds.
+					</Typography>
+				</Grid>
+			</Grid>
 		);
 	}
 
