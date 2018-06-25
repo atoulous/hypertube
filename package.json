@@ -5,7 +5,7 @@
 		"start-client": "cd client && npm run start",
 		"start-server": "nodemon --exec babel-node --ignore client server",
 		"start-db": "mongod --dbpath ./db",
-		"start-dev": "concurrently --kill-others-on-fail 'npm run start-db' 'npm run start-server' 'npm run start-client'"
+		"start-dev": "concurrently --kill-others-on-fail 'npm run start-server' 'npm run start-client'"
 	},
 	"dependencies": {
 		"body-parser": "^1.18.3",
