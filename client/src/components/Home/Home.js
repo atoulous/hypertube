@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom'
+
 
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -30,6 +32,9 @@ class Home extends Component {
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Home
         </Typography>
+        <Link to='/login'>Login</Link>
+          <Link to='/signup'>Signup</Link>
+        <a href='http://localhost:5000/auth/github'>GitHub</a>
 
         <Typography className={classes.title}>
           {this.state.response}
