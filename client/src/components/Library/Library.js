@@ -49,9 +49,9 @@ class Library extends Component {
     }
   }
 
-  getCrawlerMedias = async ({ tabsValue = 'all', term = null }) => {
+  getCrawlerMedias = async ({ tabsValue = 'all', term = null, sortedBy = 'displayName' }) => {
     try {
-      const response = await fetch(`/api/media/crawler/${tabsValue}/${term}`);
+      const response = await fetch(`/api/media/crawler/${tabsValue}/${term}/${sortedBy}`);
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.message);
