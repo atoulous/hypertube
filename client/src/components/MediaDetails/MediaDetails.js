@@ -72,7 +72,7 @@ class MediaDetails extends Component {
 
 					{(() => {
 
-						if (media.metadatas.cast && media.metadatas.cast.length !== 0) {
+						if (media.metadatas && media.metadatas.cast && media.metadatas.cast.length !== 0) {
 							return (
 								<ExpansionPanel>
 									<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -87,7 +87,7 @@ class MediaDetails extends Component {
 					})()}
 					{(() => {
 
-						if (media.metadatas.crew && media.metadatas.crew.length !== 0) {
+						if (media.metadatas && media.metadatas.crew && media.metadatas.crew.length !== 0) {
 							return (
 								<ExpansionPanel>
 									<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -102,7 +102,7 @@ class MediaDetails extends Component {
 					})()}
 					{(() => {
 
-						if (media.metadatas.episodeGuestStars && media.metadatas.episodeGuestStars.length !== 0) {
+						if (media.metadatas && media.metadatas.episodeGuestStars && media.metadatas.episodeGuestStars.length !== 0) {
 							return (
 								<ExpansionPanel>
 									<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
