@@ -17,15 +17,15 @@ const fetchCast = async (id, mediaType) => {
 			if (mDbErr) return reject(mDbErr)
 			if (!mdbRes) return resolve(null)
 
-			mdbRes.crew = mdbRes.crew.splice(0, 6)
-			mdbRes.cast = mdbRes.cast.splice(0, 6)
+			mdbRes.crew = mdbRes.crew.splice(0, 20)
+			mdbRes.cast = mdbRes.cast.splice(0, 20)
 			return resolve(mdbRes)
 		}
 
-		if (mediaType === 'tv') {
-			MovieDB.tvCredits( { id: id, language:'en' }, mediaCallback)
-		} else {
+		if (mediaType !== 'tv') {
 			MovieDB.movieCredits( { id: id, language:'en' }, mediaCallback)
+		} else {
+			MovieDB.tvCredits( { id: id, language:'en' }, mediaCallback)
 		}
 	})
 }
@@ -77,6 +77,45 @@ const getMediaInfo = async (mediaName, mediaType) => {
 	})
 }
 
+const appendShowMetadatas = async (media, showId, season, episode) => {
+	return new Promise(async (resolve, reject) => {
+		MovieDB.tvEpisodeInfo({
+			id: showId,
+			season_number: season,
+			episode_number: episode
+		}, async (err, res) => {
+			if (err) return reject(err)
+
+			MovieDB.tvEpisodeCredits({
+				id: showId,
+				season_number: season,
+				episode_number: episode
+			}, async (errCredits, resCredits) => {
+				if (errCredits) return reject(errCredits)
+
+				media.metadatas.isEpisode = true
+				media.metadatas.episodeGuestStars = resCredits.guest_stars
+				media.metadatas.productionDate = res.air_date || media.metadatas.productionDate
+
+				media.metadatas.overview = res.overview || media.metadatas.overview
+				if (res.name)
+					media.metadatas.name = media.displayName + ' - ' + res.name
+
+				media.metadatas.backdropPath = res.still_path || media.metadatas.backdropPath
+				media.metadatas.score = res.vote_average || media.metadatas.score
+
+				if (resCredits.crew && resCredits.crew.length !== 0)
+					media.metadatas.crew = resCredits.crew.splice(0, 20)
+
+				if (resCredits.cast && resCredits.cast.length !== 0)
+					media.metadatas.cast = resCredits.cast.splice(0, 20)
+
+				return resolve()
+			})
+		})
+	})
+}
+
 const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 	return new Promise(async (resolve, reject) => {
 		if (doFetchExtendedDatas && media.movieDbId && media.metadatas && !media.hasExtendedMetadatas) {
@@ -89,6 +128,7 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 				await media.save()
 				return resolve(media)
 			}
+
 			const cast = await fetchCast(media.movieDbId, mediaType)
 			media.metadatas.productionDate = metadatas.release_date
 			media.metadatas.duration = metadatas.runtime
@@ -99,16 +139,29 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 
 			if (cast && cast.crew && cast.crew.length !== 0)
 				media.metadatas.crew = cast.crew
+
+			// Looking for SxxEyy
+			const regEx = new RegExp(/(.+)S([0-9]{1,2})E([0-9]{1,2}).*/gi)
+			if (regEx.test(media.displayName)) {
+				// We found one, get details on that specific episode
+				regEx.lastIndex = 0
+				const result = regEx.exec(media.displayName)
+				const showName = result[1]
+				const season = parseInt(result[2], 10)
+				const episode = parseInt(result[3], 10)
+
+				await appendShowMetadatas(media, media.movieDbId, season, episode)
+			}
+
 			media.hasExtendedMetadatas = true
 			await media.save()
 			return resolve(media)
 		} else if (!doFetchExtendedDatas && !media.hasExtendedMetadatas) {
 			let searchTerm = media.displayName
 			if (mediaType === 'tv') {
-				searchTerm = media.displayName.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/gi, '')
 				searchTerm = media.displayName.replace(/(S[0-9]{1,2})(.*)/gi, '')
+				searchTerm = media.displayName.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/gi, '')
 			}
-
 			const mediaInfo = await getMediaInfo(searchTerm, mediaType)
 			if (!mediaInfo) {
 				console.log('no match', media.displayName, mediaType)

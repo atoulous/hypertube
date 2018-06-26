@@ -117,7 +117,7 @@ class Home extends Component {
 				<Button variant="outlined" className={classes.button}>
 					<Grid container>
 						<Grid item xs={1}>
-							<img src={'https://signin.intra.42.fr/assets/42_logo-7dfc9110a5319a308863b96bda33cea995046d1731cebb735e41b16255106c12.svg'}/>
+							<img alt="Banner" src={'https://signin.intra.42.fr/assets/42_logo-7dfc9110a5319a308863b96bda33cea995046d1731cebb735e41b16255106c12.svg'}/>
 						</Grid>
 						<Grid item xs={11}>
 							Sign in with 42

@@ -96,7 +96,6 @@ class Login extends Component{
   };
 
 	render() {
-        let active
         if (this.state.active) {
             return (<Redirect to="/profile"/>)
         }

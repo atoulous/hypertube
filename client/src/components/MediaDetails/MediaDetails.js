@@ -70,24 +70,51 @@ class MediaDetails extends Component {
 						<br />
 					</Typography>
 
-					<ExpansionPanel>
-						<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-							<Typography className={classes.heading}>Cast detail</Typography>
-						</ExpansionPanelSummary>
-						<ExpansionPanelDetails>
-							<CastGrid cast={media.metadatas ? media.metadatas.cast : []} />
-						</ExpansionPanelDetails>
-					</ExpansionPanel>
-					<ExpansionPanel>
-						<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-							<Typography className={classes.heading}>Crew details</Typography>
-						</ExpansionPanelSummary>
-						<ExpansionPanelDetails>
-							<CrewGrid crew={media.metadatas ? media.metadatas.crew : []} />
-						</ExpansionPanelDetails>
-					</ExpansionPanel>
+					{(() => {
 
+						if (media.metadatas.cast && media.metadatas.cast.length !== 0) {
+							return (
+								<ExpansionPanel>
+									<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+										<Typography className={classes.heading}>Cast detail</Typography>
+									</ExpansionPanelSummary>
+									<ExpansionPanelDetails>
+										<CastGrid cast={media.metadatas.cast} />
+									</ExpansionPanelDetails>
+								</ExpansionPanel>
+							)
+						}
+					})()}
+					{(() => {
 
+						if (media.metadatas.crew && media.metadatas.crew.length !== 0) {
+							return (
+								<ExpansionPanel>
+									<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+										<Typography className={classes.heading}>Crew details</Typography>
+									</ExpansionPanelSummary>
+									<ExpansionPanelDetails>
+										<CrewGrid crew={media.metadatas.crew} />
+									</ExpansionPanelDetails>
+								</ExpansionPanel>
+							)
+						}
+					})()}
+					{(() => {
+
+						if (media.metadatas.episodeGuestStars && media.metadatas.episodeGuestStars.length !== 0) {
+							return (
+								<ExpansionPanel>
+									<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+										<Typography className={classes.heading}>Guests stars</Typography>
+									</ExpansionPanelSummary>
+									<ExpansionPanelDetails>
+										<CastGrid cast={media.metadatas.episodeGuestStars} />
+									</ExpansionPanelDetails>
+								</ExpansionPanel>
+							)
+						}
+					})()}
 				</Grid>
 			</Grid>
 		)
