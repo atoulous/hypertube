@@ -157,7 +157,7 @@ module.exports = (passport) => {
                         newUser.name = profile.displayName || profile.username;
                         newUser.email = profile._json.email;
                         newUser.picture = profile.photos[0].value;
-                        newUser.auth = 'github'
+                        newUser.auth = 'github';
                         newUser.save((err) => {
                             if (err) throw err;
                             return done(null, newUser);

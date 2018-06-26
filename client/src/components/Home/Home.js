@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom'
-
+import cookie from 'universal-cookie';
+import Alert from 'react-bootstrap/lib/Alert'
 
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -45,12 +46,16 @@ const styles = {
 
 class Home extends Component {
   state = {
-    response: '',
 	  merror: '',
   };
 
   componentDidMount() {
-
+      const cookies = new cookie();
+      const loginerror = cookies.get('error')
+      if (loginerror) {
+      	this.setState({merror: loginerror})
+		  cookies.remove('error')
+	  }
   }
 
   render() {
@@ -58,8 +63,13 @@ class Home extends Component {
 
 	const SignUpLink = props => <Link to='/signup' {...props}/>
 	const LoginLink = props => <Link to='/login' {...props}/>
+      let merror = ''
+      if (this.state.merror) {
+          merror = <Alert bsStyle='danger'>{this.state.merror}</Alert>
+      }
 
-    return (
+
+      return (
       <div className="App">
 		<Grid container className={classes.centerV}>
 			<Grid item xs={12}>
@@ -69,6 +79,7 @@ class Home extends Component {
 
 				<br />
 				<br />
+				{ merror }
 			</Grid>
 
 
@@ -117,7 +128,7 @@ class Home extends Component {
 				<Button variant="outlined" className={classes.button}>
 					<Grid container>
 						<Grid item xs={1}>
-							<img src={'https://signin.intra.42.fr/assets/42_logo-7dfc9110a5319a308863b96bda33cea995046d1731cebb735e41b16255106c12.svg'}/>
+							<img src={'https://signin.intra.42.fr/assets/42_logo-7dfc9110a5319a308863b96bda33cea995046d1731cebb735e41b16255106c12.svg'} />
 						</Grid>
 						<Grid item xs={11}>
 							Sign in with 42
