@@ -14,9 +14,15 @@ const beautifyTorrentName = (name) => {
 	name = name.split("2160p")[0]
 	name = name.split("WEB")[0]
 	name = name.split("tv")[0]
+	name = name.split("[DVD-Rip]")[0]
+	name = name.split("iNTERNAL")[0]
+	name = name.split("SUBBED")[0]
+	name = name.split("MPEG-4")[0]
+	name = name.split("x264")[0]
+	name = name.split("EXTENDED")[0]
 	name = name.replace(/([sS][0-9]{1,2}[eE][0-9]{1,2})(.*)/g, '$1')
 
-	let year = 2010
+	let year = 1970
 	while ( year <= 2019 ) {
 		name = name.split("(" + year + ")")[0]
 		name = name.split(year)[0]
