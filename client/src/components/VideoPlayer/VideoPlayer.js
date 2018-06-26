@@ -82,14 +82,14 @@ class VideoPlayer extends Component {
 		const { media } = this.props
 
 		return (
-			<Palette image={'https://image.tmdb.org/t/p/original' + this.props.media.metadatas.backdropPath}>
+			<Palette image={'https://image.tmdb.org/t/p/original' + media.metadatas.backdropPath}>
 				{palette => (
 
 					<div>
 						<Grid container className={classes.loadingContainer} style={{background: 'linear-gradient(80deg, ' + palette.vibrant + ' 0%, ' + palette.darkMuted + ' 100%)', boxShadow: '25px 26px 118px -24px rgba(255,255,255,0.57)'}}>
 							<Grid item xs={1}></Grid>
 							<Grid item xs={10}>
-								<img src={'https://image.tmdb.org/t/p/original' + this.props.media.metadatas.backdropPath} style={{width: '100%'}} />
+								<img alt='Banner' src={'https://image.tmdb.org/t/p/original' + media.metadatas.backdropPath} style={{width: '100%'}} />
 							</Grid>
 
 
