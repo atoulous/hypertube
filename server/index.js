@@ -11,7 +11,6 @@ import passport from 'passport';
 import session from 'express-session';
 import cors from 'cors';
 
-const upload = multer({ dest: 'server/uploads/'});
 
 const upload = multer({ dest: 'server/uploads/' });
 const app = express();
