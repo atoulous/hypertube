@@ -197,7 +197,7 @@ const downloadTorrent = async media => new Promise(async (resolve, reject) => {
 
     console.log('Waiting 10s for the torrent to start downloading.');
     await delay(10000);
-    console.log('5s are up.');
+    console.log('10s are up.');
 
     await generateMasterPlaylist(mediaLength, media, srtArr)
     await startTranscode(inputStream, media)
