@@ -9,6 +9,8 @@ import './Profile.css';
 import { withStyles } from '@material-ui/core/styles';
 
 import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -74,6 +76,7 @@ class Profile extends Component {
     this.changeEmail = this.changeEmail.bind(this);
     this.changeFirstname = this.changeFirstname.bind(this);
     this.changeLastname = this.changeLastname.bind(this);
+    this.changeLanguage = this.changeLanguage.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
   state = {
@@ -86,7 +89,8 @@ class Profile extends Component {
     firstname: '',
       active: false,
       merror: '',
-      msuccess: ''
+      msuccess: '',
+      language: ''
   };
 
 
@@ -98,7 +102,8 @@ class Profile extends Component {
       this.callApi(token)
         .then((res) => {
           if (res.login) {
-            this.setState({ login: res.user.name, firstname: res.user.firstname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth });
+            this.setState({ name: res.user.name, firstname: res.user.firstname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth, language: res.user.language });
+          console.log(this.state)
           }
           else {
               this.setState({merror: res.merror})
@@ -124,7 +129,9 @@ class Profile extends Component {
 	changeEmail(e) {
 	  this.setState({ email: e.target.value });
 	}
-
+    changeLanguage(e) {
+        this.setState({ language: e.target.value });
+    }
 	changeFirstname(e) {
 	  this.setState({ firstname: e.target.value });
 	}
@@ -200,9 +207,6 @@ class Profile extends Component {
                             {this.state.name}
                         </Typography>
 
-
-
-
                         <form onSubmit={this.onSubmit} encType="multipart/form-data">
 
                             <TextField
@@ -246,7 +250,17 @@ class Profile extends Component {
                                     Upload your image
                                 </Button>
                             </label>
-
+                            <Select
+                                id="language"
+                                name="language"
+                                label="Language"
+                                value={this.state.language}
+                                onChange={this.changeLanguage}
+                            >
+                                <MenuItem value='english'>English</MenuItem>
+                                <MenuItem value='francais'>Francais</MenuItem>
+                                <MenuItem value='espanol'>Espanol</MenuItem>
+                            </Select>
                             <Button type='submit' variant="contained" color="primary" className={classes.buttonLogin}>
                                 Save
                             </Button>

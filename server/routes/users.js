@@ -70,6 +70,7 @@ module.exports = (app, passport) => {
 
   app.get('/profile', (req, res, next) => {
     passport.authenticate('jwt', (err, user, info) => {
+      console.log(user)
       if (err) { return res.json({ merror: err, login: false }); }
       if (!user) {
         return res.json({ merror: 'incorrect user', login: false });
@@ -82,7 +83,7 @@ module.exports = (app, passport) => {
   app.post('/profile', (req, res, next) => {
     passport.authenticate('jwt', (err, userlogin, info) => {
       let merror = '';
-      if (!Secu.verif(req.body.firstname) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.email)) {
+      if (!Secu.verif(req.body.firstname) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.language)) {
         if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
           fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
             if (err) throw err;
@@ -113,6 +114,7 @@ module.exports = (app, passport) => {
                 user.email = req.body.email;
                 user.firstname = req.body.firstname;
                 user.lastname = req.body.lastname;
+                user.language = req.body.language;
                 if (Secu.verif(req.body.password)) {
                   if (user.auth !== 'local') {
                     merror = 'Only local account can change password.';
@@ -151,6 +153,7 @@ module.exports = (app, passport) => {
                       firstname: user.firstname,
                       lastname: user.lastname,
                       email: user.email,
+                      language: user.language
                     },
                   });
                 });
