@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router'
 import { withStyles } from '@material-ui/core/styles';
+import Alert from 'react-bootstrap/lib/Alert'
 
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
@@ -54,16 +55,19 @@ class Fpassword extends Component {
     }
     state = {
         active: false,
+		merror: ''
     };
 
     sendpassword(e) {
         e.preventDefault()
         this.callApi(e)
             .then(res => {
-                this.setState({ response: res.message })
-                if (res.message === 'success') {
+                if (res.send) {
                 	this.setState({active: true})
                 }
+                else {
+                	this.setState({merror: res.merror})
+				}
             })
             .catch(err => console.log(err));
     }
@@ -88,7 +92,13 @@ class Fpassword extends Component {
 
 	  const { classes } = this.props;
 
-    return (<Grid container  className={classes.centerV}>
+      let merror = ''
+      if (this.state.merror) {
+          merror = <Alert bsStyle='danger'>{this.state.merror}</Alert>
+      }
+
+
+      return (<Grid container  className={classes.centerV}>
 			<Grid item xs={4}></Grid>
 			<Grid item xs={4}>
 				<Paper>
@@ -100,6 +110,8 @@ class Fpassword extends Component {
 					<Typography className={classes.title} gutterBottom variant="display4" component="h1">
 					  Reset password
 					</Typography>
+
+					{ merror }
 
 					<form onSubmit={this.sendpassword} method="post">
 						<TextField

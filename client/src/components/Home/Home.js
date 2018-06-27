@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import cookie from 'universal-cookie';
+import Alert from 'react-bootstrap/lib/Alert'
 
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -47,21 +49,30 @@ const styles = {
 
 class Home extends Component {
   state = {
-    response: '',
 	  merror: '',
   };
 
   componentDidMount() {
-
+      const cookies = new cookie();
+      const loginerror = cookies.get('error')
+      if (loginerror) {
+      	this.setState({merror: loginerror})
+		  cookies.remove('error')
+	  }
   }
 
   render() {
     const { classes } = this.props;
 
-    const SignUpLink = props => <Link to="/signup" {...props} />;
-    const LoginLink = props => <Link to="/login" {...props} />;
+	const SignUpLink = props => <Link to='/signup' {...props}/>
+	const LoginLink = props => <Link to='/login' {...props}/>
+      let merror = ''
+      if (this.state.merror) {
+          merror = <Alert bsStyle='danger'>{this.state.merror}</Alert>
+      }
 
-    return (
+
+      return (
       <div className="App">
         <Grid container className={classes.centerV}>
           <Grid item xs={12}>
@@ -69,9 +80,10 @@ class Home extends Component {
 		          Hypertube
             </Typography>
 
-            <br />
-            <br />
-          </Grid>
+				<br />
+				<br />
+				{ merror }
+			</Grid>
 
 
           <Grid item xs={12}>
