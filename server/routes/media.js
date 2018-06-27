@@ -49,26 +49,25 @@ router.get('/local/:type/:skip/:term', async (req, res) => {
   }
 });
 
-router.get('/crawler/:type/:term', async (req, res) => {
+router.get('/crawler/:type/:term/:sortedBy', async (req, res) => {
   try {
-    const { type, term } = req.params;
+    const { type, term, sortedBy } = req.params;
 
     let medias = [];
     switch (type) {
       case 'all':
-        medias = await Crawler.searchAll(term, 3);
+        medias = await Crawler.searchAll(term, 5);
         break;
       case 'movies':
         medias = await Crawler.searchMovie(term, 3);
         break;
       case 'shows':
-        medias = await Crawler.searchShow(term, 3);
+        medias = await Crawler.searchShow(term, 10);
         break;
     }
 
-	medias = medias.sort((a, b) => a.seeders <= b.seeders)
     medias = _.uniqBy(medias, 'displayName');
-    medias = _.sortBy(medias, 'displayName');
+    medias = _.sortBy(medias, sortedBy);
 
     res.status(200).json(medias);
   } catch (err) {
