@@ -31,6 +31,7 @@ async function parseMedia(magnet) {
               console.log('ParseMedia', 'Probe failed. Retrying in 2000ms')
 			  if (pass >= 20) {
 				  console.log('ParseMedia', 'Probe failed 20 times, aborting torrent. Probably not enough seeders or corrupted/incompatible input file.')
+				  fs.unlinkSync(filePath)
 				  return reject('Probe failed 20 times, aborting torrent. Probably not enough seeders or corrupted/incompatible input file.')
 			  }
               setTimeout(() => { checkProbe(pass + 1) }, 2000)
@@ -197,7 +198,7 @@ const downloadTorrent = async media => new Promise(async (resolve, reject) => {
 
     console.log('Waiting 10s for the torrent to start downloading.');
     await delay(10000);
-    console.log('5s are up.');
+    console.log('10s are up.');
 
     await generateMasterPlaylist(mediaLength, media, srtArr)
     await startTranscode(inputStream, media)

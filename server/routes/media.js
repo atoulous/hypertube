@@ -87,6 +87,8 @@ router.get('/startmedia/:id', async (req, res) => {
     .then(async (media) => {
   		if (!media) res.status(404).json({ error: `This media does not exist.:${err}` });
 
+		media.lastSeen = new Date().toISOString()
+		await media.save()
       // Media is not dowloaded or downloading, start it.
       if (media.status === 'listed') {
         MediaController.downloadTorrent(media).then(() => res.status(200).json(media).end()).catch(() => res.status(422).json({ error: 'This media could not be played, either it does not have enough seeders, or it was corrupted.' }));
