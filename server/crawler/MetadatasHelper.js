@@ -172,6 +172,7 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 			}
 			const mediaId = mediaInfo.id
 
+			mediaInfo.productionDate = mediaInfo.release_date || first_air_date || null
 			mediaInfo.posterPath = mediaInfo.poster_path
 			mediaInfo.backdropPath = mediaInfo.backdrop_path
 			mediaInfo.name = mediaInfo.title
