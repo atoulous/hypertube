@@ -121,9 +121,9 @@ CardMovie.propTypes = {
   mediaId: PropTypes.string.isRequired,
   imagePath: PropTypes.string,
   overview: PropTypes.string,
-  seeders: PropTypes.number.isRequired,
-  leechers: PropTypes.number.isRequired,
-  score: PropTypes.string.isRequired,
+  seeders: PropTypes.number,
+  leechers: PropTypes.number,
+  score: PropTypes.string,
 };
 
 export default withStyles(styles)(CardMovie);

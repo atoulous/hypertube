@@ -146,7 +146,7 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 				// We found one, get details on that specific episode
 				regEx.lastIndex = 0
 				const result = regEx.exec(media.displayName)
-				const showName = result[1]
+				// const showName = result[1]
 				const season = parseInt(result[2], 10)
 				const episode = parseInt(result[3], 10)
 
@@ -159,7 +159,7 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 		} else if (!doFetchExtendedDatas && !media.hasExtendedMetadatas) {
 			let searchTerm = media.displayName
 			if (mediaType === 'tv') {
-				searchTerm = media.displayName.replace(/(S[0-9]{1,2})(.*)/gi, '')
+				// searchTerm = media.displayName.replace(/(S[0-9]{1,2})(.*)/gi, '')
 				searchTerm = media.displayName.replace(/(S[0-9]{1,2}E[0-9]{1,2})(.*)/gi, '')
 			}
 			const mediaInfo = await getMediaInfo(searchTerm, mediaType)
@@ -170,9 +170,9 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 				await media.save()
 				return resolve(media)
 			}
-			const mediaId = mediaInfo.id
+			// const mediaId = mediaInfo.id
 
-			mediaInfo.productionDate = mediaInfo.release_date || first_air_date || null
+			mediaInfo.productionDate = mediaInfo.release_date || mediaInfo.first_air_date || null
 			mediaInfo.posterPath = mediaInfo.poster_path
 			mediaInfo.backdropPath = mediaInfo.backdrop_path
 			mediaInfo.name = mediaInfo.title

@@ -3,16 +3,16 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import config from './config';
-import routes from './routes';
 import multer from 'multer';
 import passport from 'passport';
 import session from 'express-session';
 import cors from 'cors';
-const upload = multer({ dest: 'server/uploads/' });
 
+import config from './config';
+import routes from './routes';
 import crawler from './crawler/crawler';
 
+const upload = multer({ dest: 'server/uploads/' });
 const app = express();
 
 // crawler.startCrawling();
@@ -49,7 +49,6 @@ app.use(passport.session());
 
 // Routes
 require('./routes/users.js')(app, passport);
-
 app.use('/api', routes);
 
 
