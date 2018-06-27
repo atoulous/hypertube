@@ -1,31 +1,43 @@
 import _ from 'lodash';
+import moment from 'moment-timezone';
+
 import Crawler from '../crawler/crawler';
 
 const router = require('express').Router();
 const fs = require('fs');
 const Media = require('../models/Media');
 const MediaController = require('../controllers/MediaController');
-
 const MetadatasHelper = require('../crawler/MetadatasHelper');
 
-router.get('/local/:type/:skip/:term/:sortedBy', async (req, res) => {
+router.get('/local/:type/:skip/:term/:sortedBy/:startDate/:endDate', async (req, res) => {
   try {
     const skip = parseInt(req.params.skip, 10);
-    const { term, type, sortedBy } = req.params;
+    const { term, type, sortedBy, startDate, endDate } = req.params;
     const termRegex = new RegExp(term, 'i');
-    const search = term !== 'null' ? { displayName: termRegex } : {};
+    let termSearch = term !== 'null' ? { displayName: termRegex } : {};
+
+    let dateSearch = {};
+    if (startDate !== 'null' && endDate !== 'null') {
+      dateSearch = {
+        'metadatas.productionDate': {
+          $gte: new Date(startDate.toString(), 1, 1),
+          $lt: new Date(endDate.toString(), 12, 30),
+        },
+      };
+    }
+
+    const allSearch = { ...dateSearch, ...termSearch };
 
     let medias = [];
     switch (type) {
       case 'all':
-        medias = await Media.find(search)
+        medias = await Media.find(allSearch)
           .sort({ 'metadatas.score': -1 })
-          .where()
           .limit(10)
           .skip(skip);
         break;
       case 'movies':
-        medias = await Media.find(search)
+        medias = await Media.find(allSearch)
           .sort({ 'metadatas.score': -1 })
           .where('mediaType')
           .equals('movie')
@@ -33,7 +45,7 @@ router.get('/local/:type/:skip/:term/:sortedBy', async (req, res) => {
           .skip(skip);
         break;
       case 'shows':
-        medias = await Media.find(search)
+        medias = await Media.find(allSearch)
           .sort({ 'metadatas.score': -1 })
           .where('mediaType')
           .equals('show')
@@ -43,6 +55,7 @@ router.get('/local/:type/:skip/:term/:sortedBy', async (req, res) => {
     }
 
     medias = _.uniqBy(medias, 'displayName');
+    if (sortedBy) medias = _.sortBy(medias, sortedBy);
 
     res.status(200).json(medias);
   } catch (err) {
@@ -68,7 +81,7 @@ router.get('/crawler/:type/:term/:sortedBy', async (req, res) => {
     }
 
     medias = _.uniqBy(medias, 'displayName');
-    medias = _.sortBy(medias, sortedBy);
+    if (sortedBy) medias = _.sortBy(medias, sortedBy);
 
     res.status(200).json(medias);
   } catch (err) {
@@ -77,19 +90,19 @@ router.get('/crawler/:type/:term/:sortedBy', async (req, res) => {
 });
 
 router.get('/media/:id', async (req, res) => {
-	const media = await Media.findOne({ _id: req.params.id })
-	await MetadatasHelper.fetchMetadatas(media, true, media.mediaType === 'movie' ? 'movie' : 'tv');
+  const media = await Media.findOne({ _id: req.params.id });
+  await MetadatasHelper.fetchMetadatas(media, true, media.mediaType === 'movie' ? 'movie' : 'tv');
 
-	return res.status(200).json(media)
-})
+  return res.status(200).json(media);
+});
 
 router.get('/startmedia/:id', async (req, res) => {
   Media.findOne({ _id: req.params.id })
     .then(async (media) => {
   		if (!media) res.status(404).json({ error: `This media does not exist.:${err}` });
 
-		media.lastSeen = new Date().toISOString()
-		await media.save()
+      media.lastSeen = new Date().toISOString();
+      await media.save();
       // Media is not dowloaded or downloading, start it.
       if (media.status === 'listed') {
         MediaController.downloadTorrent(media).then(() => res.status(200).json(media).end()).catch(() => res.status(422).json({ error: 'This media could not be played, either it does not have enough seeders, or it was corrupted.' }));

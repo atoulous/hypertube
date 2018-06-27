@@ -50,6 +50,7 @@ class Bar extends Component {
   handleClose = () => {
     this.setState({ anchorEl: null });
   };
+
   handleLogOut = () => {
     const cookies = new Cookies();
     cookies.remove('authtoken');
@@ -57,7 +58,7 @@ class Bar extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, handleDrawerToggle } = this.props;
     const { auth, anchorEl, redirect } = this.state;
     const open = Boolean(anchorEl);
 
@@ -69,7 +70,7 @@ class Bar extends Component {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={this.handleDrawerToggle}
+            onClick={handleDrawerToggle}
             className={classes.navIconHide}
           >
             <MenuIcon />

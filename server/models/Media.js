@@ -19,29 +19,30 @@ const MediaSchema = mongoose.Schema({
   movieDbId: String,
   metadatas: {
     name: String,
-	tagline: String,
+    tagline: String,
     posterPath: String,
     backdropPath: String,
     overview: String,
-	score: String,
-	productionDate: String,
-	duration: String,
-	isEpisode: Boolean,
-	episodeGuestStars: [{
-		character: String,
-		name: String,
-		profile_path: String
-	}],
-	cast: [{
-		character: String,
-		name: String,
-		profile_path: String
-	}], crew: [{
-		department: String,
-		job: String,
-		name: String,
-		profile_path: String
-	}]
+    score: String,
+    productionDate: { type: Date, default: Date.now },
+    duration: String,
+    isEpisode: Boolean,
+    episodeGuestStars: [{
+      character: String,
+      name: String,
+      profile_path: String,
+    }],
+    cast: [{
+      character: String,
+      name: String,
+      profile_path: String,
+    }],
+    crew: [{
+      department: String,
+      job: String,
+      name: String,
+      profile_path: String,
+    }],
   },
 });
 

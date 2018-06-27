@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import uniqBy from 'lodash/uniqBy';
-import cookie from 'universal-cookie';
+import Cookies from 'universal-cookie';
+import { Redirect } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -37,7 +38,13 @@ class Library extends Component {
     hasMore: false,
     term: null,
     loading: false,
+    redirect: null,
+    date: {
+      start: 1950,
+      end: 2018,
+    },
   };
+
 
   async componentDidMount() {
     try {
@@ -53,10 +60,16 @@ class Library extends Component {
 
   getCrawlerMedias = async ({ tabsValue = 'all', term = null, sortedBy = 'displayName' }) => {
     try {
-      const response = await fetch(`/api/media/crawler/${tabsValue}/${term}/${sortedBy}`);
+      const cookies = new Cookies();
+      const token = cookies.get('authtoken');
+      const response = await fetch(`/api/media/crawler/${tabsValue}/${term}/${sortedBy}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const body = await response.json();
-      if (response.status === 401) console.log('401')
-      else if (response.status !== 200) throw Error(body.message);
+
+      if (response.status !== 200) throw Error(body.merror);
 
       return body;
     } catch (err) {
@@ -64,18 +77,25 @@ class Library extends Component {
     }
   };
 
-  getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null }) => {
+  getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null, sortedBy = null }) => {
     try {
-      const cookies = new cookie();
+      const { start, end } = this.state.date;
+      console.log('data==', start, end);
+
+      const cookies = new Cookies();
       const token = cookies.get('authtoken');
-      const response = await fetch(`/api/media/local/${tabsValue}/${skip}/${term}`,{
-          headers: {
-              Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`/api/media/local/${tabsValue}/${skip}/${term}/${sortedBy}/${start}/${end}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       const body = await response.json();
 
-      if (response.status !== 200) throw Error(body.message);
+      // if (body && body.profile === false) {
+      //   this.setState({ redirect: '/profile' });
+      // }
+
+      if (response.status !== 200) throw Error(body.merror);
 
       return body;
     } catch (err) {
@@ -145,11 +165,21 @@ class Library extends Component {
     }
   };
 
-    render() {
+  handleChangeDate = ({ name, value }) => {
+    console.log('handleChangeDate name/value', name, value);
+
+    const { date } = this.state;
+    date[name] = value;
+    this.setState({ date });
+  };
+
+  render() {
     const { classes } = this.props;
-    const { medias, tabsValue, hasMore, loading } = this.state;
+    const { medias, tabsValue, hasMore, loading, redirect, date } = this.state;
 
     const Loader = () => (<div className={classes.loader}><CircularProgress /></div>);
+
+    if (redirect) return (<Redirect to={redirect} />);
 
     return (
       <div className={classes.root}>
@@ -158,7 +188,7 @@ class Library extends Component {
         </Typography>
         <AutoComplete handleSearch={this.handleAutoComplete} handleClearSearch={this.handleClearSearch} />
 
-        <DatePickers />
+        <DatePickers handleChangeDate={this.handleChangeDate} date={date} />
 
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
 
@@ -177,7 +207,7 @@ class Library extends Component {
                 const title = media.metadatas ? media.metadatas.name : media.displayName;
                 const overview = media.metadatas ? media.metadatas.overview : null;
                 const score = media.metadatas ? media.metadatas.score : null;
-                let imagePath = media.metadatas ? media.metadatas.posterPath || media.metadatas.backdropPath : null;
+                const imagePath = media.metadatas ? media.metadatas.posterPath || media.metadatas.backdropPath : null;
 
                 return (
                   <CardMovie

@@ -47,7 +47,7 @@ class Layout extends Component {
 
     return (
       <div className={classes.root}>
-        <Bar />
+        <Bar handleDrawerToggle={this.handleDrawerToggle} />
         <Hidden mdUp>
           <Drawer
             variant="temporary"

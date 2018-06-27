@@ -4,6 +4,8 @@ const Utils = require('./utils'),
 	}},
 	MovieDB = require('moviedb')(config.default.movieDbApiKey)
 
+import moment from 'moment-timezone';
+
 const fetchCast = async (id, mediaType) => {
 	return new Promise((resolve, reject) => {
 		const mediaCallback = async (mDbErr, mdbRes) => {
@@ -172,7 +174,7 @@ const fetchMetadatas = async (media, doFetchExtendedDatas, mediaType) => {
 			}
 			// const mediaId = mediaInfo.id
 
-			mediaInfo.productionDate = mediaInfo.release_date || mediaInfo.first_air_date || null
+			mediaInfo.productionDate = moment().format(mediaInfo.release_date) || moment.format(mediaInfo.first_air_date) || null
 			mediaInfo.posterPath = mediaInfo.poster_path
 			mediaInfo.backdropPath = mediaInfo.backdrop_path
 			mediaInfo.name = mediaInfo.title

@@ -18,15 +18,17 @@ const styles = theme => ({
 
 class DatePickers extends Component {
   state = {
-    start: 1950,
-    end: 2018,
+    start: this.props.date.start,
+    end: this.props.date.end,
   };
 
   handleChange = name => (event) => {
-    console.log('name/event', name, event);
+    console.log('handleChange name/event', name, event.target);
+    const { value } = event.target;
 
+    this.props.handleChangeDate({ name, value });
     this.setState({
-      [name]: event.target.value,
+      [name]: value,
     });
   };
 
@@ -37,19 +39,21 @@ class DatePickers extends Component {
       <form className={classes.container} noValidate>
         <TextField
           id="start"
-          label="start"
+          label="Since"
           value={this.state.start}
           type="number"
+          InputProps={{ min: 0, max: 9 }}
           className={classes.textField}
           InputLabelProps={{
             shrink: true,
           }}
+
           margin="normal"
           onChange={this.handleChange('start')}
         />
         <TextField
           id="end"
-          label="end"
+          label="To"
           value={this.state.end}
           type="number"
           className={classes.textField}
@@ -65,6 +69,7 @@ class DatePickers extends Component {
 }
 DatePickers.propTypes = {
   classes: PropTypes.object.isRequired,
+  date: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(DatePickers);

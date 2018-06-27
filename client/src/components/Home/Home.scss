@@ -6,8 +6,11 @@ body {
   background: linear-gradient(to left, #4b79a1, #283e51);
 }
 
-
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+a:hover {
+  text-decoration: none;
 }

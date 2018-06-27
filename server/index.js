@@ -3,19 +3,22 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import config from './config';
-import routes from './routes';
-import crawler from './crawler/crawler';
 import multer from 'multer';
 import passport from 'passport';
 import session from 'express-session';
 import cors from 'cors';
+import moment from 'moment-timezone';
 
+import config from './config';
+import routes from './routes';
+import crawler from './crawler/crawler';
+
+moment.tz.setDefault(config.localization.timezone);
 
 const upload = multer({ dest: 'server/uploads/' });
 const app = express();
 
-// crawler.startCrawling();
+crawler.startCrawling();
 mongoose.connect(config.db.url);
 
 const corsOption = {
@@ -33,7 +36,6 @@ app.use(cors(corsOption));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(upload.single('file'));
-
 
 
 // Passport
@@ -58,7 +60,9 @@ app.use((req, res, next) => {
     if (!user) {
       return res.status(403).json({ merror: 'incorrect user', login: false });
     }
-    if (!user.profile) { return res.status(401).json({ merror: 'Complete your profile', profile: false, login: true }); }
+    // if (!user.profile) {
+    //   return res.status(401).json({ merror: 'Complete your profile', profile: false, login: true });
+    // }
     req.user = user;
     return next();
   })(req, res, next);
