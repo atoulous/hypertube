@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import uniqBy from 'lodash/uniqBy';
+import cookie from 'universal-cookie';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -53,8 +54,8 @@ class Library extends Component {
     try {
       const response = await fetch(`/api/media/crawler/${tabsValue}/${term}`);
       const body = await response.json();
-
-      if (response.status !== 200) throw Error(body.message);
+      if (response.status === 401) console.log('401')
+      else if (response.status !== 200) throw Error(body.message);
 
       return body;
     } catch (err) {
@@ -64,7 +65,13 @@ class Library extends Component {
 
   getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null }) => {
     try {
-      const response = await fetch(`/api/media/local/${tabsValue}/${skip}/${term}`);
+      const cookies = new cookie();
+      const token = cookies.get('authtoken');
+      const response = await fetch(`/api/media/local/${tabsValue}/${skip}/${term}`,{
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.message);
