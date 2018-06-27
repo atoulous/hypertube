@@ -12,6 +12,7 @@ const MediaSchema = mongoose.Schema({
     enum: ['movie', 'show'],
   },
   source: String,
+  lastSeen: { type: Date, default: Date.now },
   seeders: Number,
   leechers: Number,
   hasExtendedMetadatas: Boolean,
