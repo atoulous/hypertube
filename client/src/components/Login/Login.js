@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import KeyboardBackspace from '@material-ui/icons/KeyboardBackspace';
+import Alert from 'react-bootstrap/lib/Alert'
 
 const styles = {
 	title: {
@@ -99,6 +100,10 @@ class Login extends Component{
         if (this.state.active) {
             return (<Redirect to="/profile"/>)
         }
+        let merror = ''
+        if (this.state.merror) {
+			merror = <Alert bsStyle='danger'>{this.state.merror}</Alert>
+        }
 
 		const { classes } = this.props;
 		return (
@@ -114,11 +119,8 @@ class Login extends Component{
 						<Typography className={classes.title} gutterBottom variant="display4" component="h1">
 				          Sign in
 				        </Typography>
+						{ merror }
 
-
-						<p className={classes.error}>
-							{this.state.merror ? 'Error: ' + this.state.merror : ''}
-						</p>
 
 						<form onSubmit={this.tryLogin} method="post">
 							<TextField

@@ -11,7 +11,8 @@ var userSchema = mongoose.Schema({
 		firstname: String,
 		lastname: String,
 		picture: String,
-		fpassword: String
+		fpassword: String,
+		language: { type: String, default: 'english' }
 })
 
 userSchema.methods.generateHash = (password) => {

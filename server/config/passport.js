@@ -157,7 +157,7 @@ module.exports = (passport) => {
                         newUser.name = profile.displayName || profile.username;
                         newUser.email = profile._json.email;
                         newUser.picture = profile.photos[0].value;
-                        newUser.auth = 'github'
+                        newUser.auth = 'github';
                         newUser.save((err) => {
                             if (err) throw err;
                             return done(null, newUser);
@@ -206,15 +206,10 @@ module.exports = (passport) => {
     User.findById(jwtPayload._id, (err, user) => {
       if (err) { return cb(err, {login: false}); }
       if (!user) { return cb('fail', {login: false}) }
-      const name = user.name;
-      const picture = user.picture;
-      const email = user.email;
-      const firstname = user.firstname;
-      const lastname = user.lastname;
-      const auth = user.auth;
+      const { name, picture, email, firstname, lastname, auth, _id, language  } = user;
       if (!name || !picture || !email || !firstname || !lastname)
-          return cb(null, {name, email, picture, firstname, lastname, auth, profile: false, login:true } );
-      return cb(null, {name, email, picture, firstname, lastname, auth, profile: true, login: true } );
+          return cb(null, {name, email, picture, firstname, lastname, auth, _id, language, profile: false, login:true } );
+      return cb(null, {name, email, picture, firstname, lastname, auth, _id, language, profile: true, login: true } );
 
     });
   }));
