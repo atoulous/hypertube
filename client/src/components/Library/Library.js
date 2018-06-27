@@ -11,6 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import TabsLibrary from './TabsLibrary';
 import CardMovie from '../CardMovie';
 import AutoComplete from '../AutoComplete';
+import DatePickers from '../DatePickers';
 
 const nbMediasPerPage = 10;
 
@@ -149,6 +150,8 @@ class Library extends Component {
           Library
         </Typography>
         <AutoComplete handleSearch={this.handleAutoComplete} handleClearSearch={this.handleClearSearch} />
+
+        <DatePickers />
 
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
 

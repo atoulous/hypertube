@@ -8,10 +8,10 @@ const MediaController = require('../controllers/MediaController');
 
 const MetadatasHelper = require('../crawler/MetadatasHelper');
 
-router.get('/local/:type/:skip/:term', async (req, res) => {
+router.get('/local/:type/:skip/:term/:sortedBy', async (req, res) => {
   try {
     const skip = parseInt(req.params.skip, 10);
-    const { term, type } = req.params;
+    const { term, type, sortedBy } = req.params;
     const termRegex = new RegExp(term, 'i');
     const search = term !== 'null' ? { displayName: termRegex } : {};
 
@@ -20,6 +20,7 @@ router.get('/local/:type/:skip/:term', async (req, res) => {
       case 'all':
         medias = await Media.find(search)
           .sort({ 'metadatas.score': -1 })
+          .where()
           .limit(10)
           .skip(skip);
         break;
