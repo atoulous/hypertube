@@ -31,6 +31,7 @@ async function parseMedia(magnet) {
               console.log('ParseMedia', 'Probe failed. Retrying in 2000ms')
 			  if (pass >= 20) {
 				  console.log('ParseMedia', 'Probe failed 20 times, aborting torrent. Probably not enough seeders or corrupted/incompatible input file.')
+				  fs.unlinkSync(filePath)
 				  return reject('Probe failed 20 times, aborting torrent. Probably not enough seeders or corrupted/incompatible input file.')
 			  }
               setTimeout(() => { checkProbe(pass + 1) }, 2000)
