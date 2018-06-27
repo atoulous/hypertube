@@ -54,6 +54,20 @@ app.use(passport.session());
 
 // Routes
 require('./routes/users.js')(app, passport);
+
+  app.use((req, res, next) => {
+    passport.authenticate('jwt', (err, user, info) => {
+      if (err) { return  res.status(403).json({merror: err, login: false }); }
+      if (!user) {
+        return res.status(403).json({ merror: 'incorrect user', login: false });
+      }
+      if (!user.profile)
+          return res.status(401).json({ merror: 'Complete your profile', profile: false, login: true })
+          req.user = user
+      return next();
+    })(req, res, next)
+  });
+
 app.use('/api', routes);
 
 
