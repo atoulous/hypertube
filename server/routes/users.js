@@ -70,7 +70,6 @@ module.exports = (app, passport) => {
 
   app.get('/profile', (req, res, next) => {
     passport.authenticate('jwt', (err, user, info) => {
-      console.log(user)
       if (err) { return res.json({ merror: err, login: false }); }
       if (!user) {
         return res.json({ merror: 'incorrect user', login: false });
