@@ -29,4 +29,4 @@ const post = async (route, data) => {
 export default {
   get,
   post,
-}
+};

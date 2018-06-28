@@ -64,6 +64,7 @@ app.use((req, res, next) => {
     //   return res.status(401).json({ merror: 'Complete your profile', profile: false, login: true });
     // }
     req.user = user;
+    console.log('user===', user);
     return next();
   })(req, res, next);
 });
