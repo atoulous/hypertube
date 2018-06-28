@@ -22,7 +22,7 @@ const post = async (route, data) => {
   return fetch(path.resolve(route), {
     method: 'POST',
     headers,
-    data,
+    body: data,
   });
 };
 
