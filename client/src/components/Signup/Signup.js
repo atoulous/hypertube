@@ -107,7 +107,7 @@ class Signup extends Component{
 
 	render() {
         if (this.state.active) {
-            return (<Redirect to="/profile"/>)
+            return (<Redirect to="/"/>)
         }
 
 		const { classes } = this.props;

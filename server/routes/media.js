@@ -11,6 +11,7 @@ const MetadatasHelper = require('../crawler/MetadatasHelper');
 
 router.get('/local/:type/:skip/:term/:sortedBy/:startDate/:endDate', async (req, res) => {
   try {
+    const { _id } = req.user;
     const skip = parseInt(req.params.skip, 10);
     const { term, type, sortedBy, startDate, endDate } = req.params;
     const termRegex = new RegExp(term, 'i');
@@ -57,6 +58,18 @@ router.get('/local/:type/:skip/:term/:sortedBy/:startDate/:endDate', async (req,
     medias = _.uniqBy(medias, 'displayName');
     if (sortedBy) medias = _.sortBy(medias, sortedBy);
 
+
+    // const user = await UserModel.find({ _id }, 'mediasStarred');
+    // const { mediasStarred } = user[0];
+    // medias.forEach((media, index) => {
+    //   mediasStarred.forEach((mediaStarred) => {
+    //     if (media._id.toString() === mediaStarred.toString()) {
+    //       medias[index] = { ...medias[index], starred: true };
+    //       console.log('media==', medias[index]);
+    //     }
+    //   });
+    // });
+
     res.status(200).json(medias);
   } catch (err) {
     console.error('media/all err', err);
@@ -97,18 +110,17 @@ router.get('/media/:id', async (req, res) => {
 });
 
 router.get('/startmedia/:id', async (req, res) => {
-  console.log('id111===', req.params);
   Media.findOne({ _id: req.params.id })
     .then(async (media) => {
-      if (!media) res.status(404).json({ error: `This media does not exist.:${err}` });
+      if (!media) res.status(404).json({ error: 'This media does not exist' });
 
       media.lastSeen = new Date().toISOString();
       await media.save();
 
-      console.log('id===', req.user._id);
       UserModel.findOne({ _id: req.user._id })
         .then((user) => {
           user.mediasSeen = [...user.mediasSeen, req.params.id];
+          user.mediasSeen = _.uniqBy(user.mediasSeen, e => e);
           user.save();
         })
         .catch((err) => { throw err; });
@@ -127,16 +139,42 @@ router.get('/startmedia/:id', async (req, res) => {
     });
 });
 
-router.get('/saw', async (req, res) => {
+router.get('/saw/:type/:sortedBy', async (req, res) => {
   const { _id } = req.user;
+  const { type, sortedBy } = req.params;
 
   const user = await UserModel.findOne({ _id }, 'mediasSeen');
-  console.log('user==', user);
 
   let medias = [];
   if (user.mediasSeen.length) {
-    medias = await Promise.all(user.mediasSeen.map(async id => Media.findOne({ _id: id })));
+    await Promise.all(user.mediasSeen.map(async (id) => {
+      const media = await Media.findOne({ _id: id });
+      if (media.mediaType === type || type === 'all') {
+        medias.push(media);
+      }
+    }));
   }
+  if (sortedBy) medias = _.sortBy(medias, sortedBy);
+
+  return res.status(200).json(medias).end();
+});
+
+router.get('/starred/:type/:sortedBy', async (req, res) => {
+  const { _id } = req.user;
+  const { type, sortedBy } = req.params;
+
+  const user = await UserModel.findOne({ _id }, 'mediasStarred');
+
+  let medias = [];
+  if (user.mediasStarred.length) {
+    await Promise.all(user.mediasStarred.map(async (id) => {
+      const media = await Media.findOne({ _id: id });
+      if (media.mediaType === type || type === 'all') {
+        medias.push(media);
+      }
+    }));
+  }
+  if (sortedBy) medias = _.sortBy(medias, sortedBy);
 
   return res.status(200).json(medias).end();
 });

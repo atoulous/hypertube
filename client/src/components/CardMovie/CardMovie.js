@@ -13,6 +13,8 @@ import StarIcon from '@material-ui/icons/Star';
 import PlayIcon from '@material-ui/icons/PlayCircleFilled';
 import Chip from '@material-ui/core/Chip';
 
+import fetchHelper from '../../helpers/fetch';
+
 const defaultImage = 'http://vollrath.com/ClientCss/images/VollrathImages/No_Image_Available.jpg';
 
 const styles = () => ({
@@ -60,12 +62,28 @@ const styles = () => ({
 });
 
 class CardMovie extends PureComponent {
-  handleStarred = (e) => {
+  state = {
+    starred: this.props.starred || false,
+  };
+
+  handleStarred = async (e) => {
     e.preventDefault();
+    try {
+      const { id } = this.props;
+      const { starred } = this.state;
+      const mode = starred ? 'unstarred' : 'starred';
+      const response = await fetchHelper.get(`/api/profile/${mode}/${id}`);
+      if (response.status !== 200) throw Error('response.status !== 200', response);
+
+      this.setState({ starred: !this.state.starred });
+    } catch (err) {
+      console.error('handleStarred err', err);
+    }
   };
 
   render() {
     const { classes, title, imagePath, overview, mediaId, seeders, leechers, score } = this.props;
+    const { starred } = this.state;
 
     return (
       <Grid item xs>
@@ -99,8 +117,8 @@ class CardMovie extends PureComponent {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button onClick={this.handleStarred} size="small" color="primary" className={classes.leftButton}>
-                {'Starred '}
+              <Button onClick={this.handleStarred} variant={starred ? 'contained' : 'text'} size="small" color="primary" className={classes.leftButton}>
+                {starred ? 'Unstarred ' : 'Starred '}
                 <StarIcon />
               </Button>
               <Button size="small" color="primary" className={classes.rightButton}>

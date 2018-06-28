@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import cookie from 'universal-cookie';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -9,16 +8,13 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-
 import Paper from '@material-ui/core/Paper';
 
 import MediaDetails from '../MediaDetails';
 import VideoPlayer from '../VideoPlayer';
 import CardComment from '../CardComment';
 
-
-const cookies = new cookie();
-const token = cookies.get('authtoken');
+import fetchHelper from '../../helpers/fetch';
 
 const styles = {
   title: {
@@ -62,23 +58,15 @@ class MoviePlayer extends Component {
   }
 
   getComments = async () => {
-    const movieId = this.props.match.params.movieId;
-    const response = await fetch(`/api/profile/comment/${movieId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { movieId } = this.props.match.params;
+    const response = await fetchHelper.get(`/api/profile/comment/${movieId}`);
     const body = await response.json();
     return body;
   }
 
   getMedia = async () => {
-    const movieId = this.props.match.params.movieId;
-    const response = await fetch(`/api/media/media/${movieId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { movieId } = this.props.match.params;
+    const response = await fetchHelper.get(`/api/media/media/${movieId}`);
     const body = await response.json();
 
     return body;
@@ -95,14 +83,8 @@ class MoviePlayer extends Component {
 
   addComment = async (e) => {
     const data = new FormData(e.target);
-    const movieId = this.props.match.params.movieId;
-    const response = await fetch(`/api/profile/comment/${movieId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      method: 'POST',
-      body: data,
-    });
+    const { movieId } = this.props.match.params;
+    const response = await fetchHelper.post(`/api/profile/comment/${movieId}`, data);
     const body = await response.json();
     console.log(body);
     if (response.status !== 200) throw Error(body.message);

@@ -4,12 +4,12 @@ const Secu = require('../models/secu.js');
 const readchunk = require('read-chunk');
 const isPng = require('is-png');
 const isJpg = require('is-jpg');
+const _ = require('lodash');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const urls = 'http://5.196.225.53:8100';
-const jwt = require('jsonwebtoken');
-
 const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz';
-const fs = require('fs');
 
 module.exports = (app, passport) => {
   app.post('/login', (req, res, next) => {
@@ -25,40 +25,40 @@ module.exports = (app, passport) => {
 
   app.post('/signup', (req, res, next) => {
     if (!Secu.verif(req.body.name) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.firstname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.password) || !Secu.verif(req.file)) {
-        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-            fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                if (err) throw err;
-            });
-        }
+      if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+        fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+          if (err) throw err;
+        });
+      }
       return res.json({ merror: 'Complete all sections of the form.', login: false });
     } else if (!Secu.isGoodPassword(req.body.password)) {
-        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-            fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                if (err) throw err;
-            });
-        }
+      if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+        fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+          if (err) throw err;
+        });
+      }
       res.json({ merror: 'A strong password consists of a combination of upper and lowercase letters and numbers.', login: false });
     } else if (!Secu.isEmail(req.body.email)) {
-        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-            fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                if (err) throw err;
-            });
-        }
+      if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+        fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+          if (err) throw err;
+        });
+      }
       res.json({ merror: 'Incorrect Email.', login: false });
     } else {
       passport.authenticate('local-signup', (err, user, info) => {
-          if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-              fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                  if (err) throw err;
-              });
-          }
+        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+          fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+            if (err) throw err;
+          });
+        }
         if (err) { return res.json({ merror: err, login: false }); }
         if (!user) {
-            if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-                fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                    if (err) throw err;
-                });
-            }
+          if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+            fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+              if (err) throw err;
+            });
+          }
           return res.json({ login: false, merror: info });
         }
         const token = jwt.sign(user.toJSON(), jwtsecret);
@@ -70,7 +70,7 @@ module.exports = (app, passport) => {
 
   app.get('/profile', (req, res, next) => {
     passport.authenticate('jwt', (err, user, info) => {
-      console.log(user)
+      console.log(user);
       if (err) { return res.json({ merror: err, login: false }); }
       if (!user) {
         return res.json({ merror: 'incorrect user', login: false });
@@ -153,7 +153,7 @@ module.exports = (app, passport) => {
                       firstname: user.firstname,
                       lastname: user.lastname,
                       email: user.email,
-                      language: user.language
+                      language: user.language,
                     },
                   });
                 });

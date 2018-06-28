@@ -110,7 +110,7 @@ class ResetPassword extends Component {
     render() {
       let active;
       if (this.state.active) {
-        active = <Redirect to="/profile" />;
+        active = <Redirect to="/" />;
       }
 
       let merror = '';

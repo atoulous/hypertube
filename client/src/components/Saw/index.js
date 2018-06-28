@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import InfiniteScroll from 'react-infinite-scroller';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -9,7 +8,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import TabsLibrary from '../Library/TabsLibrary';
 import CardMovie from '../CardMovie';
-import AutoComplete from '../AutoComplete';
 
 import fetchHelper from '../../helpers/fetch';
 
@@ -17,56 +15,76 @@ const styles = {
   title: {
     textAlign: 'center',
   },
+  root: {
+    flexGrow: 1,
+  },
+  loader: {
+    margin: 'auto',
+    textAlign: 'center',
+  },
 };
 
 class Saw extends Component {
   state = {
     medias: [],
-    hasMore: false,
+    tabsValue: this.props.match.params.tabsValue || 'all',
   };
 
   async componentDidMount() {
     try {
-      // const { tabsValue } = this.state;
-      const response = await fetchHelper.get('/api/media/saw');
-      const medias = await response.json();
-
-      if (response.status !== 200) throw Error(medias.merror);
-
-      const hasMore = !!medias.length;
-
-      this.setState({ medias, hasMore });
+      this.getMediasSeen({});
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
   }
 
+  getMediasSeen = async ({ tabsValue = 'all', sortedBy = 'lastSeen' }) => {
+    let type = null;
+    switch (tabsValue) {
+      case 'movies':
+        type = 'movie';
+        break;
+      case 'shows':
+        type = 'show';
+        break;
+      default:
+        type = 'all';
+    }
+    const response = await fetchHelper.get(`/api/media/saw/${type}/${sortedBy}`);
+    const medias = await response.json();
+
+    if (response.status !== 200) throw Error(medias.merror);
+
+    this.setState({ medias, tabsValue });
+  };
+
+  handleTabs = async (event, tabsValue) => {
+    try {
+      if (this.state.tabsValue !== tabsValue) {
+        this.getMediasSeen({ tabsValue });
+      }
+    } catch (err) {
+      console.error('handleTabs err: ', err);
+    }
+  };
+
   render() {
     const { classes } = this.props;
-    const { medias, tabsValue, hasMore, loading } = this.state;
+    const { medias, tabsValue, loading } = this.state;
 
     const Loader = () => (<div className={classes.loader}><CircularProgress /></div>);
 
     return (
       <div className={classes.root}>
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
-          Library
+          Medias seen
         </Typography>
-        <AutoComplete handleSearch={this.handleAutoComplete} handleClearSearch={this.handleClearSearch} />
 
         <TabsLibrary handleTabs={this.handleTabs} tabsValue={tabsValue} />
 
         { loading && <Loader /> }
-
-        <InfiniteScroll
-          pageStart={0}
-          loadMore={this.handleLoading}
-          hasMore={hasMore}
-          loader={<Loader key={0} />}
-          useWindow
-        >
-          <Grid container spacing={24} style={{ margin: 'auto' }}>
-            {
+        <Grid container spacing={24} style={{ margin: 'auto' }}>
+          {
               medias.map((media) => {
                 const title = media.metadatas ? media.metadatas.name : media.displayName;
                 const overview = media.metadatas ? media.metadatas.overview : null;
@@ -76,6 +94,7 @@ class Saw extends Component {
                 return (
                   <CardMovie
                     key={media._id}
+                    id={media._id}
                     title={title}
                     mediaId={media._id}
                     magnet={media.magnet}
@@ -89,8 +108,7 @@ class Saw extends Component {
               })
             }
 
-          </Grid>
-        </InfiniteScroll>
+        </Grid>
       </div>
     );
   }

@@ -59,7 +59,7 @@ class VideoPlayer extends Component {
 	}
 
 	startMedia = async () => {
-    console.log('startMedia', this.props.media);
+	  console.log('startMedia', this.props.media);
 	  const movieId = this.props.mediaId;
 	  const response = await fetchHelper.get(`/api/media/startmedia/${movieId}`);
 	  const body = await response.json();

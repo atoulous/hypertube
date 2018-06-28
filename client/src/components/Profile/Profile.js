@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import cookie from 'universal-cookie';
 import Alert from 'react-bootstrap/lib/Alert';
 
@@ -183,9 +184,11 @@ class Profile extends Component {
 
 
     render() {
+      const { classes } = this.props;
+
       let auth;
       if (this.state.auth === 'local') {
-        auth = <TextField id="password" name="password" label="Password" type="password" className={styles.username} margin="normal" />;
+        auth = <TextField id="password" name="password" label="Password" type="password" className={classes.username} margin="normal" />;
       }
       let merror = '';
       if (this.state.merror) {
@@ -195,11 +198,8 @@ class Profile extends Component {
       if (this.state.success) {
         success = <Alert bsStyle="success">{this.state.success}</Alert>;
       }
-      const { classes } = this.props;
 
       return (
-
-
         <Grid container className={classes.centerV}>
 
           <Grid item xs={4}>
@@ -282,4 +282,9 @@ class Profile extends Component {
       );
     }
 }
+
+Profile.propTypes = {
+  classes: PropTypes.array.isRequired,
+};
+
 export default withStyles(styles)(Profile);

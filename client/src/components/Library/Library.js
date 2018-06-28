@@ -200,6 +200,7 @@ class Library extends Component {
                 return (
                   <CardMovie
                     key={media._id}
+                    id={media._id}
                     title={title}
                     mediaId={media._id}
                     magnet={media.magnet}
@@ -208,6 +209,7 @@ class Library extends Component {
                     seeders={media.seeders}
                     leechers={media.leechers}
                     score={score}
+                    starred={media.starred}
                   />
                 );
               })

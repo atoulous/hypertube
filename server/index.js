@@ -37,7 +37,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(upload.single('file'));
 
-
 // Passport
 app.use(session({
   secret: 'nqwnqw',
@@ -49,7 +48,6 @@ require('./config/passport')(passport);
 // pass passport for configuration
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // Routes
 require('./routes/users.js')(app, passport);
@@ -64,7 +62,6 @@ app.use((req, res, next) => {
     //   return res.status(401).json({ merror: 'Complete your profile', profile: false, login: true });
     // }
     req.user = user;
-    console.log('user===', user);
     return next();
   })(req, res, next);
 });

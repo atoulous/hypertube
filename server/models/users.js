@@ -13,6 +13,7 @@ const userSchema = mongoose.Schema({
   picture: String,
   fpassword: String,
   mediasSeen: { type: Array, default: [] },
+  mediasStarred: { type: Array, default: [] },
   language: { type: String, default: 'english' },
 });
 

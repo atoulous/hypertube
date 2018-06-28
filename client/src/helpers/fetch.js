@@ -17,12 +17,12 @@ const get = async (route) => {
   });
 };
 
-const post = async (route, data) => {
+const post = async (route, body) => {
   const headers = setHeaders();
   return fetch(path.resolve(route), {
     method: 'POST',
     headers,
-    data,
+    body,
   });
 };
 
