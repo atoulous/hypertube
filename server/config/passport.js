@@ -118,7 +118,7 @@ module.exports = (passport) => {
           newUser.lastname = profile.name.familyName;
           newUser.gemail = profile.emails[0].value;
           newUser.picture = profile.photos[0].value;
-            newUser.auth = 'google'
+          newUser.auth = 'google'
           newUser.save((err) => {
             if (err) throw err;
             return done(null, newUser);
