@@ -18,7 +18,7 @@ moment.tz.setDefault(config.localization.timezone);
 const upload = multer({ dest: 'server/uploads/' });
 const app = express();
 
-crawler.startCrawling();
+//crawler.startCrawling();
 mongoose.connect(config.db.url);
 
 const corsOption = {

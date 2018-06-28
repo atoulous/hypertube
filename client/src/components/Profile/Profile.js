@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import cookie from 'universal-cookie';
-// import { Link } from 'react-router-dom';
-import Logout from './../Logout';
 import Alert from 'react-bootstrap/lib/Alert';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -275,7 +273,6 @@ class Profile extends Component {
                                 Save
                 </Button>
               </form>
-              <Logout />
               <br />
               <br /><br />
             </Paper>
