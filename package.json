@@ -58,7 +58,9 @@
 		"nodemon": "^1.17.5"
 	},
 	"babel": {
-		"presets": ["env"],
+		"presets": [
+			"env"
+		],
 		"plugins": [
 			"transform-es2015-destructuring",
 			"transform-object-rest-spread"

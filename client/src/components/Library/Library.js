@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroller';
 import uniqBy from 'lodash/uniqBy';
-import Cookies from 'universal-cookie';
 import { Redirect } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -14,6 +13,8 @@ import TabsLibrary from './TabsLibrary';
 import CardMovie from '../CardMovie';
 import AutoComplete from '../AutoComplete';
 import DatePickers from '../DatePickers';
+
+import fetchHelper from '../../helpers/fetch';
 
 const nbMediasPerPage = 10;
 
@@ -45,7 +46,6 @@ class Library extends Component {
     },
   };
 
-
   async componentDidMount() {
     try {
       const { tabsValue } = this.state;
@@ -60,13 +60,7 @@ class Library extends Component {
 
   getCrawlerMedias = async ({ tabsValue = 'all', term = null, sortedBy = 'displayName' }) => {
     try {
-      const cookies = new Cookies();
-      const token = cookies.get('authtoken');
-      const response = await fetch(`/api/media/crawler/${tabsValue}/${term}/${sortedBy}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetchHelper.get(`/api/media/crawler/${tabsValue}/${term}/${sortedBy}`);
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.merror);
@@ -82,13 +76,8 @@ class Library extends Component {
       const { start, end } = this.state.date;
       console.log('data==', start, end);
 
-      const cookies = new Cookies();
-      const token = cookies.get('authtoken');
-      const response = await fetch(`/api/media/local/${tabsValue}/${skip}/${term}/${sortedBy}/${start}/${end}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetchHelper.get(`/api/media/local/${tabsValue}/${skip}/${term}/${sortedBy}/${start}/${end}`);
+
       const body = await response.json();
 
       // if (body && body.profile === false) {
