@@ -32,7 +32,7 @@ const styles = () => ({
     textDecoration: 'none',
   },
   cardContent: {
-    height: 200,
+    height: 235,
     overflow: 'auto',
   },
   image: {
@@ -94,7 +94,7 @@ class CardMovie extends PureComponent {
                 </Grid>
               </Grid>
               <br />
-              <Typography className={classes.cardContent} component="p">
+              <Typography component="p">
                 {overview || 'No overview available'}
               </Typography>
             </CardContent>

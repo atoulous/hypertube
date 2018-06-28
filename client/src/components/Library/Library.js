@@ -71,11 +71,9 @@ class Library extends Component {
     }
   };
 
-  getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null, sortedBy = null }) => {
+  getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null, sortedBy = null, date = null }) => {
     try {
-      const { start, end } = this.state.date;
-      console.log('data==', start, end);
-
+      const { start, end } = date || this.state.date;
       const response = await fetchHelper.get(`/api/media/local/${tabsValue}/${skip}/${term}/${sortedBy}/${start}/${end}`);
 
       const body = await response.json();
@@ -154,12 +152,13 @@ class Library extends Component {
     }
   };
 
-  handleChangeDate = ({ name, value }) => {
-    console.log('handleChangeDate name/value', name, value);
-
+  handleChangeDate = async ({ name, value }) => {
     const { date } = this.state;
     date[name] = value;
-    this.setState({ date });
+    const medias = await this.getLocalMedias({ date });
+    const hasMore = !!medias.length;
+
+    this.setState({ medias, date, hasMore });
   };
 
   render() {

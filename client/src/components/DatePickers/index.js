@@ -23,7 +23,6 @@ class DatePickers extends Component {
   };
 
   handleChange = name => (event) => {
-    console.log('handleChange name/event', name, event.target);
     const { value } = event.target;
 
     this.props.handleChangeDate({ name, value });
@@ -70,6 +69,7 @@ class DatePickers extends Component {
 DatePickers.propTypes = {
   classes: PropTypes.object.isRequired,
   date: PropTypes.object.isRequired,
+  handleChangeDate: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(DatePickers);
