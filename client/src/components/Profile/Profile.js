@@ -11,6 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import fetchHelper from '../../helpers/fetch';
 
 const styles = {
   title: {
@@ -118,11 +119,7 @@ class Profile extends Component {
   }
 
   callApi = async (token) => {
-    const response = await fetch('/profile', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetchHelper.get('/profile');
     const body = await response.json();
 
     if (response.status !== 200) throw Error(body.message);
@@ -150,9 +147,7 @@ class Profile extends Component {
 	  this.saveProfil(e)
 	    .then((res) => {
 	      if (res.change) {
-          const cookies = new cookie();
-          cookies.remove('profile');
-	        this.setState({ firstname: res.user.firsname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth, msuccess: 'Profile updated' });
+	        this.setState({ firstname: res.user.firsname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth,language: res.user.language, msuccess: 'Profile updated' });
 	        this.setState({ merror: res.merror });
           this.setState({ success: 'Profle Updated' });
 	      } else {
@@ -164,16 +159,8 @@ class Profile extends Component {
   }
 
     saveProfil = async (e) => {
-      const cookies = new cookie();
-      const token = cookies.get('authtoken');
       const data = new FormData(e.target);
-      const response = await fetch('/profile', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        method: 'POST',
-        body: data,
-      });
+      const response = await fetchHelper.post('/profile', data);
       const body = await response.json();
 
       if (response.status !== 200) throw Error(body.message);
