@@ -8,6 +8,17 @@ const fs = require('fs');
 const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz';
 
 module.exports = (app, passport) => {
+
+  app.get('/checktoken', (req, res, next) => {
+      passport.authenticate('jwt', (err, user, info) => {
+          if (err) { return res.status(403).json({ merror: err, login: false }); }
+          if (!user) {
+              return res.status(403).json({ merror: 'incorrect user', login: false });
+          }
+          return res.json({login: true})
+      })(req, res, next);
+  })
+
   app.post('/login', (req, res, next) => {
     passport.authenticate('local-login', { session: false }, (err, user, info) => {
       if (err) { return res.status(400).json({ merror: err, login: false }); }
