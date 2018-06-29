@@ -10,6 +10,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
+import moment from 'moment';
 
 import Rating from '../Rating'
 import CastGrid from '../CastGrid'
@@ -63,7 +64,7 @@ class MediaDetails extends Component {
 
 					<Typography variant="body2" className={classes.loadingText} gutterBottom align='justify'>
 						<br />
-						Release date: { media.metadatas && media.metadatas.productionDate ? media.metadatas.productionDate : 'Unknown' } <br />
+						Release date: { media.metadatas && media.metadatas.productionDate ? moment(media.metadatas.productionDate).format("MMM Do YYYY") : 'Unknown' } <br />
 						Runtime: { media.metadatas && media.metadatas.duration ? media.metadatas.duration + 'm': 'Unknown' } <br />
 						Seeders: { media.seeders} <br />
 						Leecher: { media.leechers} <br />
