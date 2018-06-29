@@ -122,7 +122,7 @@ module.exports = (passport) => {
                     newUser.name = profile._json.nickname || profile.displayName;
                     newUser.firstname = profile.name.givenName;
                     newUser.lastname = profile.name.familyName;
-                    newUser.gemail = profile.emails[0].value;
+                    newUser.email = profile.emails[0].value;
                     newUser.picture = profile.photos[0].value;
                     newUser.auth = 'google';
                     newUser.save((err) => {

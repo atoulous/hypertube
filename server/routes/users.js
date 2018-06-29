@@ -131,7 +131,7 @@ module.exports = (app, passport) => {
         }
       const token = jwt.sign(user.toJSON(), jwtsecret);
       res.cookie('authtoken', token);
-      return res.redirect('http://localhost:3000/profile');
+      return res.redirect('http://localhost:3000/library');
     })(req, res, next);
   });
 
