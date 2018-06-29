@@ -51,7 +51,6 @@ class MoviePlayer extends Component {
       this.setState({
         comments: comments.comments,
       });
-      console.log(this.state.comments);
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
@@ -86,7 +85,6 @@ class MoviePlayer extends Component {
     const { movieId } = this.props.match.params;
     const response = await fetchHelper.post(`/api/profile/comment/${movieId}`, data);
     const body = await response.json();
-    console.log(body);
     if (response.status !== 200) throw Error(body.message);
 
     return body;
@@ -140,8 +138,6 @@ class MoviePlayer extends Component {
               name="comment"
               label="Commenting publicly"
               margin="normal"
-              hintText="MultiLine with rows: 2 and rowsMax: 4"
-              multiLine
               rows={3}
               rowsMax={5}
             />
