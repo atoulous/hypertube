@@ -85,13 +85,17 @@ module.exports = (app, passport) => {
   app.get('/auth/qd', passport.authenticate('42', { scope: ['public'] }));
   app.get('/auth/qd/callback', (req, res, next) => {
     passport.authenticate('42', (err, user, info) => {
-      if (err) { return res.json({ message: err, login: false }); }
-      if (!user) {
-        return res.json({ message: 'incorrect user', login: false });
-      }
+        if (err) {
+            res.cookie('error', err);
+            return res.redirect('http://localhost:3000/');
+        }
+        if (!user) {
+            res.cookie('error', 'no user');
+            return res.redirect('http://localhost:3000/');
+        }
       const token = jwt.sign(user.toJSON(), jwtsecret);
       res.cookie('authtoken', token);
-      return res.redirect('http://localhost:3000/profile');
+      return res.redirect('http://localhost:3000/library');
     })(req, res, next);
   });
 
@@ -117,15 +121,16 @@ module.exports = (app, passport) => {
   app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
   app.get('/auth/google/callback', (req, res, next) => {
     passport.authenticate('google', (err, user, next) => {
-      if (err) { return res.json({ message: err, login: false }); }
-      if (!user) {
-        return res.json({ message: 'incorrect user', login: false });
-      }
-
-
+        if (err) {
+            res.cookie('error', err);
+            return res.redirect('http://localhost:3000/');
+        }
+        if (!user) {
+            res.cookie('error', 'no user');
+            return res.redirect('http://localhost:3000/');
+        }
       const token = jwt.sign(user.toJSON(), jwtsecret);
       res.cookie('authtoken', token);
-
       return res.redirect('http://localhost:3000/profile');
     })(req, res, next);
   });
