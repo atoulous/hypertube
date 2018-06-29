@@ -1,14 +1,10 @@
 const User = require('./../models/users');
 const sendMail = require('./../models/sendmail');
 const Secu = require('../models/secu.js');
-const readchunk = require('read-chunk');
-const isPng = require('is-png');
-const isJpg = require('is-jpg');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
-const urls = 'http://5.196.225.53:8100';
 const jwtsecret = 'jwtsecretorpfkfgjehdbsqaz';
 
 module.exports = (app, passport) => {
@@ -68,103 +64,6 @@ module.exports = (app, passport) => {
     }
   });
 
-  app.get('/profile', (req, res, next) => {
-    passport.authenticate('jwt', (err, user, info) => {
-      console.log(user);
-      if (err) { return res.json({ merror: err, login: false }); }
-      if (!user) {
-        return res.json({ merror: 'incorrect user', login: false });
-      }
-      return res.json({ merror: 'success', login: true, user });
-    })(req, res, next);
-  });
-
-
-  app.post('/profile', (req, res, next) => {
-    passport.authenticate('jwt', (err, userlogin, info) => {
-      let merror = '';
-      if (!Secu.verif(req.body.firstname) || !Secu.verif(req.body.lastname) || !Secu.verif(req.body.email) || !Secu.verif(req.body.language)) {
-        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-          fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-            if (err) throw err;
-          });
-        }
-        res.json({ merror: 'Empty form field.', change: false });
-      } else if (!Secu.isEmail(req.body.email)) {
-        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-          fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-            if (err) throw err;
-          });
-        }
-        res.json({ merror: 'Incorrect Email.', change: false });
-      } else {
-        User.findOne({ name: userlogin.name }, (err, user) => {
-          if (err) throw err;
-          if (user) {
-            User.findOne({ email: req.body.email, name: { $ne: userlogin.name } }, (err, auser) => {
-              if (err) throw err;
-              if (auser) {
-                if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-                  fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                    if (err) throw err;
-                  });
-                }
-                res.json({ merror: 'Email already used.', change: false });
-              } else {
-                user.email = req.body.email;
-                user.firstname = req.body.firstname;
-                user.lastname = req.body.lastname;
-                user.language = req.body.language;
-                if (Secu.verif(req.body.password)) {
-                  if (user.auth !== 'local') {
-                    merror = 'Only local account can change password.';
-                  } else if (Secu.isGoodPassword(req.body.password)) {
-                    user.password = user.generateHash(req.body.password);
-                  } else {
-                    merror = 'A strong password consists of a combination of upper and lowercase letters and numbers.';
-                  }
-                }
-                if (req.file) {
-                  if (fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-                    const type = readchunk.sync(`${__dirname}/../uploads/${req.file.filename}`, 0, 8);
-                    if (!isPng(type) && !isJpg(type)) {
-                      fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                        if (err) throw err;
-                      });
-                      merror = 'Incorrect picture file.';
-                    } else {
-                      const ext = isJpg(type) ? 'jpg' : 'png';
-                      user.picture = `http://localhost:5000/uploads/${userlogin.name}.${ext}`;
-                      fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${userlogin.name}.${ext}`, (err) => {
-                        if (err) throw err;
-                      });
-                    }
-                  }
-                }
-                user.save((err) => {
-                  if (err) throw err;
-                  res.json({
-                    merror,
-                    change: true,
-                    user: {
-                      auth: user.auth,
-                      login: user.login,
-                      picture: user.picture,
-                      firstname: user.firstname,
-                      lastname: user.lastname,
-                      email: user.email,
-                      language: user.language,
-                    },
-                  });
-                });
-              }
-            });
-          } else { res.json({ message: 'Incorrect user', change: false }); }
-        });
-      }
-    })(req, res, next);
-  });
-
   app.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
@@ -189,7 +88,6 @@ module.exports = (app, passport) => {
   app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
   app.get('/auth/github/callback', (req, res, next) => {
     passport.authenticate('github', (err, user, info) => {
-      console.log(req.headers['x-forwarded-host']);
       if (err) {
         res.cookie('error', err);
         return res.redirect('http://localhost:3000/');
@@ -200,7 +98,7 @@ module.exports = (app, passport) => {
       }
       const token = jwt.sign(user.toJSON(), jwtsecret);
       res.cookie('authtoken', token);
-      return res.redirect('http://localhost:3000/profile');
+      return res.redirect('http://localhost:3000/library');
     })(req, res, next);
   });
 
