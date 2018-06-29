@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -33,11 +34,14 @@ class MoviePlayer extends Component {
   constructor(props) {
     super(props);
     this.onSubmit = this.onSubmit.bind(this);
+      this.changeComment = this.changeComment.bind(this);
   }
   state = {
     isLoading: true,
     media: {},
     comments: [],
+    redirect: null,
+    comment: ''
   };
 
   async componentDidMount() {
@@ -51,7 +55,6 @@ class MoviePlayer extends Component {
       this.setState({
         comments: comments.comments,
       });
-      console.log(this.state.comments);
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
@@ -68,7 +71,6 @@ class MoviePlayer extends Component {
     const { movieId } = this.props.match.params;
     const response = await fetchHelper.get(`/api/media/media/${movieId}`);
     const body = await response.json();
-
     return body;
   }
 
@@ -76,7 +78,12 @@ class MoviePlayer extends Component {
     e.preventDefault();
     this.addComment(e)
       .then((res) => {
-        if (res.change) { console.log('ok'); }
+        if (res.change) {
+            this.setState({
+                comments: [...this.state.comments, res.newComment]
+            })
+        }
+        this.setState({ comment: '' });
       })
       .catch(err => console.log(err));
   }
@@ -86,12 +93,17 @@ class MoviePlayer extends Component {
     const { movieId } = this.props.match.params;
     const response = await fetchHelper.post(`/api/profile/comment/${movieId}`, data);
     const body = await response.json();
-    console.log(body);
-    if (response.status !== 200) throw Error(body.message);
+    if (response.status === 403) {
+        this.setState({ redirect: '/' });
+    }
+    else if (response.status !== 200) throw Error(body.message);
 
     return body;
   };
 
+    changeComment(e) {
+        this.setState({ comment: e.target.value });
+    }
 
   renderLoading(classes) {
     return (
@@ -144,6 +156,8 @@ class MoviePlayer extends Component {
               multiLine
               rows={3}
               rowsMax={5}
+              value={this.state.comment}
+              onChange={this.changeComment}
             />
             <Button type="submit" variant="contained" color="primary" className={classes.buttonLogin}>
 							Save
@@ -171,7 +185,9 @@ class MoviePlayer extends Component {
 
   render() {
     const { classes } = this.props;
-    const { isLoading } = this.state;
+    const { isLoading, redirect } = this.state;
+
+    if (redirect) return (<Redirect to={redirect} />);
 
     if (isLoading) {
       return this.renderLoading(classes);

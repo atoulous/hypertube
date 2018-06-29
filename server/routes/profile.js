@@ -15,22 +15,26 @@ router.get('/otherprofile/:id', async (req, res) => {
         if (user) { res.status(200).json({ name: user.name, lastname: user.lastname, firstname: user.firstname, picture: user.picture  }); } else { res.status(400).json({ merror: 'no user' }); }
     });
   } catch (err) {
-      console.error('/starred/:idMedia err', err);
+      console.error('/otherprofile/:id err', err);
   }
 });
 
 
 router.post('/comment/:id', async (req, res) => {
-  const newComment = new Comments();
-  newComment.comment = req.body.comment;
-  newComment.user.id = req.user._id;
-  newComment.user.picture = req.user.picture;
-  newComment.user.name = req.user.name;
-  newComment.id_film = req.params.id;
-  newComment.save((err) => {
-    if (err) throw err;
-  });
-  res.json({ change: true });
+    try {
+      const newComment = new Comments();
+      newComment.comment = req.body.comment;
+      newComment.user.id = req.user._id;
+      newComment.user.picture = req.user.picture;
+      newComment.user.name = req.user.name;
+      newComment.id_film = req.params.id;
+      newComment.save((err) => {
+        if (err) throw err;
+      });
+      res.json({ change: true, newComment });
+    } catch (err) {
+        console.error('/comment/:id err', err);
+    }
 });
 
 router.get('/starred/:idMedia', async (req, res) => {

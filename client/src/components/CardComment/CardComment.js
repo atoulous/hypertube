@@ -74,7 +74,7 @@ class CardComment extends PureComponent {
             </p>
             <CardContent className={classes.cardContent}>
               <Typography className={classes.title} gutterBottom variant="headline" component="h2">
-                <Link to={`/profile/${title}`} title="user" className={classes.link}>
+                <Link to={`/otherprofile/${title}`} title="user" className={classes.link}>
                   {title}
                 </Link>
               </Typography>
