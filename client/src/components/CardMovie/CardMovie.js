@@ -118,7 +118,7 @@ class CardMovie extends PureComponent {
             </CardContent>
             <CardActions>
               <Button onClick={this.handleStarred} variant={starred ? 'contained' : 'text'} size="small" color="primary" className={classes.leftButton}>
-                {starred ? 'Unstarred ' : 'Starred '}
+                {starred ? 'Unstar ' : 'Star '}
                 <StarIcon />
               </Button>
               <Button size="small" color="primary" className={classes.rightButton}>
