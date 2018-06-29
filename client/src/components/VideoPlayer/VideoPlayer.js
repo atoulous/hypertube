@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 
+import Cookies from 'universal-cookie';
 import fetchHelper from '../../helpers/fetch';
 
 const styles = {
@@ -49,7 +50,13 @@ class VideoPlayer extends Component {
 	      media: media.media,
 	    });
 
-	    const HLS = new hls();
+		const cookies = new Cookies();
+		const token = cookies.get('authtoken');
+	    const HLS = new hls({
+			xhrSetup: function(xhr, url) {
+				xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+			}
+		});
 	    HLS.loadSource(`/api/media/${movieId}/master.m3u8`);
 	    HLS.attachMedia(this.refs.video);
 	    this.refs.video.play();
