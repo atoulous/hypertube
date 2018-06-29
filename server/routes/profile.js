@@ -9,6 +9,17 @@ router.get('/comment/:id', async (req, res) => {
   });
 });
 
+router.get('/otherprofile/:id', async (req, res) => {
+  try {
+    UserModel.findOne({ name: req.params.id }, (err, user) => {
+        if (user) { res.status(200).json({ name: user.name, lastname: user.lastname, firstname: user.firstname, picture: user.picture  }); } else { res.status(400).json({ merror: 'no user' }); }
+    });
+  } catch (err) {
+      console.error('/starred/:idMedia err', err);
+  }
+});
+
+
 router.post('/comment/:id', async (req, res) => {
   const newComment = new Comments();
   newComment.comment = req.body.comment;

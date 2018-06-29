@@ -14,6 +14,7 @@ import Login from './Login';
 import Profile from './Profile';
 import Fpassword from './Fpassword';
 import ResetPassword from './ResetPassword';
+import OtherProfile from './OtherProfile';
 
 const cookies = new Cookies();
 
@@ -58,6 +59,7 @@ const App = () => (
         <SecureRoute exact path="/top10" component={Top10} />
         <SecureRoute exact path="/saw" component={Saw} />
         <SecureRoute exact path="/profile" component={Profile} />
+        <SecureRoute exact path="/otherprofile/:userName" component={OtherProfile} />
       </Layout>
     </Switch>
   </BrowserRouter>
