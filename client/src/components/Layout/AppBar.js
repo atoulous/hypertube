@@ -53,7 +53,7 @@ class Bar extends Component {
 
   handleLogOut = () => {
     const cookies = new Cookies();
-    cookies.remove('authtoken');
+    cookies.remove('authtoken', { path: '/' });
     this.setState({ redirect: '/' });
   };
 
