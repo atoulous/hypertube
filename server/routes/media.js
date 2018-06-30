@@ -54,18 +54,7 @@ router.get('/local/:type/:skip/:term/:sortedBy/:startDate/:endDate', async (req,
           .limit(10);
         break;
     }
-
-    // const user = await UserModel.find({ _id }, 'mediasStarred');
-    // const { mediasStarred } = user[0];
-    // medias.forEach((media, index) => {
-    //   mediasStarred.forEach((mediaStarred) => {
-    //     if (media._id.toString() === mediaStarred.toString()) {
-    //       medias[index] = { ...medias[index], starred: true };
-    //       console.log('media==', medias[index]);
-    //     }
-    //   });
-    // });
-
+      
     res.status(200).json(medias);
   } catch (err) {
     console.error('media/all err', err);
