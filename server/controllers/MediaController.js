@@ -194,7 +194,7 @@ async function startTranscode(inputStream, media) {
 // Starts the download process.
 const downloadTorrent = async media => new Promise(async (resolve, reject) => {
   try {
-	setTimeout(reject, 80 * 1000)
+	setTimeout(reject, 100 * 1000)
     const pathToStream = `${__dirname}/streams/${media._id}`;
     if (!fs.existsSync(pathToStream)) fs.mkdirSync(pathToStream);
 
@@ -211,8 +211,8 @@ const downloadTorrent = async media => new Promise(async (resolve, reject) => {
     media.status = 'downloading'
     await media.save()
 
-    console.log('Waiting 10s for the transcoding to start.');
-    await delay(10000);
+    console.log('Waiting 15s for the transcoding to start.');
+    await delay(15000);
     console.log('10s are up.');
 
     return resolve();
