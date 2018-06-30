@@ -33,25 +33,25 @@ router.get('/local/:type/:skip/:term/:sortedBy/:startDate/:endDate', async (req,
     switch (type) {
       case 'all':
         medias = await Media.find(allSearch)
-          .sort({ 'metadatas.score': -1 })
-          .limit(10)
-          .skip(skip);
+          .sort([['seeders', -1]])
+          .skip(skip)
+          .limit(10);
         break;
       case 'movies':
         medias = await Media.find(allSearch)
-          .sort({ 'metadatas.score': -1 })
+		  .sort([['seeders', -1]])
           .where('mediaType')
           .equals('movie')
-          .limit(10)
-          .skip(skip);
+          .skip(skip)
+          .limit(10);
         break;
       case 'shows':
         medias = await Media.find(allSearch)
-          .sort({ 'metadatas.score': -1 })
+          .sort([['seeders', -1]])
           .where('mediaType')
           .equals('show')
-          .limit(10)
-          .skip(skip);
+          .skip(skip)
+          .limit(10);
         break;
     }
 
