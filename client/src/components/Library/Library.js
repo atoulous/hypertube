@@ -15,6 +15,7 @@ import AutoComplete from '../AutoComplete';
 import DatePickers from '../DatePickers';
 
 import fetchHelper from '../../helpers/fetch';
+import Checktoken from '../CheckToken';
 
 const nbMediasPerPage = 10;
 
@@ -171,6 +172,7 @@ class Library extends Component {
 
     return (
       <div className={classes.root}>
+        <Checktoken/>
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Library
         </Typography>

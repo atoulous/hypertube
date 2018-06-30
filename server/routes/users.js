@@ -21,8 +21,8 @@ module.exports = (app, passport) => {
 
   app.post('/login', (req, res, next) => {
     passport.authenticate('local-login', { session: false }, (err, user, info) => {
-      if (err) { return res.status(400).json({ merror: err, login: false }); }
-      if (!user) { return res.status(400).json({ merror: 'fail to login', login: false }); }
+      if (err) { return res.json({ merror: err, login: false }); }
+      if (!user) { return res.json({ merror: 'fail to login', login: false }); }
       const token = jwt.sign(user.toJSON(), jwtsecret);
       res.cookie('authtoken', token);
       return res.json({ merror: 'success', user, login: true, token });

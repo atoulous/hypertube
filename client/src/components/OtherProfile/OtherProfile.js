@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import Checktoken from '../CheckToken'
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -41,6 +41,7 @@ class OtherProfile extends Component {
       const {classes} = this.props
       return (
           <div>
+            <Checktoken/>
             <p>
                 Name : { name }
             </p>

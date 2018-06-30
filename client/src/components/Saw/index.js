@@ -8,6 +8,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import TabsLibrary from '../Library/TabsLibrary';
 import CardMovie from '../CardMovie';
+import Checktoken from '../CheckToken';
 
 import fetchHelper from '../../helpers/fetch';
 
@@ -76,6 +77,7 @@ class Saw extends Component {
 
     return (
       <div className={classes.root}>
+        <Checktoken/>
         <Typography className={classes.title} gutterBottom variant="headline" component="h1">
           Medias seen
         </Typography>

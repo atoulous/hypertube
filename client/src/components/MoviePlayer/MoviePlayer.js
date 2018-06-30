@@ -16,6 +16,7 @@ import VideoPlayer from '../VideoPlayer';
 import CardComment from '../CardComment';
 
 import fetchHelper from '../../helpers/fetch';
+import Checktoken from '../CheckToken';
 
 const styles = {
   title: {
@@ -108,6 +109,7 @@ class MoviePlayer extends Component {
   renderLoading(classes) {
     return (
       <Grid container spacing={16} className={classes.loadingContainer} alignItems="center" direction="column" justify="center">
+        <Checktoken/>
         <Grid item>
           <CircularProgress className={classes.progress} size={200} color="primary" />
         </Grid>
