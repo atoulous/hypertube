@@ -38,7 +38,14 @@ module.exports = (app, passport) => {
         });
       }
       return res.json({ merror: 'Complete all sections of the form.', login: false });
-    } else if (!Secu.isGoodPassword(req.body.password)) {
+    }else if (!Secu.isValid(req.body.name) || !Secu.isValid(req.body.firstname)  || !Secu.isValid(req.body.lastname) ){
+        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+            fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                if (err) throw err;
+            });
+        }
+        res.json({ merror: 'Invalid character used or to many characters (50max)', login: false });
+    }else if (!Secu.isGoodPassword(req.body.password)) {
       if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
         fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
           if (err) throw err;
@@ -54,11 +61,6 @@ module.exports = (app, passport) => {
       res.json({ merror: 'Incorrect Email.', login: false });
     } else {
       passport.authenticate('local-signup', (err, user, info) => {
-        if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
-          fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-            if (err) throw err;
-          });
-        }
         if (err) { return res.json({ merror: err, login: false }); }
         if (!user) {
           if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {

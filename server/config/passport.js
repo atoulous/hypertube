@@ -58,9 +58,6 @@ module.exports = (passport) => {
               if (fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
                 const type = readchunk.sync(`${__dirname}/../uploads/${req.file.filename}`, 0, 8);
                 if (!isPng(type) && !isJpg(type)) {
-                  fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
-                    if (err) throw err;
-                  });
                   return done(null, false, 'Incorrect picture file.');
                 }
 

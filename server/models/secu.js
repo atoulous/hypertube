@@ -23,6 +23,14 @@ class Secu {
 		else
 			return true
 	}
+
+    static isValid(data) {
+        var reg=/^[a-zA-Z0-9àäâéèêëïîöôùüû\s]*$/i
+        if (reg.test(data) && data.length < 50)
+            return true
+        else
+            return false
+    }
 }
 
 module.exports = Secu

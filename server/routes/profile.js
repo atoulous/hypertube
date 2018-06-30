@@ -5,7 +5,6 @@ const readchunk = require('read-chunk');
 const isPng = require('is-png');
 const isJpg = require('is-jpg');
 const _ = require('lodash');
-const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 
