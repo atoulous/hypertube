@@ -18,7 +18,6 @@ import OtherProfile from './OtherProfile';
 const cookies = new Cookies();
 
 const SecureRoute = ({ path, component }) => {
-  // TODO: verify informations in jwt with a call api
   if (cookies.get('authtoken')) {
     return (
       <Route exact path={path} component={component} />

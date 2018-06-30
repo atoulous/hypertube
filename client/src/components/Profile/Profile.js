@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import fetchHelper from '../../helpers/fetch';
 import Alert from 'react-bootstrap/lib/Alert';
 
@@ -92,14 +91,12 @@ class Profile extends Component {
   state = {
     success: '',
     auth: '',
-	  name: '',
-	  picture: '',
-	  email: '',
+	name: '',
+	picture: '',
+	email: '',
     lastname: '',
     firstname: '',
-    active: false,
     merror: '',
-    msuccess: '',
     language: '',
     redirect: null,
   };
@@ -146,12 +143,10 @@ class Profile extends Component {
 	  this.saveProfil(e)
 	    .then((res) => {
 	      if (res.change) {
-	        this.setState({ firstname: res.user.firsname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth, msuccess: 'Profile updated' });
-	        this.setState({ merror: res.merror });
-          this.setState({ success: 'Profle Updated' });
+	        this.setState({ merror: res.merror, firstname: res.user.firstname, lastname: res.user.lastname, picture: res.user.picture, email: res.user.email, auth: res.user.auth, success: 'Profile Updated'});
+	        this.forceUpdate()
 	      } else {
-	          this.setState({ merror: res.merror });
-          this.setState({ success: '' });
+	          this.setState({ merror: res.merror, success: ''  });
         }
 	    })
 	    .catch(err => console.log(err));
@@ -172,7 +167,7 @@ class Profile extends Component {
 
     render() {
       const { classes } = this.props;
-      const { redirect } = this.state
+      const { redirect } = this.state;
       if (redirect) return (<Redirect to={redirect} />);
 
       let auth;
@@ -286,9 +281,5 @@ class Profile extends Component {
 	  );
     }
 }
-
-Profile.propTypes = {
-  classes: PropTypes.array.isRequired,
-};
 
 export default withStyles(styles)(Profile);
