@@ -188,86 +188,104 @@ class Profile extends Component {
       }
 
       return (
-        <Grid container className={classes.centerV}>
-          <Checktoken/>
-          <Grid item xs={4}>
-            { success }
-            { merror }
-            <Paper>
+		  <Grid container>
+			  <Grid item xs={12}>
+			    {success}
+			    {merror}
+			    <Paper>
+			      <Typography
+			        className={classes.title}
+			        gutterBottom
+			        variant="display4"
+			        component="h1"
+			      >
+			        {this.state.name}
+			      </Typography>
 
-              <Typography className={classes.title} gutterBottom variant="display4" component="h1">
-                {this.state.name}
-              </Typography>
+			      <form onSubmit={this.onSubmit} encType="multipart/form-data">
+			        <TextField
+			          id="firstname"
+			          name="firstname"
+			          label="First Name"
+			          className={classes.username}
+			          margin="normal"
+			          value={this.state.firstname}
+			          onChange={this.changeFirstname}
+			        />
 
-              <form onSubmit={this.onSubmit} encType="multipart/form-data">
+			        <TextField
+			          id="lastname"
+			          name="lastname"
+			          label="Last Name"
+			          className={classes.username}
+			          margin="normal"
+			          value={this.state.lastname}
+			          onChange={this.changeLastname}
+			        />
 
-                <TextField
-                  id="firstname"
-                  name="firstname"
-                  label="First Name"
-                  className={classes.username}
-                  margin="normal"
-                  value={this.state.firstname}
-                  onChange={this.changeFirstname}
-                />
+			        <TextField
+			          id="email"
+			          name="email"
+			          label="Email address"
+			          className={classes.username}
+			          margin="normal"
+			          value={this.state.email}
+			          onChange={this.changeEmail}
+			        />
 
-                <TextField
-                  id="lastname"
-                  name="lastname"
-                  label="Last Name"
-                  className={classes.username}
-                  margin="normal"
-                  value={this.state.lastname}
-                  onChange={this.changeLastname}
-                />
+			        {auth}
+			        <img src={this.state.picture} alt="profil" className={classes.image} />
+			        <input
+			          accept="image/*"
+			          className={classes.input}
+			          id="file"
+			          type="file"
+			          name="file"
+			        />
 
-                <TextField
-                  id="email"
-                  name="email"
-                  label="Email address"
-                  className={classes.username}
-                  margin="normal"
-                  value={this.state.email}
-                  onChange={this.changeEmail}
-                />
+			        <br />
 
-                {auth}
-                <img src={this.state.picture} alt="profil" />
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  id="file"
-                  type="file"
-                  name="file"
-                />
+			        <label htmlFor="file">
+			          <Button
+			            variant="outlined"
+			            component="span"
+			            className={classes.buttonUpload}
+			          >
+			            Upload your image
+			          </Button>
+			        </label>
 
-                <label htmlFor="file">
-                  <Button variant="outlined" component="span" className={classes.buttonUpload}>
-                                    Upload your image
-                  </Button>
-                </label>
-                <Select
-                  id="language"
-                  name="language"
-                  label="Language"
-                  value={this.state.language}
-                  onChange={this.changeLanguage}
-                >
-                  <MenuItem value="english">English</MenuItem>
-                  <MenuItem value="francais">Francais</MenuItem>
-                  <MenuItem value="espanol">Espanol</MenuItem>
-                </Select>
-                <Button type="submit" variant="contained" color="primary" className={classes.buttonLogin}>
-                                Save
-                </Button>
-              </form>
-              <br />
-              <br /><br />
-            </Paper>
-          </Grid>
-        </Grid>
+			        <br />
+			        <br />
 
-      );
+			        <Select
+			          id="language"
+			          name="language"
+			          label="Language"
+			          value={this.state.language}
+			          onChange={this.changeLanguage}
+			          className={classes.username}
+			        >
+			          <MenuItem value="english">English</MenuItem>
+			          <MenuItem value="francais">Francais</MenuItem>
+			          <MenuItem value="espanol">Espanol</MenuItem>
+			        </Select>
+			        <Button
+			          type="submit"
+			          variant="contained"
+			          color="primary"
+			          className={classes.buttonLogin}
+			        >
+			          Save
+			        </Button>
+			      </form>
+			      <br />
+			      <br />
+			      <br />
+			    </Paper>
+			  </Grid>
+			</Grid>
+	  );
     }
 }
 
