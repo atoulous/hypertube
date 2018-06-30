@@ -55,10 +55,6 @@ router.get('/local/:type/:skip/:term/:sortedBy/:startDate/:endDate', async (req,
         break;
     }
 
-    medias = _.uniqBy(medias, 'displayName');
-    if (sortedBy) medias = _.sortBy(medias, sortedBy);
-
-
     // const user = await UserModel.find({ _id }, 'mediasStarred');
     // const { mediasStarred } = user[0];
     // medias.forEach((media, index) => {
