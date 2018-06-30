@@ -15,3 +15,4 @@ module.exports = {
 		'callbackURL'   : 'http://localhost:5000/auth/qd/callback'
 	}
 }
+

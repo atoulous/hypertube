@@ -65,6 +65,5 @@ typings/
 
 # global
 .DS_Store
-server/config/auth\.js
 
 db/

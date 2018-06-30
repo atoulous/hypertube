@@ -154,7 +154,7 @@ class VideoPlayer extends Component {
 	}
 
 	render() {
-	  if (!this.___isMounted) return null
+	  
 	  const { classes } = this.props;
 	  const { isLoading } = this.state;
 
