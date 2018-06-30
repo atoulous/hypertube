@@ -7,7 +7,6 @@ import Library from './Library';
 import Layout from './Layout';
 import MoviePlayer from './MoviePlayer';
 import Starred from './Starred';
-import Top10 from './Top10';
 import Saw from './Saw';
 import Signup from './Signup';
 import Login from './Login';
@@ -56,7 +55,6 @@ const App = () => (
         <SecureRoute exact path="/library/:tabsValue" component={Library} />
         <SecureRoute exact path="/movie/:movieId" component={MoviePlayer} />
         <SecureRoute exact path="/starred" component={Starred} />
-        <SecureRoute exact path="/top10" component={Top10} />
         <SecureRoute exact path="/saw" component={Saw} />
         <SecureRoute exact path="/profile" component={Profile} />
         <SecureRoute exact path="/otherprofile/:userName" component={OtherProfile} />

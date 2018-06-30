@@ -30,16 +30,6 @@ const Menu = ({ classes }) => (
     </Link>
     <Divider />
 
-    <Link to="/top10" className={classes.link}>
-      <ListItem button>
-        <ListItemIcon>
-          <ListNumberedIcon />
-        </ListItemIcon>
-        <ListItemText primary="Top 10" />
-      </ListItem>
-    </Link>
-    <Divider />
-
     {/* todo: theses two following items need auth*/}
     <Link to="/starred" className={classes.link}>
       <ListItem button>

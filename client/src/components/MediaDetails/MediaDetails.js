@@ -5,6 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
+import { Link } from 'react-router-dom';
+
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -195,7 +197,10 @@ class MediaDetails extends Component {
 										this.state.comments.map((comment) => {
 											return (
 												<Grid item xs={12} key={comment._id}>
-													{comment.user.name} ({moment(comment.date).format('MMMM Do YYYY, h:mm:ss a')}):
+													<Link to={`/otherprofile/${comment.user.name}`}>
+														{comment.user.name}
+													</Link>
+													 ({moment(comment.date).format('MMMM Do YYYY, h:mm:ss a')}):
 													<br/>
 													{comment.comment}
 
