@@ -3,6 +3,8 @@ const ffprobe = require('node-ffprobe');
 const fs = require('fs');
 const torrentStream = require('torrent-stream');
 const config = require('../config');
+import rimraf from 'rimraf';
+
 
 const delay = async ms => new Promise((resolve) => {
   setTimeout(resolve, ms);
@@ -169,8 +171,8 @@ async function startTranscode(inputStream, media) {
         .addOption('-threads', '4')
         .output(__dirname + '/streams/' + media._id + '/stream.m3u8')
         .on('start', (command) => {
-          console.log('Ffmpeg started with command', command)
-          return resolve()
+          console.log('Ffmpeg started with command', command, 'waiting 5s to resolve.')
+		  setTimeout(resolve, 5000)
         }).on('end', function() {
           console.log('Ffmpeg is done converting target', media._id)
           // Replace our 'estimates' playlist with the actual one
@@ -178,6 +180,9 @@ async function startTranscode(inputStream, media) {
           fs.renameSync(__dirname + '/streams/' + media._id + '/stream.m3u8', __dirname + '/streams/' + media._id + '/ps.m3u8')
         }).on('error', function(err) {
           console.log('Ffmpeg error for target', media._id, 'error is:', err);
+		  media.status = 'listed'
+		  media.save()
+		  rimraf.sync(__dirname + '/streams/' + media._id)
           return reject(err.message)
         }).run()
     } catch (e) {
