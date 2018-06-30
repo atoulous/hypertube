@@ -6,7 +6,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
@@ -149,20 +148,16 @@ class MoviePlayer extends Component {
 
           <form onSubmit={this.onSubmit}>
 
-            <TextField
-              id="comment"
-              name="comment"
-              label="Commenting publicly"
-              margin="normal"
-              hintText="MultiLine with rows: 2 and rowsMax: 4"
-              multiLine
-              rows={3}
-              rowsMax={5}
-              value={this.state.comment}
-              onChange={this.changeComment}
+            <textarea
+                name="comment"
+                raws="5"
+                cols="50"
+                onChange={this.changeComment}
+                value={this.state.comment}
             />
+            <br/>
             <Button type="submit" variant="contained" color="primary" className={classes.buttonLogin}>
-							Save
+							Send
             </Button>
 
           </form>
@@ -170,13 +165,16 @@ class MoviePlayer extends Component {
           <Grid container spacing={24} style={{ margin: 'auto' }}>
             {
               comments.map(comment => (
-                <CardComment
-                  key={comment.user.id}
-                  title={comment.user.name}
-                  imagePath={comment.user.picture}
-                  comment={comment.comment}
-                  date={comment.date.toLocaleDateString}
-                />
+                  <Grid item xs={12}
+                        key={comment._id}
+                  >
+                    <CardComment
+                      title={comment.user.name}
+                      imagePath={comment.user.picture}
+                      comment={comment.comment}
+                      date={comment.date}
+                    />
+                  </Grid>
                 ))
             }
           </Grid>

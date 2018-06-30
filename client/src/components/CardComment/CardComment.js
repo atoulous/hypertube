@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Link } from 'react-router-dom';
-import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
 
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -13,35 +13,21 @@ import Moment from 'moment';
 
 const styles = () => ({
   card: {
-    width: 300,
-    height: 450,
+    width: 600,
+    height: 300,
   },
   link: {
     textDecoration: 'none',
+      textAlign: 'center',
   },
-  cardContent: {
+  comment: {
     height: 200,
     overflow: 'auto',
   },
   image: {
-    width: '50%',
-  },
-  mediaFull: {
-  },
-  rightButton: {
-    marginLeft: 'auto',
-  },
-  leftButton: {
-    marginRight: 'auto',
-  },
-  row: {
-    display: 'flex',
-  },
-  chips: {
-    textAlign: 'center',
-  },
-  chipScore: {
-    background: '#fedb00',
+    width: '20%',
+    float: 'right',
+    borderRadius :'50%',
   },
 });
 
@@ -61,27 +47,26 @@ class CardComment extends PureComponent {
       <Grid item xs>
 
           <Card className={classes.card}>
-            <img
-                className={classes.image}
-                src={imagePath}
-                alt='profile'
-            />
             <p>
-                {stringdate}
-            </p>
-            <p>
-                {comment}
-            </p>
-            <CardContent className={classes.cardContent}>
-              <Typography className={classes.title} gutterBottom variant="headline" component="h2">
-                <Link to={`/otherprofile/${title}`} title="user" className={classes.link}>
+              <Link to={`/otherprofile/${title}`} title="user" className={classes.link}>
                   {title}
-                </Link>
-              </Typography>
+              </Link>
+                <br/>
+              <span>
+                  {stringdate}
+              </span>
 
-              <br />
-
+              <img
+                  className={classes.image}
+                  src={imagePath}
+                  alt='profile'
+              />
+            </p>
+            <Divider />
+            <CardContent className={classes.comment}>
+                {comment}
             </CardContent>
+
           </Card>
 
       </Grid>
