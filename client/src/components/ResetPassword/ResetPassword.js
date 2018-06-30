@@ -158,7 +158,7 @@ class ResetPassword extends Component {
 
 
                 <Button type="submit" variant="contained" color="primary" className={classes.buttonLogin}>
-                              Sign in
+					Reset your password
                 </Button>
               </form>
 
