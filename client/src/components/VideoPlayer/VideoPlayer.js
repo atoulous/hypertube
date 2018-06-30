@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import hls from 'hls.js';
-import Palette from 'react-palette';
 
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -30,25 +29,41 @@ class VideoPlayer extends Component {
 	  error: false,
 	};
 
+	componentWillUnmount(){
+	  this.___isMounted = false;
+	}
+
 	async componentDidMount() {
+		this.___isMounted = true;
 	  try {
 	    const media = await this.startMedia();
 	    if (media.error) {
-	      this.setState({
-	        error: true,
-	        isLoading: false,
-	        message: media.msg,
-	      });
+
+			if(this.___isMounted) {
+
+			      this.setState({
+			        error: true,
+			        isLoading: false,
+			        message: media.msg,
+			      });
+
+			}
 	      return;
 	    }
 
 	    const movieId = this.props.mediaId;
+
+		if(this.___isMounted) {
+
 
 	    this.setState({
 	      error: false,
 	      isLoading: false,
 	      media: media.media,
 	    });
+
+
+	}
 
 		const cookies = new Cookies();
 		const token = cookies.get('authtoken');
@@ -59,7 +74,6 @@ class VideoPlayer extends Component {
 		});
 	    HLS.loadSource(`/api/media/${movieId}/master.m3u8`);
 	    HLS.attachMedia(this.refs.video);
-	    this.refs.video.play();
 	  } catch (err) {
 	    console.error('componentDidMount err: ', err);
 	  }
@@ -89,11 +103,9 @@ class VideoPlayer extends Component {
 	  const { media } = this.props;
 
 	  return (
-  <Palette image={media.metadatas ? `https://image.tmdb.org/t/p/original${media.metadatas.backdropPath}` : 'http://via.placeholder.com/2048x450?text=Loading !'}>
-    {palette => (
 
       <div>
-        <Grid container className={classes.loadingContainer} style={{ background: `linear-gradient(80deg, ${palette.vibrant} 0%, ${palette.darkMuted} 100%)`, boxShadow: '25px 26px 118px -24px rgba(255,255,255,0.57)' }}>
+        <Grid container className={classes.loadingContainer}>
           <Grid item xs={1} />
           <Grid item xs={10}>
             <img alt="Banner" src={media.metadatas ? `https://image.tmdb.org/t/p/original${media.metadatas.backdropPath}` : 'http://via.placeholder.com/2048x450?text=Loading !'} style={{ width: '100%' }} />
@@ -116,8 +128,6 @@ class VideoPlayer extends Component {
 
 
       </div>
-				)}
-  </Palette>
 	  );
 	}
 
@@ -144,6 +154,7 @@ class VideoPlayer extends Component {
 	}
 
 	render() {
+	  if (!this.___isMounted) return null
 	  const { classes } = this.props;
 	  const { isLoading } = this.state;
 
@@ -153,6 +164,7 @@ class VideoPlayer extends Component {
 	    return this.renderError(classes);
 	  }
 	  return this.renderLoaded(classes);
+
 	}
 }
 

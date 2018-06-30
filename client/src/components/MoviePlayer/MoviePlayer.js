@@ -36,13 +36,21 @@ class MoviePlayer extends Component {
     comment: ''
   };
 
+  componentWillUnmount(){
+	this.___isMounted = false;
+  }
+
   async componentDidMount() {
+	  this.___isMounted = true;
     try {
       const media = await this.getMedia();
-      this.setState({
-        isLoading: false,
-        media: media
-      });
+
+	  if(this.___isMounted) {
+	      this.setState({
+	        isLoading: false,
+	        media: media
+	      });
+	  }
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
