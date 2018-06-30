@@ -76,7 +76,9 @@ const styles = {
     marginTop: 10,
     marginBottom: 0,
     width: 'calc(100% - 64px)',
-  },
+  }, image: {
+	margin: 32
+  }
 };
 
 class Profile extends Component {
@@ -279,9 +281,6 @@ class Profile extends Component {
 			          Save
 			        </Button>
 			      </form>
-			      <br />
-			      <br />
-			      <br />
 			    </Paper>
 			  </Grid>
 			</Grid>
