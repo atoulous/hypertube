@@ -33,12 +33,14 @@ const styles = {
 
 class MediaDetails extends Component {
 	state = {
-		comments: []
+		comments: [],
+		comment: ''
 	};
 
 	constructor(props) {
 		super(props);
 		this.onSubmit = this.onSubmit.bind(this);
+		this.changeComment = this.changeComment.bind(this);
 	}
 
 	addComment = async (e) => {
@@ -79,6 +81,10 @@ class MediaDetails extends Component {
 		const comments = await this.getComments();
 		this.setState({comments: comments})
 	}
+
+    changeComment(e) {
+        this.setState({ comment: e.target.value });
+    }
 
 	render() {
 		const { classes, media } = this.props;
@@ -172,7 +178,7 @@ class MediaDetails extends Component {
 							<form onSubmit={this.onSubmit} style={{width: '100%'}}>
 								<Grid container>
 									<Grid item xs={9}>
-										<textarea name="comment" className={classes.inputNewComment} />
+										<textarea name="comment" className={classes.inputNewComment} value={this.state.comment} onChange={this.changeComment}/>
 									</Grid>
 									<Grid item xs={1}/>
 									<Grid item xs={2}>
