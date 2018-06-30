@@ -183,7 +183,6 @@ const serveWhenAvailable = async (res, filePath) => {
   if (fs.existsSync(filePath)) {
     return res.status(200).end(fs.readFileSync(filePath));
   }
-  console.log(filePath, 'does not exist.');
   setTimeout(() => serveWhenAvailable(res, filePath), 1000);
   return null;
 };
