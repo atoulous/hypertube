@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import fetchHelper from '../../helpers/fetch';
 import Alert from 'react-bootstrap/lib/Alert';
-import Checktoken from '../CheckToken';
 
 import { withStyles } from '@material-ui/core/styles';
 

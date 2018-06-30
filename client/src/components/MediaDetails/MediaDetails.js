@@ -11,10 +11,13 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import moment from 'moment';
+import Button from '@material-ui/core/Button';
 
 import Rating from '../Rating'
 import CastGrid from '../CastGrid'
 import CrewGrid from '../CrewGrid'
+
+import fetchHelper from '../../helpers/fetch';
 
 const styles = {
 	mediaTitle: {
@@ -22,16 +25,59 @@ const styles = {
 	}, mediaSubtitle: {
 		display: 'inline',
 		marginLeft: 30
+	}, inputNewComment: {
+		width: '100%',
+		height: 36,
 	}
 };
 
 class MediaDetails extends Component {
 	state = {
-
+		comments: []
 	};
 
-	async componentDidMount() {
+	constructor(props) {
+		super(props);
+		this.onSubmit = this.onSubmit.bind(this);
+	}
 
+	addComment = async (e) => {
+      const data = new FormData(e.target);
+      const movieId = this.props.media._id;
+      const response = await fetchHelper.post(`/api/profile/comment/${movieId}`, data);
+      const body = await response.json();
+      if (response.status === 403) {
+          this.setState({ redirect: '/' });
+      }
+      else if (response.status !== 200) throw Error(body.message);
+
+      return body;
+    };
+
+	onSubmit(e) {
+      e.preventDefault();
+      this.addComment(e)
+        .then((res) => {
+          if (res.change) {
+              this.setState({
+                  comments: [res.newComment, ...this.state.comments]
+              })
+          }
+          this.setState({ comment: '' });
+        })
+        .catch(err => console.log(err));
+    }
+
+	getComments = async () => {
+      const movieId = this.props.media._id;
+      const response = await fetchHelper.get(`/api/profile/comment/${movieId}`);
+      const body = await response.json();
+      return body;
+    }
+
+	async componentDidMount() {
+		const comments = await this.getComments();
+		this.setState({comments: comments})
 	}
 
 	render() {
@@ -116,6 +162,47 @@ class MediaDetails extends Component {
 							)
 						}
 					})()}
+
+					<ExpansionPanel>
+						<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+							<Typography className={classes.heading}>Comments ({this.state.comments.length})</Typography>
+						</ExpansionPanelSummary>
+						<ExpansionPanelDetails>
+
+							<form onSubmit={this.onSubmit} style={{width: '100%'}}>
+								<Grid container>
+									<Grid item xs={9}>
+										<textarea name="comment" className={classes.inputNewComment} />
+									</Grid>
+									<Grid item xs={1}/>
+									<Grid item xs={2}>
+										<Button type="submit" variant="contained" color="primary" className={classes.buttonLogin} style={{width: '100%'}}>
+										  Send
+										</Button>
+									</Grid>
+								</Grid>
+
+								<br />
+
+								<Grid container direction='column'>
+									{
+										this.state.comments.map((comment) => {
+											return (
+												<Grid item xs={12} key={comment._id}>
+													{comment.user.name} ({moment(comment.date).format('MMMM Do YYYY, h:mm:ss a')}):
+													<br/>
+													{comment.comment}
+
+													<br/><br/>
+												</Grid>
+											)
+										})
+									}
+								</Grid>
+							</form>
+
+						</ExpansionPanelDetails>
+					</ExpansionPanel>
 				</Grid>
 			</Grid>
 		)

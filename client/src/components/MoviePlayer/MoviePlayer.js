@@ -6,13 +6,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
 
 import MediaDetails from '../MediaDetails';
 import VideoPlayer from '../VideoPlayer';
-import CardComment from '../CardComment';
 
 import fetchHelper from '../../helpers/fetch';
 import Checktoken from '../CheckToken';
@@ -31,11 +28,6 @@ const styles = {
 };
 
 class MoviePlayer extends Component {
-  constructor(props) {
-    super(props);
-    this.onSubmit = this.onSubmit.bind(this);
-      this.changeComment = this.changeComment.bind(this);
-  }
   state = {
     isLoading: true,
     media: {},
@@ -47,22 +39,13 @@ class MoviePlayer extends Component {
   async componentDidMount() {
     try {
       const media = await this.getMedia();
-      const comments = await this.getComments();
       this.setState({
         isLoading: false,
-        media,
-        comments: comments.comments,
+        media: media
       });
     } catch (err) {
       console.error('componentDidMount err: ', err);
     }
-  }
-
-  getComments = async () => {
-    const { movieId } = this.props.match.params;
-    const response = await fetchHelper.get(`/api/profile/comment/${movieId}`);
-    const body = await response.json();
-    return body;
   }
 
   getMedia = async () => {
@@ -71,37 +54,6 @@ class MoviePlayer extends Component {
     const body = await response.json();
     return body;
   }
-
-  onSubmit(e) {
-    e.preventDefault();
-    this.addComment(e)
-      .then((res) => {
-        if (res.change) {
-            this.setState({
-                comments: [...this.state.comments, res.newComment]
-            })
-        }
-        this.setState({ comment: '' });
-      })
-      .catch(err => console.log(err));
-  }
-
-  addComment = async (e) => {
-    const data = new FormData(e.target);
-    const { movieId } = this.props.match.params;
-    const response = await fetchHelper.post(`/api/profile/comment/${movieId}`, data);
-    const body = await response.json();
-    if (response.status === 403) {
-        this.setState({ redirect: '/' });
-    }
-    else if (response.status !== 200) throw Error(body.message);
-
-    return body;
-  };
-
-    changeComment(e) {
-        this.setState({ comment: e.target.value });
-    }
 
   renderLoading(classes) {
     return (
@@ -121,8 +73,6 @@ class MoviePlayer extends Component {
   }
 
   renderLoaded(classes) {
-    const { comments } = this.state;
-
     return (
       <Grid container spacing={24}>
         <Grid item xs={12}>
@@ -134,49 +84,9 @@ class MoviePlayer extends Component {
         </Grid>
 
         <Grid item xs={12}>
-          <MediaDetails media={this.state.media} />
+          <MediaDetails media={this.state.media} comments={this.state.comments}/>
         </Grid>
 
-
-        <Paper>
-
-          <Typography className={classes.title} gutterBottom variant="display4" component="h1">
-						Comments
-          </Typography>
-
-          <form onSubmit={this.onSubmit}>
-
-            <textarea
-                name="comment"
-                raws="5"
-                cols="50"
-                onChange={this.changeComment}
-                value={this.state.comment}
-            />
-            <br/>
-            <Button type="submit" variant="contained" color="primary" className={classes.buttonLogin}>
-							Send
-            </Button>
-
-          </form>
-
-          <Grid container spacing={24} style={{ margin: 'auto' }}>
-            {
-              comments.map(comment => (
-                  <Grid item xs={12}
-                        key={comment._id}
-                  >
-                    <CardComment
-                      title={comment.user.name}
-                      imagePath={comment.user.picture}
-                      comment={comment.comment}
-                      date={comment.date}
-                    />
-                  </Grid>
-                ))
-            }
-          </Grid>
-        </Paper>
       </Grid>
     );
   }

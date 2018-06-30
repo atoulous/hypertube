@@ -12,9 +12,8 @@ const fs = require('fs');
 const router = require('express').Router();
 
 router.get('/comment/:id', async (req, res) => {
-  Comments.find({ id_film: req.params.id }, (err, comments) => {
-    if (comments) { res.json({ nocomment: false, comments }); } else { res.json({ nocomment: true }); }
-  });
+  	const comments = await Comments.find({ id_film: req.params.id }).sort([['date', -1]])
+    return res.json(comments);
 });
 
 router.get('/otherprofile/:id', async (req, res) => {
