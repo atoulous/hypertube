@@ -96,7 +96,15 @@ router.post('/profile', (req, res, next) => {
                 });
             }
             res.json({ merror: 'Empty form field.', change: false });
-        } else if (!Secu.isEmail(req.body.email)) {
+        }
+        else if (!Secu.isValid(req.body.firstname) || !Secu.isValid(req.body.lastname)) {
+            if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
+                fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
+                    if (err) throw err;
+                });
+            }
+            res.json({ merror: 'Incorrect charactere or to many characteres', change: false });
+        }else if (!Secu.isEmail(req.body.email)) {
             if (req.file && fs.existsSync(`${__dirname}/../uploads/${req.file.filename}`)) {
                 fs.unlink(`${__dirname}/../uploads/${req.file.filename}`, (err) => {
                     if (err) throw err;
@@ -140,8 +148,8 @@ router.post('/profile', (req, res, next) => {
                                         merror = 'Incorrect picture file.';
                                     } else {
                                         const ext = isJpg(type) ? 'jpg' : 'png';
-                                        user.picture = `http://localhost:5000/uploads/${userlogin.name}.${ext}`;
-                                        fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${userlogin.name}.${ext}`, (err) => {
+                                        user.picture = `http://localhost:5000/uploads/${req.user.name}.${ext}`;
+                                        fs.rename(`${__dirname}/../uploads/${req.file.filename}`, `${__dirname}/../uploads/${req.user.name}.${ext}`, (err) => {
                                             if (err) throw err;
                                         });
                                     }
