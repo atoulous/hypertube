@@ -87,7 +87,7 @@ module.exports = (passport) => {
     passReqToCallback: true, // allows us to pass back the entire request to the callback
   },
     ((req, email, password, done) => {
-      User.findOne({ name: req.body.name }, (err, user) => {
+      User.findOne({ name: req.body.name, auth: 'local' }, (err, user) => {
         if (err) { return done(err); }
         if (!user) { return done(null, false, 'No user found.'); }
         if (!user.validPassword(password, user.password)) { return done(null, false, 'Oops! Wrong password.'); }
@@ -108,19 +108,29 @@ module.exports = (passport) => {
           if (user) {
             return done(null, user);
           }
-          const newUser = new User();
-          newUser.idauth = profile.id;
-          newUser.token = token;
-          if (profile._json.nickname) { newUser.name = profile._json.nickname; } else { newUser.name = profile.displayName; }
-          newUser.firstname = profile.name.givenName;
-          newUser.lastname = profile.name.familyName;
-          newUser.gemail = profile.emails[0].value;
-          newUser.picture = profile.photos[0].value;
-          newUser.auth = 'google';
-          newUser.save((err) => {
-            if (err) throw err;
-            return done(null, newUser);
-          });
+            User.findOne({ name: profile.nickname || profile.displayName }, (err, user) => {
+                if (user) {
+                    return done('user name already used');
+                }
+                User.findOne({email: profile.emails[0].value}, (err, user) => {
+                    if (user) {
+                        return done('email already used');
+                    }
+                    const newUser = new User();
+                    newUser.idauth = profile.id;
+                    newUser.token = token;
+                    newUser.name = profile._json.nickname || profile.displayName;
+                    newUser.firstname = profile.name.givenName;
+                    newUser.lastname = profile.name.familyName;
+                    newUser.email = profile.emails[0].value;
+                    newUser.picture = profile.photos[0].value;
+                    newUser.auth = 'google';
+                    newUser.save((err) => {
+                        if (err) throw err;
+                        return done(null, newUser);
+                    });
+                })
+            })
         });
       });
     })));
@@ -178,19 +188,29 @@ module.exports = (passport) => {
           if (user) {
             return done(null, user);
           }
-          const newUser = new User();
-          newUser.idauth = profile.id;
-          newUser.token = token;
-          newUser.name = profile.username;
-          newUser.firstname = profile.name.givenName;
-          newUser.lastname = profile.name.familyName;
-          newUser.email = profile.emails[0].value;
-          newUser.picture = profile.photos[0].value;
-          newUser.auth = 'qd';
-          newUser.save((err) => {
-            if (err) throw err;
-            return done(null, newUser);
-          });
+            User.findOne({ name: profile.username }, (err, user) => {
+                if (user) {
+                    return done('user name already used');
+                }
+                User.findOne({email: profile.emails[0].value}, (err, user) => {
+                    if (user) {
+                        return done('email already used');
+                    }
+                    const newUser = new User();
+                    newUser.idauth = profile.id;
+                    newUser.token = token;
+                    newUser.name = profile.username;
+                    newUser.firstname = profile.name.givenName;
+                    newUser.lastname = profile.name.familyName;
+                    newUser.email = profile.emails[0].value;
+                    newUser.picture = profile.photos[0].value;
+                    newUser.auth = 'qd';
+                    newUser.save((err) => {
+                        if (err) throw err;
+                        return done(null, newUser);
+                    });
+                })
+            })
         });
       });
     })));

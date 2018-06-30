@@ -100,16 +100,18 @@ class Home extends Component {
           </Grid>
 
           <Grid item xs={12}>
-            <Button variant="outlined" className={classes.button}>
-              <Grid container>
-                <Grid item xs={1}>
-                  <FontAwesomeIcon className={classes.iconButton} icon={faGoogle} />
+            <a className={classes.link} href="http://localhost:5000/auth/google">
+              <Button variant="outlined" className={classes.button}>
+                <Grid container>
+                  <Grid item xs={1}>
+                    <FontAwesomeIcon className={classes.iconButton} icon={faGoogle} />
+                  </Grid>
+                  <Grid item xs={11}>
+                              Sign in with Google
+                  </Grid>
                 </Grid>
-                <Grid item xs={11}>
-							Sign in with Google
-                </Grid>
-              </Grid>
-            </Button>
+              </Button>
+            </a>
           </Grid>
 
           <Grid item xs={12}>
@@ -128,16 +130,18 @@ class Home extends Component {
           </Grid>
 
           <Grid item xs={12}>
-            <Button variant="outlined" className={classes.button}>
-              <Grid container>
-                <Grid item xs={1}>
-                  <img alt="Banner" src="https://signin.intra.42.fr/assets/42_logo-7dfc9110a5319a308863b96bda33cea995046d1731cebb735e41b16255106c12.svg" />
+            <a className={classes.link} href="http://localhost:5000/auth/qd">
+              <Button variant="outlined" className={classes.button}>
+                <Grid container>
+                  <Grid item xs={1}>
+                    <img alt="Banner" src="https://signin.intra.42.fr/assets/42_logo-7dfc9110a5319a308863b96bda33cea995046d1731cebb735e41b16255106c12.svg" />
+                  </Grid>
+                  <Grid item xs={11}>
+                              Sign in with 42
+                  </Grid>
                 </Grid>
-                <Grid item xs={11}>
-							Sign in with 42
-                </Grid>
-              </Grid>
-            </Button>
+              </Button>
+            </a>
           </Grid>
 
           <br />
