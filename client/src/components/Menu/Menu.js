@@ -7,7 +7,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import StarIcon from '@material-ui/icons/Star';
-import ListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import VideoLibrary from '@material-ui/icons/VideoLibrary';
 import Refresh from '@material-ui/icons/Refresh';
 import Divider from '@material-ui/core/Divider';
@@ -30,7 +29,6 @@ const Menu = ({ classes }) => (
     </Link>
     <Divider />
 
-    {/* todo: theses two following items need auth*/}
     <Link to="/starred" className={classes.link}>
       <ListItem button>
         <ListItemIcon>
