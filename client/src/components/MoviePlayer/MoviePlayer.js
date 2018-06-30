@@ -47,12 +47,10 @@ class MoviePlayer extends Component {
   async componentDidMount() {
     try {
       const media = await this.getMedia();
+      const comments = await this.getComments();
       this.setState({
         isLoading: false,
         media,
-      });
-      const comments = await this.getComments();
-      this.setState({
         comments: comments.comments,
       });
     } catch (err) {

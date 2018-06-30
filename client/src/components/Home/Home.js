@@ -93,7 +93,7 @@ class Home extends Component {
                   <FontAwesomeIcon className={classes.iconButton} icon={faEnvelope} />
                 </Grid>
                 <Grid item xs={11}>
-							Sign in with your email
+							Sign in with your username
                 </Grid>
               </Grid>
             </Button>
