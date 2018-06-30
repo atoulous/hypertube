@@ -29,19 +29,24 @@ router.get('/otherprofile/:id', async (req, res) => {
 
 router.post('/comment/:id', async (req, res) => {
     try {
-      const newComment = new Comments();
-      newComment.comment = req.body.comment;
-      newComment.user.id = req.user._id;
-      newComment.user.picture = req.user.picture;
-      newComment.user.name = req.user.name;
-      newComment.id_film = req.params.id;
-      newComment.save((err) => {
-        if (err) throw err;
-      });
-      res.json({ change: true, newComment });
-    } catch (err) {
-        console.error('/comment/:id err', err);
-    }
+        if (req.body.comment === undefined || req.body.comment === '')
+            res.json({change: false});
+        else {
+            const newComment = new Comments();
+            newComment.comment = req.body.comment;
+            newComment.user.id = req.user._id;
+            newComment.user.picture = req.user.picture;
+            newComment.user.name = req.user.name;
+            newComment.id_film = req.params.id;
+            newComment.save((err) => {
+                if (err) throw err;
+            });
+            res.json({change: true, newComment});
+        }
+        }
+    catch (err) {
+            console.error('/comment/:id err', err);
+        }
 });
 
 router.get('/starred/:idMedia', async (req, res) => {
