@@ -74,7 +74,9 @@ class Library extends Component {
 
   getLocalMedias = async ({ tabsValue = 'all', skip = 0, term = null, sortedBy = null, date = null }) => {
     try {
-      const { start, end } = date || this.state.date;
+      let { start, end } = date || this.state.date;
+	  if (!start) start = '0'
+	  if (!end) end = '0'
       const response = await fetchHelper.get(`/api/media/local/${tabsValue}/${skip}/${term}/${sortedBy}/${start}/${end}`);
 
       const body = await response.json();
